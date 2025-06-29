@@ -1,6 +1,8 @@
 // ===== SHARED FILTERS SYSTEM =====
 // This system manages shared filters across all views with caching and state persistence
 
+console.log('Shared Filters System loading...');
+
 // Global shared filter state
 const SharedFilters = {
     // Cache for filter options
@@ -115,6 +117,9 @@ async function initializeSharedFilters() {
         
         // Load filter options if not cached or expired (this is the async part)
         await loadFilterOptionsIfNeeded();
+        
+        // Initialize the UI with the loaded data
+        initializeFilterUI();
         
         // Mark as initialized
         SharedFilters.isInitialized = true;
@@ -327,6 +332,9 @@ function initializeFilterUI() {
  * Populate filter dropdowns with cached options
  */
 function populateFilterDropdowns() {
+    console.log('🔄 Populating filter dropdowns...');
+    console.log('SharedFilters cache:', SharedFilters.cache);
+    
     const mappings = [
         { containerId: 'sportsOptions', type: 'sports', labelId: 'sportsDropdownLabel', defaultLabel: 'All Sports' },
         { containerId: 'citiesOptions', type: 'cities', labelId: 'citiesDropdownLabel', defaultLabel: 'All Cities' },
@@ -335,8 +343,11 @@ function populateFilterDropdowns() {
     ];
     
     mappings.forEach(mapping => {
+        console.log(`Populating ${mapping.type} dropdown...`);
         simpleFilterDropdown(mapping);
     });
+    
+    console.log('✅ Filter dropdowns populated');
 }
 
 /**
@@ -429,9 +440,13 @@ function setupFilterEventListeners() {
  * Handle filter checkbox changes
  */
 function onFilterChange(filterType, containerId, defaultLabel, labelId) {
+    console.log(`🔘 Filter change detected: ${filterType}`, { containerId, defaultLabel, labelId });
+    
     // Update selections
     const newSelections = getCheckedValues(containerId);
     SharedFilters.selections[filterType] = newSelections;
+    
+    console.log(`📝 Updated ${filterType} selections:`, newSelections);
     
     // Update dropdown label
     updateDropdownLabel(containerId, defaultLabel, labelId);
@@ -441,6 +456,14 @@ function onFilterChange(filterType, containerId, defaultLabel, labelId) {
     
     // Notify listeners
     notifyFilterChangeListeners();
+    
+    // Recargar datos automáticamente si existe la función loadData
+    if (typeof window.loadData === 'function') {
+        console.log(`🔄 Auto-reloading data after ${filterType} change`);
+        window.loadData();
+    }
+    
+    console.log(`✅ Filter change processed for ${filterType}`);
 }
 
 /**
@@ -463,10 +486,12 @@ function onDateFilterChange(inputId, value) {
 function getCheckedValues(containerId) {
     const container = document.getElementById(containerId);
     if (!container) {
+        console.warn(`⚠️ Container not found: ${containerId}`);
         return [];
     }
     
     const checkedValues = Array.from(container.querySelectorAll('input[type=checkbox]:checked')).map(cb => cb.value);
+    console.log(`🔍 getCheckedValues for ${containerId}:`, checkedValues);
     return checkedValues;
 }
 
@@ -747,8 +772,13 @@ window.debugFilterSearch = debugFilterSearch;
 
 // Simple and direct filter function
 function simpleFilterDropdown(mapping) {
+    console.log(`🔍 simpleFilterDropdown called for ${mapping.type}:`, mapping);
+    
     const container = document.getElementById(mapping.containerId);
-    if (!container) return;
+    if (!container) {
+        console.error(`❌ Container not found: ${mapping.containerId}`);
+        return;
+    }
 
     // Busca el input de búsqueda relativo al contenedor
     const filterInput = container?.parentElement?.querySelector('input[type="text"]');
@@ -756,6 +786,9 @@ function simpleFilterDropdown(mapping) {
 
     const allOptions = SharedFilters.cache[mapping.type] || [];
     const selectedValues = SharedFilters.selections[mapping.type] || [];
+
+    console.log(`${mapping.type} options:`, allOptions);
+    console.log(`${mapping.type} selected:`, selectedValues);
 
     function getOptionText(opt) {
         if (typeof opt === 'string') return opt;
@@ -774,6 +807,8 @@ function simpleFilterDropdown(mapping) {
         const value = getOptionText(opt);
         return !searchTerm || value.toLowerCase().includes(searchTerm);
     });
+
+    console.log(`${mapping.type} filtered options:`, filteredOptions);
 
     // console.log('[Filtro]', { filteredOptionsLength: filteredOptions.length, first: filteredOptions[0] });
 
@@ -796,9 +831,19 @@ function simpleFilterDropdown(mapping) {
         html = '<div class="text-muted small">No hay coincidencias</div>';
     }
 
+    console.log(`${mapping.type} HTML generated:`, html.substring(0, 200) + '...');
+    
     container.innerHTML = html;
     updateDropdownLabel(mapping.containerId, mapping.defaultLabel, mapping.labelId);
+    
+    console.log(`✅ ${mapping.type} dropdown populated`);
 }
 
 // Make it available globally
-window.simpleFilterDropdown = simpleFilterDropdown; 
+window.simpleFilterDropdown = simpleFilterDropdown;
+window.initializeSharedFilters = initializeSharedFilters;
+window.initializeFilterUI = initializeFilterUI;
+window.onFilterChange = onFilterChange;
+window.getSelectedDropdownValues = getSelectedDropdownValues;
+
+console.log('Shared Filters System loaded successfully'); 

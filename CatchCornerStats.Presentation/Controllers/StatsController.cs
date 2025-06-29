@@ -163,19 +163,23 @@ namespace CatchCornerStats.Presentation.Controllers
         /// <summary>
         /// Get the percentage distribution of bookings by start time.
         /// </summary>
-        /// <param name="sport">Sport to filter by (optional).</param>
-        /// <param name="city">City to filter by (optional).</param>
-        /// <param name="rinkSize">Rink size to filter by (optional).</param>
-        /// <param name="facility">Facility to filter by (optional).</param>
+        /// <param name="sports">Sports to filter by (optional).</param>
+        /// <param name="cities">Cities to filter by (optional).</param>
+        /// <param name="rinkSizes">Rink sizes to filter by (optional).</param>
+        /// <param name="facilities">Facilities to filter by (optional).</param>
         /// <param name="month">Month to filter by (optional).</param>
         /// <param name="dayOfWeek">Day of the week to filter by (optional).</param>
+        /// <param name="createdDateFrom">Start date to filter bookings (optional).</param>
+        /// <param name="createdDateTo">End date to filter bookings (optional).</param>
+        /// <param name="happeningDateFrom">Start date to filter bookings (optional).</param>
+        /// <param name="happeningDateTo">End date to filter bookings (optional).</param>
         /// <returns>Un objeto con totalBookings y data (diccionario de hora a cantidad).</returns>
         [HttpGet("GetBookingsByStartTime")]
         public async Task<IActionResult> GetBookingsByStartTime(
-            [FromQuery] string? sport,
-            [FromQuery] string? city,
-            [FromQuery] string? rinkSize,
-            [FromQuery] string? facility,
+            [FromQuery] List<string>? sports,
+            [FromQuery] List<string>? cities,
+            [FromQuery] List<string>? rinkSizes,
+            [FromQuery] List<string>? facilities,
             [FromQuery] int? month,
             [FromQuery] int? dayOfWeek,
             [FromQuery] DateTime? createdDateFrom,
@@ -186,9 +190,26 @@ namespace CatchCornerStats.Presentation.Controllers
             var stopwatch = Stopwatch.StartNew();
             try
             {
-                var result = await _statsRepository.GetBookingsByStartTimeAsync(sport, city, rinkSize, facility, month, dayOfWeek, createdDateFrom, createdDateTo, happeningDateFrom, happeningDateTo);
+                _logger.LogInformation("=== GetBookingsByStartTime START ===");
+                _logger.LogInformation("Received parameters:");
+                _logger.LogInformation($"  sports: [{string.Join(", ", sports ?? new List<string>())}] (null: {sports == null})");
+                _logger.LogInformation($"  cities: [{string.Join(", ", cities ?? new List<string>())}] (null: {cities == null})");
+                _logger.LogInformation($"  rinkSizes: [{string.Join(", ", rinkSizes ?? new List<string>())}] (null: {rinkSizes == null})");
+                _logger.LogInformation($"  facilities: [{string.Join(", ", facilities ?? new List<string>())}] (null: {facilities == null})");
+                _logger.LogInformation($"  month: {month} (null: {month == null})");
+                _logger.LogInformation($"  dayOfWeek: {dayOfWeek} (null: {dayOfWeek == null})");
+                _logger.LogInformation($"  createdDateFrom: {createdDateFrom} (null: {createdDateFrom == null})");
+                _logger.LogInformation($"  createdDateTo: {createdDateTo} (null: {createdDateTo == null})");
+                _logger.LogInformation($"  happeningDateFrom: {happeningDateFrom} (null: {happeningDateFrom == null})");
+                _logger.LogInformation($"  happeningDateTo: {happeningDateTo} (null: {happeningDateTo == null})");
+
+                var result = await _statsRepository.GetBookingsByStartTimeAsync(sports, cities, rinkSizes, facilities, month, dayOfWeek, createdDateFrom, createdDateTo, happeningDateFrom, happeningDateTo);
                 stopwatch.Stop();
+                
+                _logger.LogInformation($"Repository returned: TotalBookings = {result.TotalBookings}, TimeSlots = {result.Data.Count}");
                 _logger.LogInformation($"GetBookingsByStartTime completed in {stopwatch.ElapsedMilliseconds}ms - {result.TotalBookings} total bookings, {result.Data.Count} time slots");
+                _logger.LogInformation("=== GetBookingsByStartTime END ===");
+                
                 return Ok(result);
             }
             catch (Exception ex)

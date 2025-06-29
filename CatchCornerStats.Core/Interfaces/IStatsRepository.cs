@@ -55,10 +55,10 @@ namespace CatchCornerStats.Core.Interfaces
         /// <summary>
         /// Returns the percentage distribution of bookings by start time.
         /// </summary>
-        /// <param name="sport">Sport to filter by (optional).</param>
-        /// <param name="city">City to filter by (optional).</param>
-        /// <param name="rinkSize">Rink size to filter by (optional).</param>
-        /// <param name="facility">Facility to filter by (optional).</param>
+        /// <param name="sports">Sports to filter by (optional).</param>
+        /// <param name="cities">Cities to filter by (optional).</param>
+        /// <param name="rinkSizes">Rink sizes to filter by (optional).</param>
+        /// <param name="facilities">Facilities to filter by (optional).</param>
         /// <param name="month">Month to filter by (optional).</param>
         /// <param name="dayOfWeek">Day of the week to filter by (optional).</param>
         /// <param name="createdDateFrom">Start date to filter bookings (optional).</param>
@@ -66,10 +66,10 @@ namespace CatchCornerStats.Core.Interfaces
         /// <param name="happeningDateFrom">Start date to filter bookings (optional).</param>
         /// <param name="happeningDateTo">End date to filter bookings (optional).</param>
         /// <returns>
-        /// Dictionary where key = start time (e.g., "9:00"), 
-        /// value = percentage of bookings.
+        /// BookingsByStartTimeResult with total bookings and data dictionary where key = start time (e.g., "9:00 AM"), 
+        /// value = number of bookings.
         /// </returns>
-        Task<BookingsByStartTimeResult> GetBookingsByStartTimeAsync(string? sport, string? city, string? rinkSize, string? facility, int? month, int? dayOfWeek, DateTime? createdDateFrom, DateTime? createdDateTo, DateTime? happeningDateFrom, DateTime? happeningDateTo);
+        Task<BookingsByStartTimeResult> GetBookingsByStartTimeAsync(List<string>? sports, List<string>? cities, List<string>? rinkSizes, List<string>? facilities, int? month, int? dayOfWeek, DateTime? createdDateFrom, DateTime? createdDateTo, DateTime? happeningDateFrom, DateTime? happeningDateTo);
 
         /// <summary>
         /// Returns the percentage distribution of booking durations.

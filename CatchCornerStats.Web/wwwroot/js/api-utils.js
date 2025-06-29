@@ -1,5 +1,7 @@
 // ===== CATCHCORNERSTATS - API UTILITIES =====
 
+console.log('API Utilities loading...');
+
 // API Utility Functions
 const API_UTILS = {
     // Default fetch options

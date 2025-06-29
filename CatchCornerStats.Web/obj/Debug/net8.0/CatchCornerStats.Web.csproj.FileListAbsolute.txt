@@ -89,4 +89,3 @@ C:\Users\lania\Desktop\Proyectos\CatchCornerStats\CatchCornerStats.Web\bin\Debug
 C:\Users\lania\Desktop\Proyectos\CatchCornerStats\CatchCornerStats.Web\bin\Debug\net8.0\CatchCornerStats.Data.pdb
 C:\Users\lania\Desktop\Proyectos\CatchCornerStats\CatchCornerStats.Web\obj\Debug\net8.0\CatchCornerStats.Web.csproj.AssemblyReference.cache
 C:\Users\lania\Desktop\Proyectos\CatchCornerStats\CatchCornerStats.Web\obj\Debug\net8.0\CatchCor.0BAE412F.Up2Date
-C:\Users\lania\Desktop\Proyectos\CatchCornerStats\CatchCornerStats.Web\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

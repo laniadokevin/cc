@@ -94,4 +94,3 @@ C:\Users\lania\Desktop\Proyectos\CatchCornerStats\CatchCornerStats.Presentation\
 C:\Users\lania\Desktop\Proyectos\CatchCornerStats\CatchCornerStats.Presentation\bin\Debug\net8.0\CatchCornerStats.Presentation.staticwebassets.endpoints.json
 C:\Users\lania\Desktop\Proyectos\CatchCornerStats\CatchCornerStats.Presentation\obj\Debug\net8.0\staticwebassets.build.endpoints.json
 C:\Users\lania\Desktop\Proyectos\CatchCornerStats\CatchCornerStats.Presentation\obj\Debug\net8.0\staticwebassets\msbuild.CatchCornerStats.Presentation.Microsoft.AspNetCore.StaticWebAssetEndpoints.props
-C:\Users\lania\Desktop\Proyectos\CatchCornerStats\CatchCornerStats.Presentation\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

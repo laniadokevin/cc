@@ -1,8 +1,6 @@
 using CatchCornerStats.Core.Interfaces;
 using CatchCornerStats.Data.Repositories;
-using CatchCornerStats.Core.Interfaces;
 using CatchCornerStats.Data;
-using CatchCornerStats.Data.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -40,7 +38,10 @@ builder.Services.AddCors(options =>
                 // Development ports
                 "http://localhost:3000",
                 "http://localhost:5000",
-                "https://localhost:5001"
+                "https://localhost:5001",
+                // Additional ports for development
+                "http://localhost:5044",
+                "https://localhost:7254"
               )
               .AllowAnyHeader()
               .AllowAnyMethod()
