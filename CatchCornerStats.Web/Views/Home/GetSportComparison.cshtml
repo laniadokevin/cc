@@ -89,6 +89,46 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-semibold">Month</label>
+                            <select class="form-select" id="monthFilter">
+                                <option value="">All Months</option>
+                                <option value="1">January</option>
+                                <option value="2">February</option>
+                                <option value="3">March</option>
+                                <option value="4">April</option>
+                                <option value="5">May</option>
+                                <option value="6">June</option>
+                                <option value="7">July</option>
+                                <option value="8">August</option>
+                                <option value="9">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-semibold">Year</label>
+                            <select class="form-select" id="yearFilter">
+                                <option value="">All Years</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-semibold">Created Date From</label>
+                            <input type="date" class="form-control" id="createdDateFrom">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-semibold">Created Date To</label>
+                            <input type="date" class="form-control" id="createdDateTo">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-semibold">Happening Date From</label>
+                            <input type="date" class="form-control" id="happeningDateFrom">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-semibold">Happening Date To</label>
+                            <input type="date" class="form-control" id="happeningDateTo">
+                        </div>
                     </div>
                     <div class="d-flex gap-2 mb-3">
                         <button class="btn btn-primary px-4 shadow-sm" onclick="applyFilters()">
@@ -356,19 +396,29 @@
         // Construir parámetros de API usando filtros globales
         function buildApiParameters() {
             const params = {};
-            
             if (typeof getSelectedFilterValues === 'function') {
                 const sports = getSelectedFilterValues('sports');
                 const cities = getSelectedFilterValues('cities');
                 const rinkSizes = getSelectedFilterValues('rinkSizes');
                 const facilities = getSelectedFilterValues('facilities');
-                
-                if (sports && sports.length > 0) params.sport = sports.join(',');
-                if (cities && cities.length > 0) params.city = cities.join(',');
-                if (rinkSizes && rinkSizes.length > 0) params.rinkSize = rinkSizes.join(',');
-                if (facilities && facilities.length > 0) params.facility = facilities.join(',');
+                if (sports && sports.length > 0) params.sports = sports;
+                if (cities && cities.length > 0) params.cities = cities;
+                if (rinkSizes && rinkSizes.length > 0) params.rinkSizes = rinkSizes;
+                if (facilities && facilities.length > 0) params.facilities = facilities;
             }
-            
+            // Nuevos filtros
+            const month = document.getElementById('monthFilter').value;
+            if (month) params.month = parseInt(month);
+            const year = document.getElementById('yearFilter').value;
+            if (year) params.year = parseInt(year);
+            const createdDateFrom = document.getElementById('createdDateFrom').value;
+            if (createdDateFrom) params.createdDateFrom = createdDateFrom;
+            const createdDateTo = document.getElementById('createdDateTo').value;
+            if (createdDateTo) params.createdDateTo = createdDateTo;
+            const happeningDateFrom = document.getElementById('happeningDateFrom').value;
+            if (happeningDateFrom) params.happeningDateFrom = happeningDateFrom;
+            const happeningDateTo = document.getElementById('happeningDateTo').value;
+            if (happeningDateTo) params.happeningDateTo = happeningDateTo;
             return params;
         }
 
@@ -381,37 +431,46 @@
         // Botón para limpiar filtros globales y recargar datos
         function clearFilters() {
             ConfigHelpers?.log('Limpiando filtros...');
+            // Limpiar filtros globales si existen
             if (typeof clearAllFilters === 'function') {
                 clearAllFilters();
             }
+            // Limpiar mes y año
+            const month = document.getElementById('monthFilter');
+            if (month) month.value = '';
+            const year = document.getElementById('yearFilter');
+            if (year) year.value = '';
+            // Limpiar datepickers
+            const dateIds = ['createdDateFrom', 'createdDateTo', 'happeningDateFrom', 'happeningDateTo'];
+            dateIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            });
             loadData();
         }
 
         // Mostrar datos en la UI
         function displayData(data, source = '') {
-            currentData = data;
-            ConfigHelpers?.log(`Mostrando datos (${source}):`, data);
-            
-            if (!data || !Array.isArray(data) || data.length === 0) {
+            // Compatibilidad: aceptar tanto 'results' como 'Results'
+            const results = data.Results || data.results;
+            const totalUniqueBookings = data.TotalUniqueBookings || data.totalUniqueBookings;
+            if (!data || !Array.isArray(results) || results.length === 0) {
                 showError('No data available for sport comparison');
                 return;
             }
-
-            updateSummaryCards(data);
-            updateDataTable(data);
-            
+            currentData = results;
+            updateSummaryCards({ Results: results, TotalUniqueBookings: totalUniqueBookings });
+            updateDataTable(results);
             document.getElementById('data').classList.remove('d-none');
             document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
 
             // Guardar en historial
-            const sports = [...new Set(data.map(item => item.sport))];
-            const totalBookings = data.reduce((sum, item) => sum + (item.totalBookings || 0), 0);
-            const flaggedCount = data.filter(item => item.isFlaggedTop6 || item.isFlaggedTop8 || item.isFlaggedHighBookings).length;
-            const topSport = data.reduce((top, current) => 
-                (current.totalBookings || 0) > (top.totalBookings || 0) ? current : top
+            const sports = [...new Set(results.map(item => item.sport))];
+            const flaggedCount = results.filter(item => item.isFlaggedTop6 || item.isFlaggedTop8 || item.isFlaggedHighBookings).length;
+            const topSport = results.reduce((top, current) =>
+                (current.totalBookings || 0) > (top.totalBookings || 0) ? current : top, { sport: 'N/A', totalBookings: 0 }
             );
             const filtersSummary = (typeof getFiltersSummary === 'function') ? getFiltersSummary() : 'All Data';
-            
             saveHistoryEntry({
                 date: new Date().toLocaleString(),
                 filters: filtersSummary,
@@ -423,18 +482,16 @@
 
         // Update summary cards
         function updateSummaryCards(data) {
-            const sports = [...new Set(data.map(item => item.sport))];
-            const totalBookings = data.reduce((sum, item) => sum + (item.totalBookings || 0), 0);
-            const flaggedCount = data.filter(item => item.isFlaggedTop6 || item.isFlaggedTop8 || item.isFlaggedHighBookings).length;
-            
-            // Find top performing sport
-            const topSport = data.reduce((top, current) => 
-                (current.totalBookings || 0) > (top.totalBookings || 0) ? current : top
+            const results = data.Results || data.results;
+            const totalUniqueBookings = data.TotalUniqueBookings || data.totalUniqueBookings;
+            const sports = [...new Set(results.map(item => item.sport))];
+            const flaggedCount = results.filter(item => item.isFlaggedTop6 || item.isFlaggedTop8 || item.isFlaggedHighBookings).length;
+            const topSport = results.reduce((top, current) =>
+                (current.totalBookings || 0) > (top.totalBookings || 0) ? current : top, { sport: 'N/A', totalBookings: 0 }
             );
-
             document.getElementById('totalSports').textContent = sports.length;
             document.getElementById('topSport').textContent = topSport.sport || 'N/A';
-            document.getElementById('totalBookings').textContent = formatNumber(totalBookings);
+            document.getElementById('totalBookings').textContent = formatNumber(totalUniqueBookings || 0);
             document.getElementById('flaggedCount').textContent = flaggedCount;
         }
 
@@ -586,5 +643,19 @@
                 renderHistory();
             }
         }
+
+        // Inicializar el filtro de año con los últimos 10 años
+        document.addEventListener('DOMContentLoaded', function () {
+            const yearSelect = document.getElementById('yearFilter');
+            if (yearSelect) {
+                const currentYear = new Date().getFullYear();
+                for (let y = currentYear; y >= currentYear - 10; y--) {
+                    const opt = document.createElement('option');
+                    opt.value = y;
+                    opt.textContent = y;
+                    yearSelect.appendChild(opt);
+                }
+            }
+        });
     </script>
 } 

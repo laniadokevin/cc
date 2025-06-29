@@ -108,12 +108,31 @@ namespace CatchCornerStats.Core.Interfaces
         /// - Are not in the top 8 but have more bookings than a top 8 sport.
         /// - Have 60+ bookings (or >= 5% of the most popular sport) in a month.
         /// </summary>
-        /// <param name="city">City to filter by (optional).</param>
+        /// <param name="sports">Sports to filter by (optional).</param>
+        /// <param name="cities">Cities to filter by (optional).</param>
+        /// <param name="rinkSizes">Rink sizes to filter by (optional).</param>
+        /// <param name="facilities">Facilities to filter by (optional).</param>
         /// <param name="month">Month to filter by (optional).</param>
+        /// <param name="year">Year to filter by (optional).</param>
+        /// <param name="createdDateFrom">Start date to filter bookings (optional).</param>
+        /// <param name="createdDateTo">End date to filter bookings (optional).</param>
+        /// <param name="happeningDateFrom">Start date to filter bookings (optional).</param>
+        /// <param name="happeningDateTo">End date to filter bookings (optional).</param>
         /// <returns>
-        /// List of SportComparisonResult containing sport ranking and flag status.
+        /// SportComparisonResponseDto containing the list of results and the total unique bookings.
         /// </returns>
-        Task<List<SportComparisonResult>> GetSportComparisonReportAsync(string? city, int? month);
+        Task<SportComparisonResponseDto> GetSportComparisonReportAsync(
+            List<string>? sports,
+            List<string>? cities,
+            List<string>? rinkSizes,
+            List<string>? facilities,
+            int? month,
+            int? year,
+            DateTime? createdDateFrom,
+            DateTime? createdDateTo,
+            DateTime? happeningDateFrom,
+            DateTime? happeningDateTo
+        );
         Task<List<string>> GetSportsAsync();
         Task<List<string>> GetCitiesAsync();
         Task<List<string>> GetRinkSizesAsync();

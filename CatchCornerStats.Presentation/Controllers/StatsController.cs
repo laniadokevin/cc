@@ -291,18 +291,27 @@ namespace CatchCornerStats.Presentation.Controllers
         /// </summary>
         /// <param name="city">City to filter by (optional).</param>
         /// <param name="month">Month to filter by (optional).</param>
-        /// <returns>A list of sport comparison results with flag status.</returns>
+        /// <returns>A response DTO with sport comparison results and total unique bookings.</returns>
         [HttpGet("GetSportComparison")]
         public async Task<IActionResult> GetSportComparison(
-            [FromQuery] string? city,
-            [FromQuery] int? month)
+            [FromQuery] List<string>? sports,
+            [FromQuery] List<string>? cities,
+            [FromQuery] List<string>? rinkSizes,
+            [FromQuery] List<string>? facilities,
+            [FromQuery] int? month,
+            [FromQuery] int? year,
+            [FromQuery] DateTime? createdDateFrom,
+            [FromQuery] DateTime? createdDateTo,
+            [FromQuery] DateTime? happeningDateFrom,
+            [FromQuery] DateTime? happeningDateTo)
         {
             var stopwatch = Stopwatch.StartNew();
             try
             {
-                var result = await _statsRepository.GetSportComparisonReportAsync(city, month);
+                var result = await _statsRepository.GetSportComparisonReportAsync(
+                    sports, cities, rinkSizes, facilities, month, year, createdDateFrom, createdDateTo, happeningDateFrom, happeningDateTo);
                 stopwatch.Stop();
-                _logger.LogInformation($"GetSportComparison completed in {stopwatch.ElapsedMilliseconds}ms - {result.Count} sport comparisons");
+                _logger.LogInformation($"GetSportComparison completed in {stopwatch.ElapsedMilliseconds}ms - {result.Results.Count} sport comparisons, {result.TotalUniqueBookings} unique bookings");
                 return Ok(result);
             }
             catch (Exception ex)

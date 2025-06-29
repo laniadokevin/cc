@@ -305,12 +305,30 @@ namespace CatchCornerStats.Data.Repositories
             };
         }
 
-        public async Task<List<SportComparisonResult>> GetSportComparisonReportAsync(string? city, int? month)
+        public async Task<SportComparisonResponseDto> GetSportComparisonReportAsync(
+            List<string>? sports,
+            List<string>? cities,
+            List<string>? rinkSizes,
+            List<string>? facilities,
+            int? month,
+            int? year,
+            DateTime? createdDateFrom,
+            DateTime? createdDateTo,
+            DateTime? happeningDateFrom,
+            DateTime? happeningDateTo)
         {
-            var query = BuildBaseQuery(null, city, null, null);
-
+            var query = BuildBaseQuery(sports, cities, rinkSizes, facilities);
+            ApplyDateFilters(ref query, createdDateFrom, createdDateTo, happeningDateFrom, happeningDateTo);
             if (month.HasValue)
-                query = query.Where(x => x.HappeningDate.Month == month);
+                query = query.Where(x => x.HappeningDate.Month == month.Value);
+            if (year.HasValue)
+                query = query.Where(x => x.HappeningDate.Year == year.Value);
+
+            // Obtener el total de bookings únicos (global, según filtro)
+            var totalUniqueBookings = await query
+                .Select(x => x.BookingNumber)
+                .Distinct()
+                .CountAsync();
 
             // OPTIMIZACIÓN: Una sola consulta con ranking por ciudad
             var sportBookings = await query
@@ -324,14 +342,13 @@ namespace CatchCornerStats.Data.Repositories
                 })
                 .ToListAsync();
 
-            if (!sportBookings.Any()) return new List<SportComparisonResult>();
+            if (!sportBookings.Any())
+                return new SportComparisonResponseDto { Results = new List<SportComparisonResult>(), TotalUniqueBookings = 0 };
 
             // Agrupar por ciudad y calcular rankings y flags por ciudad
             var results = new List<SportComparisonResult>();
-            
-            var cities = sportBookings.Select(x => x.City).Distinct();
-            
-            foreach (var currentCity in cities)
+            var citiesList = sportBookings.Select(x => x.City).Distinct();
+            foreach (var currentCity in citiesList)
             {
                 var citySports = sportBookings
                     .Where(x => x.City == currentCity)
@@ -341,39 +358,41 @@ namespace CatchCornerStats.Data.Repositories
                 if (!citySports.Any()) continue;
 
                 var maxBookings = citySports.First().TotalBookings;
-                
-                // Calcular rankings por ciudad
                 for (int i = 0; i < citySports.Count; i++)
                 {
                     var sport = citySports[i];
-                    var ranking = i + 1; // Ranking basado en posición (1 = más popular)
-                    
-                    // Determinar flags según criterios específicos
+                    var ranking = i + 1;
                     bool isFlaggedTop6 = false;
                     bool isFlaggedTop8 = false;
                     bool isFlaggedHighBookings = false;
-
-                    // Flag Top6: Si no está en top 6 pero tiene más bookings que un top 6
-                    if (ranking > 6)
-                    {
-                        var top6MinBookings = citySports.Take(6).Min(x => x.TotalBookings);
-                        isFlaggedTop6 = sport.TotalBookings > top6MinBookings;
-                    }
-
-                    // Flag Top8: Si no está en top 8 pero tiene más bookings que un top 8
-                    if (ranking > 8)
-                    {
-                        var top8MinBookings = citySports.Take(8).Min(x => x.TotalBookings);
-                        isFlaggedTop8 = sport.TotalBookings > top8MinBookings;
-                    }
-
-                    // Flag HighBookings: Si está rankeado 9+ y tiene 60+ bookings o 5% del más popular
+                    
+                    // FLAGS TEMPORALMENTE DESACTIVADOS - Lógica comentada hasta redefinir criterios
+                    // if (ranking > 6)
+                    // {
+                    //     var top6MinBookings = citySports.Take(6).Min(x => x.TotalBookings);
+                    //     isFlaggedTop6 = sport.TotalBookings > top6MinBookings;
+                    // }
+                    // if (ranking > 8)
+                    // {
+                    //     var top8MinBookings = citySports.Take(8).Min(x => x.TotalBookings);
+                    //     isFlaggedTop8 = sport.TotalBookings > top8MinBookings;
+                    // }
+                    
+                    // HIGHBOOKINGS FLAG REACTIVADO - Detecta deportes con volumen significativo
                     if (ranking >= 9)
                     {
-                        var threshold = Math.Max(60, maxBookings * 0.05);
-                        isFlaggedHighBookings = sport.TotalBookings >= threshold;
+                        // CRITERIO 1: Mínimo absoluto de 60 bookings
+                        bool meetsAbsoluteThreshold = sport.TotalBookings >= 60;
+                        
+                        // CRITERIO 2: Al menos 5% de los bookings del deporte más popular
+                        //bool meetsRelativeThreshold = sport.TotalBookings >= (maxBookings * 0.05);
+                        
+                        // ELIGE UNO DE LOS DOS CRITERIOS (descomenta la línea que quieras usar):
+                        isFlaggedHighBookings = meetsAbsoluteThreshold;        // Solo 60+ bookings
+                        // isFlaggedHighBookings = meetsRelativeThreshold;    // Solo 5% del máximo
+                        // isFlaggedHighBookings = meetsAbsoluteThreshold || meetsRelativeThreshold;  // Ambos criterios
                     }
-
+                    
                     results.Add(new SportComparisonResult
                     {
                         Sport = sport.Sport,
@@ -387,7 +406,11 @@ namespace CatchCornerStats.Data.Repositories
                 }
             }
 
-            return results.OrderBy(x => x.City).ThenBy(x => x.Ranking).ToList();
+            return new SportComparisonResponseDto
+            {
+                Results = results.OrderBy(x => x.City).ThenBy(x => x.Ranking).ToList(),
+                TotalUniqueBookings = totalUniqueBookings
+            };
         }
 
         public async Task<List<string>> GetSportsAsync()
