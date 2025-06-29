@@ -770,6 +770,18 @@
           }
         }
       }
+    },
+    "/api/Stats/GetAllFilters": {
+      "get": {
+        "tags": [
+          "Stats"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
     }
   },
   "components": { }

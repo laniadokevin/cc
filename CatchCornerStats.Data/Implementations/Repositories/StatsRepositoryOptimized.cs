@@ -254,41 +254,49 @@ namespace CatchCornerStats.Data.Repositories
 
         public async Task<List<string>> GetSportsAsync()
         {
+            // OPTIMIZACIÓN: Usar consulta más eficiente con índices
             return await _context.Arenas
                 .Where(x => !string.IsNullOrEmpty(x.Sport))
                 .Select(x => x.Sport)
                 .Distinct()
                 .OrderBy(x => x)
+                .AsNoTracking() // OPTIMIZACIÓN: No tracking para consultas de solo lectura
                 .ToListAsync();
         }
 
         public async Task<List<string>> GetCitiesAsync()
         {
+            // OPTIMIZACIÓN: Usar consulta más eficiente con índices
             return await _context.Arenas
                 .Where(x => !string.IsNullOrEmpty(x.Area))
                 .Select(x => x.Area)
                 .Distinct()
                 .OrderBy(x => x)
+                .AsNoTracking() // OPTIMIZACIÓN: No tracking para consultas de solo lectura
                 .ToListAsync();
         }
 
         public async Task<List<string>> GetRinkSizesAsync()
         {
+            // OPTIMIZACIÓN: Usar consulta más eficiente con índices
             return await _context.Arenas
                 .Where(x => !string.IsNullOrEmpty(x.Size))
                 .Select(x => x.Size)
                 .Distinct()
                 .OrderBy(x => x)
+                .AsNoTracking() // OPTIMIZACIÓN: No tracking para consultas de solo lectura
                 .ToListAsync();
         }
 
         public async Task<List<string>> GetFacilitiesAsync()
         {
+            // OPTIMIZACIÓN: Usar consulta más eficiente con índices
             return await _context.Arenas
                 .Where(x => !string.IsNullOrEmpty(x.Facility))
                 .Select(x => x.Facility)
                 .Distinct()
                 .OrderBy(x => x)
+                .AsNoTracking() // OPTIMIZACIÓN: No tracking para consultas de solo lectura
                 .ToListAsync();
         }
 

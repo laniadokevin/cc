@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test URLs - CatchCornerStats</title>
+</head>
+<body>
+    <h1>Test URLs - CatchCornerStats</h1>
+    <div id="results"></div>
+
+    <script src="CatchCornerStats.Web/wwwroot/js/config.js"></script>
+    <script src="CatchCornerStats.Web/wwwroot/js/api-utils.js"></script>
+    
+    <script>
+        function testUrls() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<h2>Testing URL Construction</h2>';
+            
+            // Test ConfigHelpers
+            results.innerHTML += '<h3>ConfigHelpers Tests:</h3>';
+            results.innerHTML += `<p>getStatsUrl('averageLeadTime'): ${ConfigHelpers.getStatsUrl('averageLeadTime')}</p>`;
+            results.innerHTML += `<p>getFilterUrl('sports'): ${ConfigHelpers.getFilterUrl('sports')}</p>`;
+            results.innerHTML += `<p>getApiUrl('/test'): ${ConfigHelpers.getApiUrl('/test')}</p>`;
+            
+            // Test buildApiUrl
+            results.innerHTML += '<h3>buildApiUrl Tests:</h3>';
+            results.innerHTML += `<p>buildApiUrl('/Stats/GetAverageLeadTime'): ${buildApiUrl('/Stats/GetAverageLeadTime')}</p>`;
+            
+            const params = new URLSearchParams();
+            params.append('sports', 'hockey');
+            results.innerHTML += `<p>buildApiUrl with params: ${buildApiUrl('/Stats/GetAverageLeadTime', params)}</p>`;
+            
+            // Test API_UTILS
+            results.innerHTML += '<h3>API_UTILS Tests:</h3>';
+            results.innerHTML += `<p>loadStatsData endpoint: ${CatchCornerStatsConfig.api.stats.averageLeadTime}</p>`;
+            results.innerHTML += `<p>loadFilterOptions endpoint: ${CatchCornerStatsConfig.api.filters.sports}</p>`;
+            
+            // Test actual API calls (will fail but show URLs)
+            results.innerHTML += '<h3>API Call Tests:</h3>';
+            
+            API_UTILS.loadStatsData('averageLeadTime')
+                .then(data => {
+                    results.innerHTML += '<p style="color: green;">✅ loadStatsData success</p>';
+                })
+                .catch(error => {
+                    results.innerHTML += `<p style="color: red;">❌ loadStatsData error: ${error.message}</p>`;
+                });
+                
+            API_UTILS.loadFilterOptions('sports')
+                .then(data => {
+                    results.innerHTML += '<p style="color: green;">✅ loadFilterOptions success</p>';
+                })
+                .catch(error => {
+                    results.innerHTML += `<p style="color: red;">❌ loadFilterOptions error: ${error.message}</p>`;
+                });
+        }
+        
+        // Run tests when page loads
+        window.addEventListener('load', testUrls);
+    </script>
+</body>
+</html> 

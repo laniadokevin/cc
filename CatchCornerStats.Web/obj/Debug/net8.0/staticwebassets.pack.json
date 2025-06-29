@@ -25,6 +25,14 @@
       "PackagePath": "staticwebassets\\js\\config.js"
     },
     {
+      "Id": "C:\\Users\\lania\\Desktop\\Proyectos\\CatchCornerStats\\CatchCornerStats.Web\\wwwroot\\js\\filter-cache.js",
+      "PackagePath": "staticwebassets\\js\\filter-cache.js"
+    },
+    {
+      "Id": "C:\\Users\\lania\\Desktop\\Proyectos\\CatchCornerStats\\CatchCornerStats.Web\\wwwroot\\js\\shared-filters.js",
+      "PackagePath": "staticwebassets\\js\\shared-filters.js"
+    },
+    {
       "Id": "C:\\Users\\lania\\Desktop\\Proyectos\\CatchCornerStats\\CatchCornerStats.Web\\wwwroot\\lib\\bootstrap\\LICENSE",
       "PackagePath": "staticwebassets\\lib\\bootstrap"
     },

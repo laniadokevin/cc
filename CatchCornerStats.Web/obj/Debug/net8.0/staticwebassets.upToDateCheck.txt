@@ -4,6 +4,8 @@ wwwroot\favicon.ico
 wwwroot\js\api-utils.js
 wwwroot\js\app.js
 wwwroot\js\config.js
+wwwroot\js\filter-cache.js
+wwwroot\js\shared-filters.js
 wwwroot\lib\bootstrap\dist\css\bootstrap.css
 wwwroot\lib\bootstrap\dist\css\bootstrap.css.map
 wwwroot\lib\bootstrap\dist\css\bootstrap.min.css

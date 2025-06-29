@@ -197,140 +197,150 @@
 
 @section Scripts {
     <script>
-        // Global variables
         let currentData = null;
-
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            loadFilterOptions();
-            loadData();
-        });
-
-        // Load filter options from API
-        async function loadFilterOptions() {
-            await Promise.all([
-                populateCheckboxDropdown('sportsOptions', 'GetSports', 'All Sports', 'sportsDropdownLabel'),
-                populateCheckboxDropdown('citiesOptions', 'GetCities', 'All Cities', 'citiesDropdownLabel'),
-                populateCheckboxDropdown('rinkSizesOptions', 'GetRinkSizes', 'All Sizes', 'rinkSizesDropdownLabel'),
-                populateCheckboxDropdown('facilitiesOptions', 'GetFacilities', 'All Facilities', 'facilitiesDropdownLabel')
-            ]);
-        }
-
-        function btoaUtf8(str) {
-            return btoa(unescape(encodeURIComponent(str)));
-        }
-
-        async function populateCheckboxDropdown(containerId, endpoint, allLabel, labelId) {
-            const container = document.getElementById(containerId);
-            const label = document.getElementById(labelId);
-            container.innerHTML = '';
+        let filtersReady = false;
+        let initialDataLoaded = false;
+        
+        // Función para inicializar la vista
+        async function initializeView() {
             try {
-                const url = 'https://localhost:7254/api/Stats/' + endpoint + '?v=' + Date.now();
-                const response = await fetch(url);
-                const data = await response.json();
-                if (!data.length) {
-                    container.innerHTML = '<div class="text-muted small">No options</div>';
-                    label.textContent = allLabel;
+                ConfigHelpers.log('Iniciando vista GetAverageLeadTime...');
+                
+                // Verificar que SharedFilters esté disponible
+                if (typeof initializeSharedFilters !== 'function') {
+                    ConfigHelpers.logError('SharedFilters no está disponible');
                     return;
                 }
-                data.forEach(item => {
-                    if (item.value && item.value !== '') {
-                        const id = containerId + '_' + btoaUtf8(item.value).replace(/[^a-zA-Z0-9]/g, '');
-                        container.innerHTML += `<div class='form-check'>
-                            <input class='form-check-input' type='checkbox' value="${item.value}" id="${id}" onchange="updateDropdownLabel('${containerId}','${allLabel}','${labelId}')">
-                            <label class='form-check-label' for="${id}">${item.value}</label>
-                        </div>`;
-                    }
-                });
-                updateDropdownLabel(containerId, allLabel, labelId);
-            } catch (err) {
-                container.innerHTML = '<div class="text-danger small">Error loading</div>';
-                label.textContent = allLabel;
+                
+                // CARGAR DATOS INMEDIATAMENTE (sin filtros)
+                ConfigHelpers.log('Cargando datos iniciales sin filtros...');
+                await loadDataWithoutFilters();
+                initialDataLoaded = true;
+                
+                // INICIALIZAR FILTROS EN PARALELO (sin bloquear)
+                ConfigHelpers.log('Inicializando filtros en paralelo...');
+                initializeFiltersAsync();
+                
+            } catch (error) {
+                ConfigHelpers.logError('Error inicializando vista:', error);
+                showError('Error inicializando la vista: ' + error.message);
             }
         }
-
-        function updateDropdownLabel(containerId, allLabel, labelId) {
-            const container = document.getElementById(containerId);
-            const label = document.getElementById(labelId);
-            const checked = Array.from(container.querySelectorAll('input[type=checkbox]:checked')).map(cb => cb.value);
-            if (checked.length === 0) {
-                label.textContent = allLabel;
-            } else if (checked.length === 1) {
-                label.textContent = checked[0];
-            } else {
-                label.textContent = `${checked.length} selected`;
-            }
-        }
-
-        function filterDropdownOptions(input, containerId) {
-            const filter = input.value.toLowerCase();
-            const container = document.getElementById(containerId);
-            Array.from(container.children).forEach(div => {
-                const label = div.querySelector('label');
-                if (label && label.textContent.toLowerCase().includes(filter)) {
-                    div.style.display = '';
-                } else {
-                    div.style.display = 'none';
+        
+        // Inicializar filtros de forma asíncrona
+        async function initializeFiltersAsync() {
+            try {
+                // Inicializar filtros compartidos
+                await initializeSharedFilters();
+                ConfigHelpers.log('Filtros compartidos inicializados');
+                
+                // Verificar que los elementos del DOM estén listos
+                const requiredElements = ['sportsOptions', 'citiesOptions', 'rinkSizesOptions', 'facilitiesOptions'];
+                const missingElements = requiredElements.filter(id => !document.getElementById(id));
+                
+                if (missingElements.length > 0) {
+                    ConfigHelpers.logError('Elementos faltantes:', missingElements);
+                    return;
                 }
-            });
+                
+                // Inicializar UI de filtros
+                if (typeof initializeFilterUI === 'function') {
+                    initializeFilterUI();
+                    ConfigHelpers.log('Filtros visuales renderizados');
+                }
+                
+                filtersReady = true;
+                ConfigHelpers.log('Filtros listos');
+                
+                // Si ya se cargaron datos iniciales, recargar con filtros
+                if (initialDataLoaded) {
+                    ConfigHelpers.log('Recargando datos con filtros...');
+                    await loadData();
+                }
+                
+                // Configurar listener para cambios de filtros
+                addFilterChangeListener(() => {
+                    ConfigHelpers.log('Filtros cambiados, recargando datos...');
+                    loadData();
+                });
+                
+            } catch (error) {
+                ConfigHelpers.logError('Error inicializando filtros:', error);
+            }
         }
-
-        function getCheckedValues(containerId) {
-            const container = document.getElementById(containerId);
-            return Array.from(container.querySelectorAll('input[type=checkbox]:checked')).map(cb => cb.value);
-        }
-
-        // Load data from API
-        async function loadData() {
+        
+        // Cargar datos sin filtros (carga inicial rápida)
+        async function loadDataWithoutFilters() {
             try {
                 showLoading();
                 hideError();
                 
-                // Build query parameters
-                const params = new URLSearchParams();
-                
-                // Get filter values
-                const sports = getCheckedValues('sportsOptions');
-                const cities = getCheckedValues('citiesOptions');
-                const rinkSizes = getCheckedValues('rinkSizesOptions');
-                const facilities = getCheckedValues('facilitiesOptions');
-                const createdFrom = document.getElementById('createdDateFrom').value;
-                const createdTo = document.getElementById('createdDateTo').value;
-                const happeningFrom = document.getElementById('happeningDateFrom').value;
-                const happeningTo = document.getElementById('happeningDateTo').value;
-                
-                // Add parameters
-                sports.forEach(sport => params.append('sports', sport));
-                cities.forEach(city => params.append('cities', city));
-                rinkSizes.forEach(size => params.append('rinkSizes', size));
-                facilities.forEach(facility => params.append('facilities', facility));
-                if (createdFrom) params.append('createdDateFrom', createdFrom);
-                if (createdTo) params.append('createdDateTo', createdTo);
-                if (happeningFrom) params.append('happeningDateFrom', happeningFrom);
-                if (happeningTo) params.append('happeningDateTo', happeningTo);
-                
-                // Make API call
-                const url = `https://localhost:7254/api/Stats/GetAverageLeadTime${params.toString() ? '?' + params.toString() : ''}`;
-                const response = await fetch(url);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                
-                const data = await response.json();
-                displayData(data);
+                // Usar las utilidades de API optimizadas
+                const data = await API_UTILS.loadStatsData('averageLeadTime');
+                displayData(data, 'Carga inicial sin filtros');
                 
             } catch (error) {
-                console.error('Error loading data:', error);
-                showError('Failed to load data: ' + error.message);
+                ConfigHelpers.logError('Error cargando datos iniciales:', error);
+                const userMessage = API_UTILS.handleApiError(error, 'loadDataWithoutFilters');
+                showError(userMessage);
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // Inicializar cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', initializeView);
+        
+        // También inicializar si el DOM ya está listo (para navegación SPA)
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeView);
+        } else {
+            initializeView();
+        }
+
+        // Cargar datos desde la API usando los filtros globales
+        async function loadData() {
+            if (!filtersReady) {
+                ConfigHelpers.log('loadData() abortado: filtros no listos');
+                return;
+            }
+            
+            try {
+                showLoading();
+                hideError();
+                
+                const params = buildApiParameters();
+                
+                // Usar las utilidades de API optimizadas
+                const data = await API_UTILS.loadStatsData('averageLeadTime', params);
+                displayData(data, 'Datos con filtros aplicados');
+                
+            } catch (error) {
+                ConfigHelpers.logError('Error cargando datos:', error);
+                const userMessage = API_UTILS.handleApiError(error, 'loadData');
+                showError(userMessage);
             } finally {
                 hideLoading();
             }
         }
 
-        // Display data in UI
-        function displayData(data) {
+        // Botón para aplicar filtros (solo recarga datos)
+        function applyFilters() {
+            ConfigHelpers.log('Aplicando filtros...');
+            loadData();
+        }
+
+        // Botón para limpiar filtros globales y recargar datos
+        function clearFilters() {
+            ConfigHelpers.log('Limpiando filtros...');
+            clearAllFilters();
+            loadData();
+        }
+
+        // Mostrar datos en la UI
+        function displayData(data, source = '') {
             currentData = data;
+            ConfigHelpers.log(`Mostrando datos (${source}):`, data);
             
             // Update summary cards
             const averageDays = document.getElementById('averageDays');
@@ -348,8 +358,9 @@
             const tbody = document.getElementById('resultsTable');
             tbody.innerHTML = '';
             
+            // Usar el resumen de filtros global
+            const filtersSummary = (typeof getFiltersSummary === 'function') ? getFiltersSummary() : 'All Data';
             const row = document.createElement('tr');
-            const filtersSummary = getFiltersSummary();
             const category = getLeadTimeCategory(data.averageLeadTime);
             const categoryClass = getCategoryClass(data.averageLeadTime);
             
@@ -361,121 +372,43 @@
             `;
             tbody.appendChild(row);
 
-            // Show data container
             document.getElementById('data').classList.remove('d-none');
-            
-            // Update timestamp
             document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
         }
 
-        // Get filters summary
-        function getFiltersSummary() {
-            const sports = getCheckedValues('sportsOptions');
-            const cities = getCheckedValues('citiesOptions');
-            const rinkSizes = getCheckedValues('rinkSizesOptions');
-            const facilities = getCheckedValues('facilitiesOptions');
-            const createdFrom = document.getElementById('createdDateFrom').value;
-            const createdTo = document.getElementById('createdDateTo').value;
-            const happeningFrom = document.getElementById('happeningDateFrom').value;
-            const happeningTo = document.getElementById('happeningDateTo').value;
-            
-            const parts = [];
-            
-            if (sports.length > 0) {
-                parts.push(`Sports: ${sports.join(', ')}`);
-            }
-            
-            if (cities.length > 0) {
-                parts.push(`Cities: ${cities.join(', ')}`);
-            }
-            
-            if (rinkSizes.length > 0) {
-                parts.push(`Rink Sizes: ${rinkSizes.join(', ')}`);
-            }
-            
-            if (facilities.length > 0) {
-                parts.push(`Facilities: ${facilities.join(', ')}`);
-            }
-            
-            if (createdFrom && createdTo) {
-                parts.push(`Created: ${createdFrom} to ${createdTo}`);
-            } else if (createdFrom) {
-                parts.push(`Created from: ${createdFrom}`);
-            } else if (createdTo) {
-                parts.push(`Created to: ${createdTo}`);
-            }
-            
-            if (happeningFrom && happeningTo) {
-                parts.push(`Happening: ${happeningFrom} to ${happeningTo}`);
-            } else if (happeningFrom) {
-                parts.push(`Happening from: ${happeningFrom}`);
-            } else if (happeningTo) {
-                parts.push(`Happening to: ${happeningTo}`);
-            }
-            
-            return parts.length ? parts.join(' | ') : 'All Data';
-        }
-
-        // Categorize lead time
+        // Categorizar lead time
         function getLeadTimeCategory(avgLeadTime) {
             if (!avgLeadTime || avgLeadTime <= 1) return 'Short';
             if (avgLeadTime <= 7) return 'Medium';
             return 'Long';
         }
-
-        // Get category CSS class
+        
         function getCategoryClass(avgLeadTime) {
             if (!avgLeadTime || avgLeadTime <= 1) return 'bg-success';
             if (avgLeadTime <= 7) return 'bg-warning';
             return 'bg-danger';
         }
-
-        // Apply filters
-        function applyFilters() {
-            loadData();
-        }
-
-        // Clear filters
-        function clearFilters() {
-            ['sportsOptions','citiesOptions','rinkSizesOptions','facilitiesOptions'].forEach(id => {
-                const container = document.getElementById(id);
-                Array.from(container.querySelectorAll('input[type=checkbox]')).forEach(cb => cb.checked = false);
-            });
-            updateDropdownLabel('sportsOptions','All Sports','sportsDropdownLabel');
-            updateDropdownLabel('citiesOptions','All Cities','citiesDropdownLabel');
-            updateDropdownLabel('rinkSizesOptions','All Sizes','rinkSizesDropdownLabel');
-            updateDropdownLabel('facilitiesOptions','All Facilities','facilitiesDropdownLabel');
-            document.getElementById('createdDateFrom').value = '';
-            document.getElementById('createdDateTo').value = '';
-            document.getElementById('happeningDateFrom').value = '';
-            document.getElementById('happeningDateTo').value = '';
-            loadData();
-        }
-
-        // Show loading
+        
         function showLoading() {
             document.getElementById('loading').classList.remove('d-none');
             document.getElementById('data').classList.add('d-none');
             document.getElementById('error').classList.add('d-none');
         }
-
-        // Hide loading
+        
         function hideLoading() {
             document.getElementById('loading').classList.add('d-none');
         }
-
-        // Show error
+        
         function showError(message) {
             document.getElementById('errorText').textContent = message;
             document.getElementById('error').classList.remove('d-none');
+            document.getElementById('data').classList.add('d-none');
         }
-
-        // Hide error
+        
         function hideError() {
             document.getElementById('error').classList.add('d-none');
         }
-
-        // Format number
+        
         function formatNumber(num) {
             return new Intl.NumberFormat().format(num);
         }

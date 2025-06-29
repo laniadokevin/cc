@@ -14,6 +14,11 @@ namespace CatchCornerStats.Presentation.Controllers
     {
         private readonly IStatsRepository _statsRepository;
         private readonly ILogger<StatsController> _logger;
+        
+        // Cache en memoria para filtros
+        private static readonly Dictionary<string, (List<string> Data, DateTime Expiry)> _filterCache = new();
+        private static readonly object _cacheLock = new object();
+        private const int CACHE_DURATION_MINUTES = 30;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="StatsController"/> class.
@@ -24,6 +29,31 @@ namespace CatchCornerStats.Presentation.Controllers
         {
             _statsRepository = statsRepository;
             _logger = logger;
+        }
+
+        // Método helper para obtener datos del cache
+        private List<string> GetCachedFilterData(string cacheKey, Func<Task<List<string>>> dataLoader)
+        {
+            lock (_cacheLock)
+            {
+                if (_filterCache.TryGetValue(cacheKey, out var cached) && cached.Expiry > DateTime.UtcNow)
+                {
+                    _logger.LogInformation($"Cache hit for {cacheKey}: {cached.Data.Count} items");
+                    return cached.Data;
+                }
+            }
+            
+            return null;
+        }
+
+        // Método helper para guardar datos en cache
+        private void SetCachedFilterData(string cacheKey, List<string> data)
+        {
+            lock (_cacheLock)
+            {
+                _filterCache[cacheKey] = (data, DateTime.UtcNow.AddMinutes(CACHE_DURATION_MINUTES));
+                _logger.LogInformation($"Cache set for {cacheKey}: {data.Count} items");
+            }
         }
 
         [HttpGet("GetAllStatsRaw")]
@@ -291,9 +321,23 @@ namespace CatchCornerStats.Presentation.Controllers
             var stopwatch = Stopwatch.StartNew();
             try
             {
+                // Intentar obtener del cache primero
+                var cachedData = GetCachedFilterData("sports", () => _statsRepository.GetSportsAsync());
+                if (cachedData != null)
+                {
+                    stopwatch.Stop();
+                    _logger.LogInformation($"GetSports completed from cache in {stopwatch.ElapsedMilliseconds}ms - {cachedData.Count} sports");
+                    return Ok(cachedData.Select(x => new { value = x }));
+                }
+
+                // Si no está en cache, cargar desde la base de datos
                 var result = await _statsRepository.GetSportsAsync();
+                
+                // Guardar en cache
+                SetCachedFilterData("sports", result);
+                
                 stopwatch.Stop();
-                _logger.LogInformation($"GetSports completed in {stopwatch.ElapsedMilliseconds}ms - {result.Count} sports");
+                _logger.LogInformation($"GetSports completed from DB in {stopwatch.ElapsedMilliseconds}ms - {result.Count} sports");
                 return Ok(result.Select(x => new { value = x }));
             }
             catch (Exception ex)
@@ -310,9 +354,23 @@ namespace CatchCornerStats.Presentation.Controllers
             var stopwatch = Stopwatch.StartNew();
             try
             {
+                // Intentar obtener del cache primero
+                var cachedData = GetCachedFilterData("cities", () => _statsRepository.GetCitiesAsync());
+                if (cachedData != null)
+                {
+                    stopwatch.Stop();
+                    _logger.LogInformation($"GetCities completed from cache in {stopwatch.ElapsedMilliseconds}ms - {cachedData.Count} cities");
+                    return Ok(cachedData.Select(x => new { value = x }));
+                }
+
+                // Si no está en cache, cargar desde la base de datos
                 var result = await _statsRepository.GetCitiesAsync();
+                
+                // Guardar en cache
+                SetCachedFilterData("cities", result);
+                
                 stopwatch.Stop();
-                _logger.LogInformation($"GetCities completed in {stopwatch.ElapsedMilliseconds}ms - {result.Count} cities");
+                _logger.LogInformation($"GetCities completed from DB in {stopwatch.ElapsedMilliseconds}ms - {result.Count} cities");
                 return Ok(result.Select(x => new { value = x }));
             }
             catch (Exception ex)
@@ -329,9 +387,23 @@ namespace CatchCornerStats.Presentation.Controllers
             var stopwatch = Stopwatch.StartNew();
             try
             {
+                // Intentar obtener del cache primero
+                var cachedData = GetCachedFilterData("rinkSizes", () => _statsRepository.GetRinkSizesAsync());
+                if (cachedData != null)
+                {
+                    stopwatch.Stop();
+                    _logger.LogInformation($"GetRinkSizes completed from cache in {stopwatch.ElapsedMilliseconds}ms - {cachedData.Count} rink sizes");
+                    return Ok(cachedData.Select(x => new { value = x }));
+                }
+
+                // Si no está en cache, cargar desde la base de datos
                 var result = await _statsRepository.GetRinkSizesAsync();
+                
+                // Guardar en cache
+                SetCachedFilterData("rinkSizes", result);
+                
                 stopwatch.Stop();
-                _logger.LogInformation($"GetRinkSizes completed in {stopwatch.ElapsedMilliseconds}ms - {result.Count} rink sizes");
+                _logger.LogInformation($"GetRinkSizes completed from DB in {stopwatch.ElapsedMilliseconds}ms - {result.Count} rink sizes");
                 return Ok(result.Select(x => new { value = x }));
             }
             catch (Exception ex)
@@ -348,15 +420,88 @@ namespace CatchCornerStats.Presentation.Controllers
             var stopwatch = Stopwatch.StartNew();
             try
             {
+                // Intentar obtener del cache primero
+                var cachedData = GetCachedFilterData("facilities", () => _statsRepository.GetFacilitiesAsync());
+                if (cachedData != null)
+                {
+                    stopwatch.Stop();
+                    _logger.LogInformation($"GetFacilities completed from cache in {stopwatch.ElapsedMilliseconds}ms - {cachedData.Count} facilities");
+                    return Ok(cachedData.Select(x => new { value = x }));
+                }
+
+                // Si no está en cache, cargar desde la base de datos
                 var result = await _statsRepository.GetFacilitiesAsync();
+                
+                // Guardar en cache
+                SetCachedFilterData("facilities", result);
+                
                 stopwatch.Stop();
-                _logger.LogInformation($"GetFacilities completed in {stopwatch.ElapsedMilliseconds}ms - {result.Count} facilities");
+                _logger.LogInformation($"GetFacilities completed from DB in {stopwatch.ElapsedMilliseconds}ms - {result.Count} facilities");
                 return Ok(result.Select(x => new { value = x }));
             }
             catch (Exception ex)
             {
                 stopwatch.Stop();
                 _logger.LogError(ex, $"GetFacilities failed after {stopwatch.ElapsedMilliseconds}ms");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Get all filter options in a single request (optimized)
+        /// </summary>
+        [HttpGet("GetAllFilters")]
+        public async Task<IActionResult> GetAllFilters()
+        {
+            var stopwatch = Stopwatch.StartNew();
+            try
+            {
+                // Intentar obtener del cache primero
+                var cachedSports = GetCachedFilterData("sports", () => _statsRepository.GetSportsAsync());
+                var cachedCities = GetCachedFilterData("cities", () => _statsRepository.GetCitiesAsync());
+                var cachedRinkSizes = GetCachedFilterData("rinkSizes", () => _statsRepository.GetRinkSizesAsync());
+                var cachedFacilities = GetCachedFilterData("facilities", () => _statsRepository.GetFacilitiesAsync());
+
+                if (cachedSports != null && cachedCities != null && cachedRinkSizes != null && cachedFacilities != null)
+                {
+                    stopwatch.Stop();
+                    _logger.LogInformation($"GetAllFilters completed from cache in {stopwatch.ElapsedMilliseconds}ms");
+                    return Ok(new
+                    {
+                        sports = cachedSports.Select(x => new { value = x }),
+                        cities = cachedCities.Select(x => new { value = x }),
+                        rinkSizes = cachedRinkSizes.Select(x => new { value = x }),
+                        facilities = cachedFacilities.Select(x => new { value = x })
+                    });
+                }
+
+                // Si no están en cache, cargar desde la base de datos SECUENCIALMENTE para evitar problemas de concurrencia
+                var sports = await _statsRepository.GetSportsAsync();
+                var cities = await _statsRepository.GetCitiesAsync();
+                var rinkSizes = await _statsRepository.GetRinkSizesAsync();
+                var facilities = await _statsRepository.GetFacilitiesAsync();
+
+                // Guardar en cache
+                SetCachedFilterData("sports", sports);
+                SetCachedFilterData("cities", cities);
+                SetCachedFilterData("rinkSizes", rinkSizes);
+                SetCachedFilterData("facilities", facilities);
+
+                stopwatch.Stop();
+                _logger.LogInformation($"GetAllFilters completed from DB in {stopwatch.ElapsedMilliseconds}ms - Sports: {sports.Count}, Cities: {cities.Count}, RinkSizes: {rinkSizes.Count}, Facilities: {facilities.Count}");
+                
+                return Ok(new
+                {
+                    sports = sports.Select(x => new { value = x }),
+                    cities = cities.Select(x => new { value = x }),
+                    rinkSizes = rinkSizes.Select(x => new { value = x }),
+                    facilities = facilities.Select(x => new { value = x })
+                });
+            }
+            catch (Exception ex)
+            {
+                stopwatch.Stop();
+                _logger.LogError(ex, $"GetAllFilters failed after {stopwatch.ElapsedMilliseconds}ms");
                 throw;
             }
         }
