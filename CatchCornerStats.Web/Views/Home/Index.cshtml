@@ -1,0 +1,119 @@
+@{
+    ViewData["Title"] = "CatchCorner Stats - Market Analysis Dashboard";
+}
+
+<div class="container-fluid py-4">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="text-center">
+                <h1 class="h2 mb-2 text-gradient">CatchCorner Stats</h1>
+                <p class="text-muted mb-0">High-Level Market Analysis Dashboard</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lead Time Analysis Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h3 class="h5 mb-3 text-primary">
+                <i class="bi bi-clock me-2"></i>Lead Time Analysis
+            </h3>
+        </div>
+        <div class="col-md-6">
+            <a href="/Home/GetAverageLeadTime" class="btn btn-outline-primary w-100 py-4 fs-5 mb-3">
+                <i class="bi bi-clock me-2"></i>Average Lead Time
+                <br><small class="text-muted">Average days in advance bookings are made</small>
+            </a>
+        </div>
+        <div class="col-md-6">
+            <a href="/Home/GetLeadTimeBreakdown" class="btn btn-outline-primary w-100 py-4 fs-5 mb-3">
+                <i class="bi bi-pie-chart me-2"></i>Lead Time Breakdown
+                <br><small class="text-muted">Percentage distribution by days in advance</small>
+            </a>
+        </div>
+    </div>
+
+    <!-- Bookings Analysis Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h3 class="h5 mb-3 text-success">
+                <i class="bi bi-calendar-week me-2"></i>Bookings Analysis
+            </h3>
+        </div>
+        <div class="col-md-4">
+            <a href="/Home/GetBookingsByDay" class="btn btn-outline-success w-100 py-4 fs-5 mb-3">
+                <i class="bi bi-calendar-week me-2"></i>Bookings by Day
+                <br><small class="text-muted">Which days people book the most</small>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a href="/Home/GetBookingsByStartTime" class="btn btn-outline-success w-100 py-4 fs-5 mb-3">
+                <i class="bi bi-clock-history me-2"></i>Bookings by Start Time
+                <br><small class="text-muted">Start times distribution analysis</small>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a href="/Home/GetBookingDurationBreakdown" class="btn btn-outline-success w-100 py-4 fs-5 mb-3">
+                <i class="bi bi-hourglass-split me-2"></i>Booking Duration
+                <br><small class="text-muted">Duration intervals people book most</small>
+            </a>
+        </div>
+    </div>
+
+    <!-- Advanced Analysis Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h3 class="h5 mb-3 text-info">
+                <i class="bi bi-graph-up me-2"></i>Advanced Analysis
+            </h3>
+        </div>
+        <div class="col-md-6">
+            <a href="/Home/GetMonthlyReport" class="btn btn-outline-info w-100 py-4 fs-5 mb-3">
+                <i class="bi bi-graph-up me-2"></i>Monthly Report
+                <br><small class="text-muted">Month-to-month analysis with drop flags</small>
+            </a>
+        </div>
+        <div class="col-md-6">
+            <a href="/Home/GetSportComparison" class="btn btn-outline-info w-100 py-4 fs-5 mb-3">
+                <i class="bi bi-bar-chart me-2"></i>Sport Comparison
+                <br><small class="text-muted">Per-city sport ranking with flags</small>
+            </a>
+        </div>
+    </div>
+
+    <!-- Info Section -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card bg-light">
+                <div class="card-body text-center">
+                    <h5 class="card-title">
+                        <i class="bi bi-info-circle me-2"></i>About This Dashboard
+                    </h5>
+                    <p class="card-text">
+                        This dashboard provides comprehensive market analysis tools for sports facility bookings. 
+                        All views include advanced filtering by sports, cities, rink sizes, and facilities.
+                    </p>
+                    <div class="row text-start">
+                        <div class="col-md-6">
+                            <h6>Key Features:</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="bi bi-check-circle text-success me-2"></i>Lead time analysis</li>
+                                <li><i class="bi bi-check-circle text-success me-2"></i>Booking patterns by day/time</li>
+                                <li><i class="bi bi-check-circle text-success me-2"></i>Duration analysis</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Advanced Analytics:</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="bi bi-check-circle text-success me-2"></i>Monthly trends with flags</li>
+                                <li><i class="bi bi-check-circle text-success me-2"></i>Sport comparison by city</li>
+                                <li><i class="bi bi-check-circle text-success me-2"></i>Performance indicators</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

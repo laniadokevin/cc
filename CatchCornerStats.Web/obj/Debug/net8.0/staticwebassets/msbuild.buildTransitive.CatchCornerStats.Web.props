@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\buildMultiTargeting\CatchCornerStats.Web.props" />
+</Project>

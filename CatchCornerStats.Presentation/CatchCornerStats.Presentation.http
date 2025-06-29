@@ -1,0 +1,6 @@
+@CatchCornerStats.Presentation_HostAddress = http://localhost:5044
+
+GET {{CatchCornerStats.Presentation_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

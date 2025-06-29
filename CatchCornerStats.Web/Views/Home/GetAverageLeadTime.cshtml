@@ -1,0 +1,483 @@
+@{
+    ViewData["Title"] = "Average Lead Time";
+}
+
+<div class="container-fluid py-4">
+    <!-- Header --> 
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h2 mb-1 fw-bold text-primary">
+                        <i class="bi bi-clock-history me-2"></i>Average Lead Time
+                    </h1>
+                    <p class="text-muted mb-0">Average days in advance that bookings are made</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary" onclick="loadData()">
+                        <i class="bi bi-arrow-clockwise me-2"></i>Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-funnel me-2"></i>Filters
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3 mb-2">
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Sports</label>
+                            <div class="dropdown w-100">
+                                <button class="btn btn-outline-secondary w-100 text-start dropdown-toggle" type="button" id="sportsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span id="sportsDropdownLabel">All Sports</span>
+                                </button>
+                                <ul class="dropdown-menu w-100 p-2" aria-labelledby="sportsDropdown" style="max-height: 300px; overflow-y: auto;">
+                                    <input type="text" class="form-control mb-2" placeholder="Search..." onkeyup="filterDropdownOptions(this, 'sportsOptions')">
+                                    <div id="sportsOptions"></div>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Cities</label>
+                            <div class="dropdown w-100">
+                                <button class="btn btn-outline-secondary w-100 text-start dropdown-toggle" type="button" id="citiesDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span id="citiesDropdownLabel">All Cities</span>
+                                </button>
+                                <ul class="dropdown-menu w-100 p-2" aria-labelledby="citiesDropdown" style="max-height: 300px; overflow-y: auto;">
+                                    <input type="text" class="form-control mb-2" placeholder="Search..." onkeyup="filterDropdownOptions(this, 'citiesOptions')">
+                                    <div id="citiesOptions"></div>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Rink Sizes</label>
+                            <div class="dropdown w-100">
+                                <button class="btn btn-outline-secondary w-100 text-start dropdown-toggle" type="button" id="rinkSizesDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span id="rinkSizesDropdownLabel">All Sizes</span>
+                                </button>
+                                <ul class="dropdown-menu w-100 p-2" aria-labelledby="rinkSizesDropdown" style="max-height: 300px; overflow-y: auto;">
+                                    <input type="text" class="form-control mb-2" placeholder="Search..." onkeyup="filterDropdownOptions(this, 'rinkSizesOptions')">
+                                    <div id="rinkSizesOptions"></div>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Facilities</label>
+                            <div class="dropdown w-100">
+                                <button class="btn btn-outline-secondary w-100 text-start dropdown-toggle" type="button" id="facilitiesDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span id="facilitiesDropdownLabel">All Facilities</span>
+                                </button>
+                                <ul class="dropdown-menu w-100 p-2" aria-labelledby="facilitiesDropdown" style="max-height: 300px; overflow-y: auto;">
+                                    <input type="text" class="form-control mb-2" placeholder="Search..." onkeyup="filterDropdownOptions(this, 'facilitiesOptions')">
+                                    <div id="facilitiesOptions"></div>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Created Date (From)</label>
+                            <input type="date" class="form-control" id="createdDateFrom">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Created Date (To)</label>
+                            <input type="date" class="form-control" id="createdDateTo">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Happening Date (From)</label>
+                            <input type="date" class="form-control" id="happeningDateFrom">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Happening Date (To)</label>
+                            <input type="date" class="form-control" id="happeningDateTo">
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2 mb-2">
+                        <button class="btn btn-primary px-4 shadow-sm" onclick="applyFilters()">
+                            <i class="bi bi-funnel me-2"></i>Apply Filters
+                        </button>
+                        <button class="btn btn-outline-secondary px-4 shadow-sm" onclick="clearFilters()">
+                            <i class="bi bi-x-circle me-2"></i>Clear Filters
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-clock me-2"></i>Results
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Loading -->
+                    <div id="loading" class="text-center d-none py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-3">Loading data...</p>
+                    </div>
+
+                    <!-- Error -->
+                    <div id="error" class="alert alert-danger d-none" role="alert">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        <span id="errorText">An error occurred</span>
+                    </div>
+
+                    <!-- Data -->
+                    <div id="data" class="d-none">
+                        <!-- Summary Cards -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="card bg-primary text-white">
+                                    <div class="card-body text-center">
+                                        <h3 class="mb-0" id="averageDays">0</h3>
+                                        <p class="mb-0">Average Lead Time (Days)</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card bg-success text-white">
+                                    <div class="card-body text-center">
+                                        <h3 class="mb-0" id="totalBookings">0</h3>
+                                        <p class="mb-0">Total Bookings</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Results Table -->
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Filters</th>
+                                        <th>Average Lead Time (Days)</th>
+                                        <th>Total Bookings</th>
+                                        <th>Category</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="resultsTable">
+                                    <!-- Data will be populated here -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Legend -->
+                        <div class="mt-3">
+                            <small class="text-muted">
+                                <strong>Categories:</strong>
+                                <span class="text-success">Short</span> (≤1 day),
+                                <span class="text-warning">Medium</span> (2-7 days),
+                                <span class="text-danger">Long</span> (>7 days)
+                            </small>
+                        </div>
+
+                        <!-- Last Updated -->
+                        <div class="mt-3 text-muted small">
+                            Last updated: <span id="lastUpdated">Never</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Global variables
+        let currentData = null;
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFilterOptions();
+            loadData();
+        });
+
+        // Load filter options from API
+        async function loadFilterOptions() {
+            await Promise.all([
+                populateCheckboxDropdown('sportsOptions', 'GetSports', 'All Sports', 'sportsDropdownLabel'),
+                populateCheckboxDropdown('citiesOptions', 'GetCities', 'All Cities', 'citiesDropdownLabel'),
+                populateCheckboxDropdown('rinkSizesOptions', 'GetRinkSizes', 'All Sizes', 'rinkSizesDropdownLabel'),
+                populateCheckboxDropdown('facilitiesOptions', 'GetFacilities', 'All Facilities', 'facilitiesDropdownLabel')
+            ]);
+        }
+
+        function btoaUtf8(str) {
+            return btoa(unescape(encodeURIComponent(str)));
+        }
+
+        async function populateCheckboxDropdown(containerId, endpoint, allLabel, labelId) {
+            const container = document.getElementById(containerId);
+            const label = document.getElementById(labelId);
+            container.innerHTML = '';
+            try {
+                const url = 'https://localhost:7254/api/Stats/' + endpoint + '?v=' + Date.now();
+                const response = await fetch(url);
+                const data = await response.json();
+                if (!data.length) {
+                    container.innerHTML = '<div class="text-muted small">No options</div>';
+                    label.textContent = allLabel;
+                    return;
+                }
+                data.forEach(item => {
+                    if (item.value && item.value !== '') {
+                        const id = containerId + '_' + btoaUtf8(item.value).replace(/[^a-zA-Z0-9]/g, '');
+                        container.innerHTML += `<div class='form-check'>
+                            <input class='form-check-input' type='checkbox' value="${item.value}" id="${id}" onchange="updateDropdownLabel('${containerId}','${allLabel}','${labelId}')">
+                            <label class='form-check-label' for="${id}">${item.value}</label>
+                        </div>`;
+                    }
+                });
+                updateDropdownLabel(containerId, allLabel, labelId);
+            } catch (err) {
+                container.innerHTML = '<div class="text-danger small">Error loading</div>';
+                label.textContent = allLabel;
+            }
+        }
+
+        function updateDropdownLabel(containerId, allLabel, labelId) {
+            const container = document.getElementById(containerId);
+            const label = document.getElementById(labelId);
+            const checked = Array.from(container.querySelectorAll('input[type=checkbox]:checked')).map(cb => cb.value);
+            if (checked.length === 0) {
+                label.textContent = allLabel;
+            } else if (checked.length === 1) {
+                label.textContent = checked[0];
+            } else {
+                label.textContent = `${checked.length} selected`;
+            }
+        }
+
+        function filterDropdownOptions(input, containerId) {
+            const filter = input.value.toLowerCase();
+            const container = document.getElementById(containerId);
+            Array.from(container.children).forEach(div => {
+                const label = div.querySelector('label');
+                if (label && label.textContent.toLowerCase().includes(filter)) {
+                    div.style.display = '';
+                } else {
+                    div.style.display = 'none';
+                }
+            });
+        }
+
+        function getCheckedValues(containerId) {
+            const container = document.getElementById(containerId);
+            return Array.from(container.querySelectorAll('input[type=checkbox]:checked')).map(cb => cb.value);
+        }
+
+        // Load data from API
+        async function loadData() {
+            try {
+                showLoading();
+                hideError();
+                
+                // Build query parameters
+                const params = new URLSearchParams();
+                
+                // Get filter values
+                const sports = getCheckedValues('sportsOptions');
+                const cities = getCheckedValues('citiesOptions');
+                const rinkSizes = getCheckedValues('rinkSizesOptions');
+                const facilities = getCheckedValues('facilitiesOptions');
+                const createdFrom = document.getElementById('createdDateFrom').value;
+                const createdTo = document.getElementById('createdDateTo').value;
+                const happeningFrom = document.getElementById('happeningDateFrom').value;
+                const happeningTo = document.getElementById('happeningDateTo').value;
+                
+                // Add parameters
+                sports.forEach(sport => params.append('sports', sport));
+                cities.forEach(city => params.append('cities', city));
+                rinkSizes.forEach(size => params.append('rinkSizes', size));
+                facilities.forEach(facility => params.append('facilities', facility));
+                if (createdFrom) params.append('createdDateFrom', createdFrom);
+                if (createdTo) params.append('createdDateTo', createdTo);
+                if (happeningFrom) params.append('happeningDateFrom', happeningFrom);
+                if (happeningTo) params.append('happeningDateTo', happeningTo);
+                
+                // Make API call
+                const url = `https://localhost:7254/api/Stats/GetAverageLeadTime${params.toString() ? '?' + params.toString() : ''}`;
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                displayData(data);
+                
+            } catch (error) {
+                console.error('Error loading data:', error);
+                showError('Failed to load data: ' + error.message);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Display data in UI
+        function displayData(data) {
+            currentData = data;
+            
+            // Update summary cards
+            const averageDays = document.getElementById('averageDays');
+            const totalBookings = document.getElementById('totalBookings');
+            
+            if (averageDays && data.averageLeadTime !== undefined) {
+                averageDays.textContent = data.averageLeadTime.toFixed(2);
+            }
+            
+            if (totalBookings && data.totalBookings !== undefined) {
+                totalBookings.textContent = formatNumber(data.totalBookings);
+            }
+
+            // Update results table
+            const tbody = document.getElementById('resultsTable');
+            tbody.innerHTML = '';
+            
+            const row = document.createElement('tr');
+            const filtersSummary = getFiltersSummary();
+            const category = getLeadTimeCategory(data.averageLeadTime);
+            const categoryClass = getCategoryClass(data.averageLeadTime);
+            
+            row.innerHTML = `
+                <td>${filtersSummary}</td>
+                <td>${data.averageLeadTime ? data.averageLeadTime.toFixed(2) : '0.00'}</td>
+                <td>${formatNumber(data.totalBookings || 0)}</td>
+                <td><span class="badge ${categoryClass}">${category}</span></td>
+            `;
+            tbody.appendChild(row);
+
+            // Show data container
+            document.getElementById('data').classList.remove('d-none');
+            
+            // Update timestamp
+            document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+        }
+
+        // Get filters summary
+        function getFiltersSummary() {
+            const sports = getCheckedValues('sportsOptions');
+            const cities = getCheckedValues('citiesOptions');
+            const rinkSizes = getCheckedValues('rinkSizesOptions');
+            const facilities = getCheckedValues('facilitiesOptions');
+            const createdFrom = document.getElementById('createdDateFrom').value;
+            const createdTo = document.getElementById('createdDateTo').value;
+            const happeningFrom = document.getElementById('happeningDateFrom').value;
+            const happeningTo = document.getElementById('happeningDateTo').value;
+            
+            const parts = [];
+            
+            if (sports.length > 0) {
+                parts.push(`Sports: ${sports.join(', ')}`);
+            }
+            
+            if (cities.length > 0) {
+                parts.push(`Cities: ${cities.join(', ')}`);
+            }
+            
+            if (rinkSizes.length > 0) {
+                parts.push(`Rink Sizes: ${rinkSizes.join(', ')}`);
+            }
+            
+            if (facilities.length > 0) {
+                parts.push(`Facilities: ${facilities.join(', ')}`);
+            }
+            
+            if (createdFrom && createdTo) {
+                parts.push(`Created: ${createdFrom} to ${createdTo}`);
+            } else if (createdFrom) {
+                parts.push(`Created from: ${createdFrom}`);
+            } else if (createdTo) {
+                parts.push(`Created to: ${createdTo}`);
+            }
+            
+            if (happeningFrom && happeningTo) {
+                parts.push(`Happening: ${happeningFrom} to ${happeningTo}`);
+            } else if (happeningFrom) {
+                parts.push(`Happening from: ${happeningFrom}`);
+            } else if (happeningTo) {
+                parts.push(`Happening to: ${happeningTo}`);
+            }
+            
+            return parts.length ? parts.join(' | ') : 'All Data';
+        }
+
+        // Categorize lead time
+        function getLeadTimeCategory(avgLeadTime) {
+            if (!avgLeadTime || avgLeadTime <= 1) return 'Short';
+            if (avgLeadTime <= 7) return 'Medium';
+            return 'Long';
+        }
+
+        // Get category CSS class
+        function getCategoryClass(avgLeadTime) {
+            if (!avgLeadTime || avgLeadTime <= 1) return 'bg-success';
+            if (avgLeadTime <= 7) return 'bg-warning';
+            return 'bg-danger';
+        }
+
+        // Apply filters
+        function applyFilters() {
+            loadData();
+        }
+
+        // Clear filters
+        function clearFilters() {
+            ['sportsOptions','citiesOptions','rinkSizesOptions','facilitiesOptions'].forEach(id => {
+                const container = document.getElementById(id);
+                Array.from(container.querySelectorAll('input[type=checkbox]')).forEach(cb => cb.checked = false);
+            });
+            updateDropdownLabel('sportsOptions','All Sports','sportsDropdownLabel');
+            updateDropdownLabel('citiesOptions','All Cities','citiesDropdownLabel');
+            updateDropdownLabel('rinkSizesOptions','All Sizes','rinkSizesDropdownLabel');
+            updateDropdownLabel('facilitiesOptions','All Facilities','facilitiesDropdownLabel');
+            document.getElementById('createdDateFrom').value = '';
+            document.getElementById('createdDateTo').value = '';
+            document.getElementById('happeningDateFrom').value = '';
+            document.getElementById('happeningDateTo').value = '';
+            loadData();
+        }
+
+        // Show loading
+        function showLoading() {
+            document.getElementById('loading').classList.remove('d-none');
+            document.getElementById('data').classList.add('d-none');
+            document.getElementById('error').classList.add('d-none');
+        }
+
+        // Hide loading
+        function hideLoading() {
+            document.getElementById('loading').classList.add('d-none');
+        }
+
+        // Show error
+        function showError(message) {
+            document.getElementById('errorText').textContent = message;
+            document.getElementById('error').classList.remove('d-none');
+        }
+
+        // Hide error
+        function hideError() {
+            document.getElementById('error').classList.add('d-none');
+        }
+
+        // Format number
+        function formatNumber(num) {
+            return new Intl.NumberFormat().format(num);
+        }
+    </script>
+} 

@@ -1,0 +1,12 @@
+C:\Users\lania\Desktop\Proyectos\CatchCornerStats\CatchCornerStats.Core\bin\Debug\net8.0\CatchCornerStats.Core.deps.json
+C:\Users\lania\Desktop\Proyectos\CatchCornerStats\CatchCornerStats.Core\bin\Debug\net8.0\CatchCornerStats.Core.dll
+C:\Users\lania\Desktop\Proyectos\CatchCornerStats\CatchCornerStats.Core\bin\Debug\net8.0\CatchCornerStats.Core.pdb
+C:\Users\lania\Desktop\Proyectos\CatchCornerStats\CatchCornerStats.Core\obj\Debug\net8.0\CatchCornerStats.Core.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\lania\Desktop\Proyectos\CatchCornerStats\CatchCornerStats.Core\obj\Debug\net8.0\CatchCornerStats.Core.AssemblyInfoInputs.cache
+C:\Users\lania\Desktop\Proyectos\CatchCornerStats\CatchCornerStats.Core\obj\Debug\net8.0\CatchCornerStats.Core.AssemblyInfo.cs
+C:\Users\lania\Desktop\Proyectos\CatchCornerStats\CatchCornerStats.Core\obj\Debug\net8.0\CatchCornerStats.Core.csproj.CoreCompileInputs.cache
+C:\Users\lania\Desktop\Proyectos\CatchCornerStats\CatchCornerStats.Core\obj\Debug\net8.0\CatchCornerStats.Core.sourcelink.json
+C:\Users\lania\Desktop\Proyectos\CatchCornerStats\CatchCornerStats.Core\obj\Debug\net8.0\CatchCornerStats.Core.dll
+C:\Users\lania\Desktop\Proyectos\CatchCornerStats\CatchCornerStats.Core\obj\Debug\net8.0\refint\CatchCornerStats.Core.dll
+C:\Users\lania\Desktop\Proyectos\CatchCornerStats\CatchCornerStats.Core\obj\Debug\net8.0\CatchCornerStats.Core.pdb
+C:\Users\lania\Desktop\Proyectos\CatchCornerStats\CatchCornerStats.Core\obj\Debug\net8.0\ref\CatchCornerStats.Core.dll

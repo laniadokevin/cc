@@ -1,0 +1,465 @@
+@{
+    ViewData["Title"] = "Lead Time Breakdown";
+}
+
+<div class="container-fluid py-4">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div>
+                    <h1 class="h2 mb-1 fw-bold text-primary">
+                        <i class="bi bi-pie-chart me-2"></i>Lead Time Breakdown
+                    </h1>
+                    <p class="text-muted mb-0">Distribution of lead times for bookings. Analyze by sport, city, rink size, and facility.</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-primary shadow-sm" onclick="loadData()">
+                        <i class="bi bi-arrow-clockwise me-2"></i>Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom-0">
+                    <h5 class="card-title mb-0 text-secondary">
+                        <i class="bi bi-funnel me-2"></i>Filters
+                    </h5>
+                </div>
+                <div class="card-body pb-2">
+                    <div class="row g-3 mb-2">
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Sports</label>
+                            <div class="dropdown w-100">
+                                <button class="btn btn-outline-secondary w-100 text-start dropdown-toggle" type="button" id="sportsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span id="sportsDropdownLabel">All Sports</span>
+                                </button>
+                                <ul class="dropdown-menu w-100 p-2" aria-labelledby="sportsDropdown" style="max-height: 300px; overflow-y: auto;">
+                                    <input type="text" class="form-control mb-2" placeholder="Search..." onkeyup="filterDropdownOptions(this, 'sportsOptions')">
+                                    <div id="sportsOptions"></div>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Cities</label>
+                            <div class="dropdown w-100">
+                                <button class="btn btn-outline-secondary w-100 text-start dropdown-toggle" type="button" id="citiesDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span id="citiesDropdownLabel">All Cities</span>
+                                </button>
+                                <ul class="dropdown-menu w-100 p-2" aria-labelledby="citiesDropdown" style="max-height: 300px; overflow-y: auto;">
+                                    <input type="text" class="form-control mb-2" placeholder="Search..." onkeyup="filterDropdownOptions(this, 'citiesOptions')">
+                                    <div id="citiesOptions"></div>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Rink Sizes</label>
+                            <div class="dropdown w-100">
+                                <button class="btn btn-outline-secondary w-100 text-start dropdown-toggle" type="button" id="rinkSizesDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span id="rinkSizesDropdownLabel">All Sizes</span>
+                                </button>
+                                <ul class="dropdown-menu w-100 p-2" aria-labelledby="rinkSizesDropdown" style="max-height: 300px; overflow-y: auto;">
+                                    <input type="text" class="form-control mb-2" placeholder="Search..." onkeyup="filterDropdownOptions(this, 'rinkSizesOptions')">
+                                    <div id="rinkSizesOptions"></div>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Facilities</label>
+                            <div class="dropdown w-100">
+                                <button class="btn btn-outline-secondary w-100 text-start dropdown-toggle" type="button" id="facilitiesDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span id="facilitiesDropdownLabel">All Facilities</span>
+                                </button>
+                                <ul class="dropdown-menu w-100 p-2" aria-labelledby="facilitiesDropdown" style="max-height: 300px; overflow-y: auto;">
+                                    <input type="text" class="form-control mb-2" placeholder="Search..." onkeyup="filterDropdownOptions(this, 'facilitiesOptions')">
+                                    <div id="facilitiesOptions"></div>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Created Date (From)</label>
+                            <input type="date" class="form-control" id="createdDateFrom">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Created Date (To)</label>
+                            <input type="date" class="form-control" id="createdDateTo">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Happening Date (From)</label>
+                            <input type="date" class="form-control" id="happeningDateFrom">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Happening Date (To)</label>
+                            <input type="date" class="form-control" id="happeningDateTo">
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2 mb-2">
+                        <button class="btn btn-primary px-4 shadow-sm" onclick="applyFilters()">
+                            <i class="bi bi-funnel me-2"></i>Apply Filters
+                        </button>
+                        <button class="btn btn-outline-secondary px-4 shadow-sm" onclick="clearFilters()">
+                            <i class="bi bi-x-circle me-2"></i>Clear Filters
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Section -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-white border-bottom-0">
+                    <h5 class="card-title mb-0 text-primary">
+                        <i class="bi bi-pie-chart me-2"></i>Lead Time Breakdown Results
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="loadingSpinner" class="text-center d-none py-5">
+                        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-3 text-primary">Loading data...</p>
+                    </div>
+                    <div id="errorMessage" class="alert alert-danger d-none" role="alert">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        <span id="errorText">An error occurred while loading data.</span>
+                    </div>
+                    <div id="dataContainer" class="d-none">
+                        <div class="row mb-4 g-3">
+                            <div class="col-md-6">
+                                <div class="card border-0 bg-gradient-primary text-white shadow-sm h-100">
+                                    <div class="card-body">
+                                        <h6 class="fw-bold mb-3"><i class="bi bi-pie-chart me-2"></i>Pie Chart</h6>
+                                        <div class="chart-container" style="height: 300px;">
+                                            <canvas id="leadTimePieChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card border-0 bg-gradient-success text-white shadow-sm h-100">
+                                    <div class="card-body">
+                                        <h6 class="fw-bold mb-3"><i class="bi bi-bar-chart me-2"></i>Bar Chart</h6>
+                                        <div class="chart-container" style="height: 300px;">
+                                            <canvas id="leadTimeBarChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-responsive mb-3">
+                            <table class="table table-hover align-middle rounded shadow-sm">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Days in Advance</th>
+                                        <th>Percentage (%)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="detailsTableBody"></tbody>
+                            </table>
+                        </div>
+                        <!-- Query History Table -->
+                        <div class="table-responsive mb-3">
+                            <h6 class="fw-bold mt-4 mb-2">
+                                <i class="bi bi-clock-history me-2"></i>Query History
+                                <button class="btn btn-sm btn-outline-danger ms-2" onclick="clearHistory()" title="Clear History">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </h6>
+                            <table class="table table-sm table-bordered align-middle" id="historyTable">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Date/Time <span data-bs-toggle="tooltip" title="When this query was made."><i class="bi bi-info-circle"></i></span></th>
+                                        <th>Filters <span data-bs-toggle="tooltip" title="Filters applied for this query."><i class="bi bi-info-circle"></i></span></th>
+                                        <th>Top 3 Days in Advance <span data-bs-toggle="tooltip" title="The three most common lead times (days in advance) and their percentages."><i class="bi bi-info-circle"></i></span></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="historyTableBody">
+                                    <!-- History rows go here -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-3 small">
+                            <div>
+                                <span class="text-muted">Last updated: <span id="lastUpdated">Never</span></span>
+                            </div>
+                            <div>
+                                <span class="text-muted">API Endpoint: <code>/api/Stats/GetLeadTimeBreakdown</code></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+// --- Filtros con checkboxes y buscador ---
+document.addEventListener('DOMContentLoaded', function() {
+    loadFilterOptions();
+    loadData();
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+        new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+async function loadFilterOptions() {
+    await Promise.all([
+        populateCheckboxDropdown('sportsOptions', 'GetSports', 'All Sports', 'sportsDropdownLabel'),
+        populateCheckboxDropdown('citiesOptions', 'GetCities', 'All Cities', 'citiesDropdownLabel'),
+        populateCheckboxDropdown('rinkSizesOptions', 'GetRinkSizes', 'All Sizes', 'rinkSizesDropdownLabel'),
+        populateCheckboxDropdown('facilitiesOptions', 'GetFacilities', 'All Facilities', 'facilitiesDropdownLabel')
+    ]);
+}
+// Función segura para base64 UTF-8
+function btoaUtf8(str) {
+    return btoa(unescape(encodeURIComponent(str)));
+}
+async function populateCheckboxDropdown(containerId, endpoint, allLabel, labelId) {
+    const container = document.getElementById(containerId);
+    const label = document.getElementById(labelId);
+    container.innerHTML = '';
+    try {
+        const url = 'https://localhost:7254/api/Stats/' + endpoint + '?v=' + Date.now();
+        const response = await fetch(url);
+        const data = await response.json();
+        if (!data.length) {
+            container.innerHTML = '<div class="text-muted small">No options</div>';
+            label.textContent = allLabel;
+            return;
+        }
+        data.forEach(item => {
+            if (item.value && item.value !== '') {
+                const id = containerId + '_' + btoaUtf8(item.value).replace(/[^a-zA-Z0-9]/g, '');
+                container.innerHTML += `<div class='form-check'>
+                    <input class='form-check-input' type='checkbox' value="${item.value}" id="${id}" onchange="updateDropdownLabel('${containerId}','${allLabel}','${labelId}')">
+                    <label class='form-check-label' for="${id}">${item.value}</label>
+                </div>`;
+            }
+        });
+        updateDropdownLabel(containerId, allLabel, labelId);
+    } catch (err) {
+        container.innerHTML = '<div class="text-danger small">Error loading</div>';
+        label.textContent = allLabel;
+    }
+}
+function updateDropdownLabel(containerId, allLabel, labelId) {
+    const container = document.getElementById(containerId);
+    const label = document.getElementById(labelId);
+    const checked = Array.from(container.querySelectorAll('input[type=checkbox]:checked')).map(cb => cb.value);
+    if (checked.length === 0) {
+        label.textContent = allLabel;
+    } else if (checked.length === 1) {
+        label.textContent = checked[0];
+    } else {
+        label.textContent = `${checked.length} selected`;
+    }
+}
+function filterDropdownOptions(input, containerId) {
+    const filter = input.value.toLowerCase();
+    const container = document.getElementById(containerId);
+    Array.from(container.children).forEach(div => {
+        const label = div.querySelector('label');
+        if (label && label.textContent.toLowerCase().includes(filter)) {
+            div.style.display = '';
+        } else {
+            div.style.display = 'none';
+        }
+    });
+}
+function getCheckedValues(containerId) {
+    const container = document.getElementById(containerId);
+    return Array.from(container.querySelectorAll('input[type=checkbox]:checked')).map(cb => cb.value);
+}
+function applyFilters() {
+    loadData();
+}
+function clearFilters() {
+    ['sportsOptions','citiesOptions','rinkSizesOptions','facilitiesOptions'].forEach(id => {
+        const container = document.getElementById(id);
+        Array.from(container.querySelectorAll('input[type=checkbox]')).forEach(cb => cb.checked = false);
+    });
+    updateDropdownLabel('sportsOptions','All Sports','sportsDropdownLabel');
+    updateDropdownLabel('citiesOptions','All Cities','citiesDropdownLabel');
+    updateDropdownLabel('rinkSizesOptions','All Sizes','rinkSizesDropdownLabel');
+    updateDropdownLabel('facilitiesOptions','All Facilities','facilitiesDropdownLabel');
+    // Limpiar fechas
+    document.getElementById('createdDateFrom').value = '';
+    document.getElementById('createdDateTo').value = '';
+    document.getElementById('happeningDateFrom').value = '';
+    document.getElementById('happeningDateTo').value = '';
+    loadData();
+}
+
+// --- Lógica de resultados ---
+let pieChart = null;
+let barChart = null;
+let queryHistory = [];
+async function loadData() {
+    showLoading();
+    hideError();
+    try {
+        const params = new URLSearchParams();
+        const sports = getCheckedValues('sportsOptions');
+        const cities = getCheckedValues('citiesOptions');
+        const rinkSizes = getCheckedValues('rinkSizesOptions');
+        const facilities = getCheckedValues('facilitiesOptions');
+        if (sports.length > 0) sports.forEach(s => params.append('sports', s));
+        if (cities.length > 0) cities.forEach(c => params.append('cities', c));
+        if (rinkSizes.length > 0) rinkSizes.forEach(r => params.append('rinkSizes', r));
+        if (facilities.length > 0) facilities.forEach(f => params.append('facilities', f));
+        // Fechas
+        const createdFrom = document.getElementById('createdDateFrom').value;
+        const createdTo = document.getElementById('createdDateTo').value;
+        const happeningFrom = document.getElementById('happeningDateFrom').value;
+        const happeningTo = document.getElementById('happeningDateTo').value;
+        if (createdFrom) params.append('createdDateFrom', createdFrom);
+        if (createdTo) params.append('createdDateTo', createdTo);
+        if (happeningFrom) params.append('happeningDateFrom', happeningFrom);
+        if (happeningTo) params.append('happeningDateTo', happeningTo);
+        const url = `https://localhost:7254/api/Stats/GetLeadTimeBreakdown${params.toString() ? '?' + params.toString() : ''}`;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await response.json();
+        displayData(data);
+        updateLastUpdated();
+    } catch (error) {
+        showError('Failed to load data: ' + error.message);
+    } finally {
+        hideLoading();
+    }
+}
+function displayData(data) {
+    if (!data || Object.keys(data).length === 0) {
+        document.getElementById('dataContainer').classList.add('d-none');
+        return;
+    }
+    // Pie chart
+    const pieCtx = document.getElementById('leadTimePieChart');
+    if (pieChart) pieChart.destroy();
+    pieChart = new Chart(pieCtx, {
+        type: 'pie',
+        data: {
+            labels: Object.keys(data),
+            datasets: [{
+                data: Object.values(data),
+                backgroundColor: [
+                    '#0d6efd', '#198754', '#ffc107', '#dc3545',
+                    '#0dcaf0', '#6f42c1', '#fd7e14', '#20c997'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { position: 'bottom' } }
+        }
+    });
+    // Bar chart
+    const barCtx = document.getElementById('leadTimeBarChart');
+    if (barChart) barChart.destroy();
+    barChart = new Chart(barCtx, {
+        type: 'bar',
+        data: {
+            labels: Object.keys(data),
+            datasets: [{
+                label: 'Percentage',
+                data: Object.values(data),
+                backgroundColor: '#0d6efd'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, title: { display: true, text: '%' } } }
+        }
+    });
+    // Table
+    const tbody = document.getElementById('detailsTableBody');
+    tbody.innerHTML = '';
+    Object.entries(data).forEach(([days, percent]) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${days}</td><td>${percent.toFixed(2)}</td>`;
+        tbody.appendChild(row);
+    });
+    // Agregar al historial
+    const top3 = Object.entries(data)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .map(([days, percent]) => `${days}d (${percent.toFixed(1)}%)`).join(', ');
+    addToHistory(getFiltersSummary(), top3);
+    document.getElementById('dataContainer').classList.remove('d-none');
+}
+function showLoading() {
+    document.getElementById('loadingSpinner').classList.remove('d-none');
+    document.getElementById('dataContainer').classList.add('d-none');
+}
+function hideLoading() {
+    document.getElementById('loadingSpinner').classList.add('d-none');
+}
+function showError(message) {
+    document.getElementById('errorText').textContent = message;
+    document.getElementById('errorMessage').classList.remove('d-none');
+}
+function hideError() {
+    document.getElementById('errorMessage').classList.add('d-none');
+}
+function updateLastUpdated() {
+    document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+}
+function addToHistory(filtersSummary, top3) {
+    const now = new Date().toLocaleString();
+    queryHistory.unshift({
+        date: now,
+        filters: filtersSummary,
+        top3: top3
+    });
+    renderHistory();
+}
+function renderHistory() {
+    const tbody = document.getElementById('historyTableBody');
+    tbody.innerHTML = '';
+    queryHistory.forEach(item => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${item.date}</td>
+            <td>${item.filters}</td>
+            <td>${item.top3}</td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+function clearHistory() {
+    queryHistory = [];
+    renderHistory();
+}
+function getFiltersSummary() {
+    const sports = getCheckedValues('sportsOptions');
+    const cities = getCheckedValues('citiesOptions');
+    const rinkSizes = getCheckedValues('rinkSizesOptions');
+    const facilities = getCheckedValues('facilitiesOptions');
+    const createdDateFrom = document.getElementById('createdDateFrom').value;
+    const createdDateTo = document.getElementById('createdDateTo').value;
+    const happeningDateFrom = document.getElementById('happeningDateFrom').value;
+    const happeningDateTo = document.getElementById('happeningDateTo').value;
+    const parts = [];
+    if (sports.length) parts.push(`Sport: ${sports.join(', ')}`);
+    if (cities.length) parts.push(`City: ${cities.join(', ')}`);
+    if (rinkSizes.length) parts.push(`Rink Size: ${rinkSizes.join(', ')}`);
+    if (facilities.length) parts.push(`Facility: ${facilities.join(', ')}`);
+    if (createdDateFrom) parts.push(`Created From: ${createdDateFrom}`);
+    if (createdDateTo) parts.push(`Created To: ${createdDateTo}`);
+    if (happeningDateFrom) parts.push(`Happening From: ${happeningDateFrom}`);
+    if (happeningDateTo) parts.push(`Happening To: ${happeningDateTo}`);
+    return parts.length ? parts.join(' | ') : 'All Data';
+}
+</script>
+} 

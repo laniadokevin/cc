@@ -1,0 +1,19 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "CatchCornerStats.Presentation\\CatchCornerStats.Presentation.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "CatchCornerStats.Web\\CatchCornerStats.Web.csproj",
+        "Action": "Start"
+      }
+    ]
+  },
+  {
+    "Name": "New Profile (1)",
+    "Projects": []
+  }
+]

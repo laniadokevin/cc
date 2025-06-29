@@ -1,0 +1,27 @@
+/* Fix para dropdowns de filtros solapados */
+.dropdown-menu {
+    z-index: 2050 !important;
+}
+
+/* Opcional: asegurar que los padres no oculten el dropdown */
+.card, .row, .container, .container-fluid {
+    overflow: visible !important;
+}
+
+body {
+    background-color: #f8fafc !important; /* Gris muy claro, casi blanco */
+}
+
+.card.bg-gradient-primary, .card.bg-gradient-success {
+    background: #fff !important;
+    color: #212529 !important;
+    box-shadow: 0 2px 16px 0 rgba(0,0,0,0.07), 0 1.5px 4px 0 rgba(0,0,0,0.03);
+    border-radius: 1rem !important;
+}
+
+/* Opcional: mejora para tablas */
+.table {
+    background: #fff;
+    border-radius: 0.75rem;
+    overflow: hidden;
+} 
