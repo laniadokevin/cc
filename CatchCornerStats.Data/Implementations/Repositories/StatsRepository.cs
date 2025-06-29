@@ -144,7 +144,7 @@ namespace CatchCornerStats.Data.Repositories
 
             // OPTIMIZACIÓN: Agrupar directamente por hora de inicio
             var grouped = await query
-                .GroupBy(x => x.StartTime.Hours)
+                .GroupBy(x => x.StartTime.Value.Hours)
                 .Select(g => new
                 {
                     StartHour = g.Key,
@@ -168,27 +168,47 @@ namespace CatchCornerStats.Data.Repositories
 
         public async Task<Dictionary<string, double>> GetBookingDurationBreakdownAsync(string? sport, string? city, string? rinkSize, string? facility, DateTime? createdDateFrom, DateTime? createdDateTo, DateTime? happeningDateFrom, DateTime? happeningDateTo)
         {
-            var query = BuildBaseQuery(sport, city, rinkSize, facility);
-            ApplyDateFilters(ref query, createdDateFrom, createdDateTo, happeningDateFrom, happeningDateTo);
+            // Si los filtros están en Bookings, evitamos el JOIN
+            var query = _context.Bookings.AsQueryable();
 
-            // OPTIMIZACIÓN: Calcular duración en SQL
-            var durations = await query
-                .Select(x => new
-                {
-                    x.BookingNumber,
-                    DurationHours = Math.Round((x.EndTime - x.StartTime).TotalHours, 1)
-                })
-                .GroupBy(x => x.DurationHours)
+            if (!string.IsNullOrEmpty(sport))
+                query = query.Where(x => x.Sport == sport);
+            if (!string.IsNullOrEmpty(city))
+                query = query.Where(x => x.City == city);
+            if (!string.IsNullOrEmpty(rinkSize))
+                query = query.Where(x => x.RinkSize == rinkSize);
+            if (!string.IsNullOrEmpty(facility))
+                query = query.Where(x => x.Facility == facility);
+            if (createdDateFrom.HasValue)
+                query = query.Where(x => x.CreatedDateUtc >= createdDateFrom.Value);
+            if (createdDateTo.HasValue)
+                query = query.Where(x => x.CreatedDateUtc <= createdDateTo.Value);
+            if (happeningDateFrom.HasValue)
+                query = query.Where(x => x.HappeningDate >= happeningDateFrom.Value);
+            if (happeningDateTo.HasValue)
+                query = query.Where(x => x.HappeningDate <= happeningDateTo.Value);
+
+            // Traer solo BookingNumber, StartTime y EndTime únicos
+            var bookings = await query
+                .Where(x => EF.Property<object>(x, "StartTime") != null && EF.Property<object>(x, "EndTime") != null)
+                .Select(x => new { x.BookingNumber, x.StartTime, x.EndTime })
+                .Distinct()
+                .ToListAsync();
+
+            if (!bookings.Any()) return new Dictionary<string, double>();
+
+            var durations = bookings
+                .GroupBy(x => Math.Round((x.EndTime.Value - x.StartTime.Value).TotalHours, 1))
+                .Where(g => g.Key > 0) // Solo duraciones positivas
                 .Select(g => new
                 {
                     Duration = $"{g.Key} hr",
-                    UniqueBookings = g.Select(x => x.BookingNumber).Distinct().Count()
+                    UniqueBookings = g.Count()
                 })
-                .ToListAsync();
-
-            if (!durations.Any()) return new Dictionary<string, double>();
+                .ToList();
 
             var totalBookings = durations.Sum(x => x.UniqueBookings);
+            if (totalBookings == 0) return new Dictionary<string, double>();
 
             return durations.ToDictionary(
                 x => x.Duration,
@@ -643,8 +663,8 @@ namespace CatchCornerStats.Data.Repositories
         public int BookingNumber { get; set; }
         public DateTime CreatedDateUtc { get; set; }
         public DateTime HappeningDate { get; set; }
-        public TimeSpan StartTime { get; set; }
-        public TimeSpan EndTime { get; set; }
+        public TimeSpan? StartTime { get; set; }
+        public TimeSpan? EndTime { get; set; }
         public string Facility { get; set; } = string.Empty;
         public string Sport { get; set; } = string.Empty;
         public string City { get; set; } = string.Empty;

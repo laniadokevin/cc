@@ -48,7 +48,7 @@
                                     <span id="sportsDropdownLabel">All Sports</span>
                                 </button>
                                 <ul class="dropdown-menu w-100 p-2" aria-labelledby="sportsDropdown" style="max-height: 300px; overflow-y: auto; z-index: 1051;">
-                                    <input type="text" class="form-control mb-2" placeholder="Search..." oninput="simpleFilterDropdown({containerId:'sportsOptions',type:'sports',labelId:'sportsDropdownLabel',defaultLabel:'All Sports'})">
+                                    <input type="text" class="form-control mb-2" placeholder="Search..." oninput="if(SharedFilters && SharedFilters.isInitialized) simpleFilterDropdown({containerId:'sportsOptions',type:'sports',labelId:'sportsDropdownLabel',defaultLabel:'All Sports'})">
                                     <div id="sportsOptions"></div>
                                 </ul>
                             </div>
@@ -60,7 +60,7 @@
                                     <span id="citiesDropdownLabel">All Cities</span>
                                 </button>
                                 <ul class="dropdown-menu w-100 p-2" aria-labelledby="citiesDropdown" style="max-height: 300px; overflow-y: auto; z-index: 1051;">
-                                    <input type="text" class="form-control mb-2" placeholder="Search..." oninput="simpleFilterDropdown({containerId:'citiesOptions',type:'cities',labelId:'citiesDropdownLabel',defaultLabel:'All Cities'})">
+                                    <input type="text" class="form-control mb-2" placeholder="Search..." oninput="if(SharedFilters && SharedFilters.isInitialized) simpleFilterDropdown({containerId:'citiesOptions',type:'cities',labelId:'citiesDropdownLabel',defaultLabel:'All Cities'})">
                                     <div id="citiesOptions"></div>
                                 </ul>
                             </div>
@@ -72,7 +72,7 @@
                                     <span id="rinkSizesDropdownLabel">All Sizes</span>
                                 </button>
                                 <ul class="dropdown-menu w-100 p-2" aria-labelledby="rinkSizesDropdown" style="max-height: 300px; overflow-y: auto; z-index: 1051;">
-                                    <input type="text" class="form-control mb-2" placeholder="Search..." oninput="simpleFilterDropdown({containerId:'rinkSizesOptions',type:'rinkSizes',labelId:'rinkSizesDropdownLabel',defaultLabel:'All Sizes'})">
+                                    <input type="text" class="form-control mb-2" placeholder="Search..." oninput="if(SharedFilters && SharedFilters.isInitialized) simpleFilterDropdown({containerId:'rinkSizesOptions',type:'rinkSizes',labelId:'rinkSizesDropdownLabel',defaultLabel:'All Sizes'})">
                                     <div id="rinkSizesOptions"></div>
                                 </ul>
                             </div>
@@ -84,7 +84,7 @@
                                     <span id="facilitiesDropdownLabel">All Facilities</span>
                                 </button>
                                 <ul class="dropdown-menu w-100 p-2" aria-labelledby="facilitiesDropdown" style="max-height: 300px; overflow-y: auto; z-index: 1051;">
-                                    <input type="text" class="form-control mb-2" placeholder="Search..." oninput="simpleFilterDropdown({containerId:'facilitiesOptions',type:'facilities',labelId:'facilitiesDropdownLabel',defaultLabel:'All Facilities'})">
+                                    <input type="text" class="form-control mb-2" placeholder="Search..." oninput="if(SharedFilters && SharedFilters.isInitialized) simpleFilterDropdown({containerId:'facilitiesOptions',type:'facilities',labelId:'facilitiesDropdownLabel',defaultLabel:'All Facilities'})">
                                     <div id="facilitiesOptions"></div>
                                 </ul>
                             </div>
@@ -240,10 +240,41 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="d-flex justify-content-between align-items-center mt-3 small">
-                            <div>
-                                <span class="text-muted">Last updated: <span id="lastUpdated">Never</span></span>
+                        <!-- Last Updated -->
+                        <div class="mt-3 text-muted small">
+                            Last updated: <span id="lastUpdated">Never</span>
+                        </div>
+
+                        <!-- Legend -->
+                        <div class="mt-3">
+                            <small class="text-muted">
+                                <strong>Legend:</strong>
+                                <span class="text-success">Short</span> (≤1h),
+                                <span class="text-warning">Medium</span> (1-2h),
+                                <span class="text-danger">Long</span> (>2h)
+                            </small>
+                        </div>
+
+                        <!-- Historial de Consultas -->
+                        <div class="mt-4">
+                            <h6 class="fw-bold mb-2"><i class="bi bi-clock-history me-2"></i>Historial de Consultas</h6>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-sm">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Filters <i class="bi bi-info-circle" data-bs-toggle="tooltip" title="Resumen de los filtros aplicados para esta consulta."></i></th>
+                                            <th>Most Popular Duration <i class="bi bi-info-circle" data-bs-toggle="tooltip" title="Duración más frecuente en las reservas filtradas."></i></th>
+                                            <th>Average Duration (Hours) <i class="bi bi-info-circle" data-bs-toggle="tooltip" title="Promedio de duración de las reservas."></i></th>
+                                            <th>Total Bookings <i class="bi bi-info-circle" data-bs-toggle="tooltip" title="Cantidad total de reservas que cumplen los filtros."></i></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="historyTable">
+                                        <!-- Data will be populated here -->
+                                    </tbody>
+                                </table>
                             </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-3 small">
                             <div>
                                 <span class="text-muted">API Endpoint: <code>/api/Stats/GetBookingDurationBreakdown</code></span>
                             </div>
@@ -261,120 +292,215 @@
         let pieChart = null;
         let barChart = null;
         let queryHistory = [];
-
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', function() {
-            // Load history from localStorage
-            loadHistoryFromStorage();
-            
-            // Initialize shared filters and load data
-            if (typeof SharedFilters !== 'undefined' && SharedFilters.initialize) {
-                SharedFilters.initialize().then(() => {
-                    loadData();
-                });
-            } else {
-                // Fallback if SharedFilters not available
-                loadData();
-            }
-        });
-
-        // Load data from API
-        async function loadData() {
-            showLoading();
-            hideError();
-            
+        let filtersReady = false;
+        
+        // Función para inicializar la vista
+        async function initializeView() {
             try {
-                const params = new URLSearchParams();
-                const sports = getSelectedDropdownValues('sportsOptions');
-                const cities = getSelectedDropdownValues('citiesOptions');
-                const rinkSizes = getSelectedDropdownValues('rinkSizesOptions');
-                const facilities = getSelectedDropdownValues('facilitiesOptions');
+                ConfigHelpers.log('Iniciando vista GetBookingDurationBreakdown...');
                 
-                if (sports.length) params.append('sport', sports.join(','));
-                if (cities.length) params.append('city', cities.join(','));
-                if (rinkSizes.length) params.append('rinkSize', rinkSizes.join(','));
-                if (facilities.length) params.append('facility', facilities.join(','));
-                
-                // Fechas
-                const createdFrom = document.getElementById('createdDateFrom').value;
-                const createdTo = document.getElementById('createdDateTo').value;
-                const happeningFrom = document.getElementById('happeningDateFrom').value;
-                const happeningTo = document.getElementById('happeningDateTo').value;
-                if (createdFrom) params.append('createdDateFrom', createdFrom);
-                if (createdTo) params.append('createdDateTo', createdTo);
-                if (happeningFrom) params.append('happeningDateFrom', happeningFrom);
-                if (happeningTo) params.append('happeningDateTo', happeningTo);
-                
-                const url = `${API_BASE_URL}/api/Stats/GetBookingDurationBreakdown${params.toString() ? '?' + params.toString() : ''}`;
-                const response = await fetch(url);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                // Verificar que SharedFilters esté disponible
+                if (typeof initializeSharedFilters !== 'function') {
+                    ConfigHelpers.logError('SharedFilters not available - initializeSharedFilters function not found');
+                    console.error('Available global functions:', Object.keys(window).filter(key => typeof window[key] === 'function'));
+                    return;
                 }
                 
-                currentData = await response.json();
+                ConfigHelpers.log('initializeSharedFilters function found, calling it...');
                 
-                displayData();
-                updateLastUpdated();
+                // Inicializar filtros compartidos
+                await initializeSharedFilters();
+                filtersReady = true;
+                ConfigHelpers.log('Filtros inicializados correctamente');
+                
+                // Cargar datos iniciales
+                await loadDataWithoutFilters();
                 
             } catch (error) {
-                console.error('Error loading data:', error);
-                showError('Failed to load data: ' + error.message);
+                ConfigHelpers.logError('Error inicializando vista:', error);
+                showError('Error inicializando la vista: ' + error.message);
+            }
+        }
+        
+        // Cargar datos sin filtros (carga inicial rápida)
+        async function loadDataWithoutFilters() {
+            try {
+                showLoading();
+                hideError();
+                
+                // Usar las utilidades de API optimizadas
+                const data = await API_UTILS.loadStatsData('bookingDurationBreakdown');
+                displayData(data, 'Carga inicial sin filtros');
+                
+            } catch (error) {
+                ConfigHelpers.logError('Error cargando datos iniciales:', error);
+                const userMessage = API_UTILS.handleApiError(error, 'loadDataWithoutFilters');
+                showError(userMessage);
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // Inicializar cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', initializeView);
+        
+        // También inicializar si el DOM ya está listo (para navegación SPA)
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeView);
+        } else {
+            initializeView();
+        }
+
+        // Agregar listener para cambios de filtros (recarga automática)
+        document.addEventListener('DOMContentLoaded', function() {
+            // Escuchar cambios en los filtros de fecha
+            const dateInputs = ['createdDateFrom', 'createdDateTo', 'happeningDateFrom', 'happeningDateTo'];
+            dateInputs.forEach(inputId => {
+                const element = document.getElementById(inputId);
+                if (element) {
+                    element.addEventListener('change', () => {
+                        console.log(`📅 Date filter changed: ${inputId}`);
+                        loadData();
+                    });
+                }
+            });
+        });
+
+        // Cargar datos desde la API usando los filtros globales
+        async function loadData() {
+            console.log('🔄 loadData() called');
+            
+            if (!filtersReady) {
+                ConfigHelpers.log('loadData() abortado: filtros no listos');
+                return;
+            }
+            
+            try {
+                showLoading();
+                hideError();
+                
+                console.log('🔍 Calling buildApiParameters()...');
+                const params = buildApiParameters();
+                console.log('📤 buildApiParameters() returned:', params);
+                
+                // Usar las utilidades de API optimizadas
+                const data = await API_UTILS.loadStatsData('bookingDurationBreakdown', params);
+                displayData(data, 'Datos con filtros aplicados');
+                
+            } catch (error) {
+                ConfigHelpers.logError('Error cargando datos:', error);
+                const userMessage = API_UTILS.handleApiError(error, 'loadData');
+                showError(userMessage);
             } finally {
                 hideLoading();
             }
         }
 
-        // Display data
-        function displayData() {
-            if (!currentData) return;
+        // Hacer loadData disponible globalmente
+        window.loadData = loadData;
+
+        // Botón para aplicar filtros (solo recarga datos)
+        function applyFilters() {
+            console.log('🔘 Apply Filters button clicked');
+            ConfigHelpers.log('Aplicando filtros...');
+            loadData();
+        }
+
+        // Botón para limpiar filtros globales y recargar datos
+        function clearFilters() {
+            ConfigHelpers.log('Limpiando filtros...');
+            clearAllFilters();
+            loadData();
+        }
+
+        // Build API parameters from shared filters
+        function buildApiParameters() {
+            const params = new URLSearchParams();
             
-            const labels = Object.keys(currentData);
-            const values = Object.values(currentData);
-            const totalBookings = values.reduce((sum, val) => sum + val, 0);
-            const avgDuration = labels.reduce((sum, label, index) => sum + (parseFloat(label) * values[index]), 0) / totalBookings;
+            // Get values from shared filters
+            const sports = getSelectedDropdownValues('sportsOptions');
+            const cities = getSelectedDropdownValues('citiesOptions');
+            const rinkSizes = getSelectedDropdownValues('rinkSizesOptions');
+            const facilities = getSelectedDropdownValues('facilitiesOptions');
             
-            // Find most popular duration
+            // Get additional filters
+            const createdDateFrom = document.getElementById('createdDateFrom').value;
+            const createdDateTo = document.getElementById('createdDateTo').value;
+            const happeningDateFrom = document.getElementById('happeningDateFrom').value;
+            const happeningDateTo = document.getElementById('happeningDateTo').value;
+            
+            console.log('🔍 Building API parameters:', {
+                sports, cities, rinkSizes, facilities,
+                createdDateFrom, createdDateTo, happeningDateFrom, happeningDateTo
+            });
+            
+            // Add parameters (using new List<string> format)
+            if (sports.length) sports.forEach(sport => params.append('sports', sport));
+            if (cities.length) cities.forEach(city => params.append('cities', city));
+            if (rinkSizes.length) rinkSizes.forEach(size => params.append('rinkSizes', size));
+            if (facilities.length) facilities.forEach(facility => params.append('facilities', facility));
+            if (createdDateFrom) params.append('createdDateFrom', createdDateFrom);
+            if (createdDateTo) params.append('createdDateTo', createdDateTo);
+            if (happeningDateFrom) params.append('happeningDateFrom', happeningDateFrom);
+            if (happeningDateTo) params.append('happeningDateTo', happeningDateTo);
+            
+            console.log('📤 Final API parameters:', params.toString());
+            return params;
+        }
+
+        // Mostrar datos en la UI
+        function displayData(data, source = '') {
+            currentData = data;
+            ConfigHelpers.log(`Mostrando datos (${source}):`, data);
+
+            // Permitir tanto {data: {...}} como {...} plano
+            let dataObj = data && data.data ? data.data : data;
+            if (!dataObj || Object.keys(dataObj).length === 0) {
+                showError('No data available');
+                return;
+            }
+
+            const labels = Object.keys(dataObj);
+            const values = Object.values(dataObj);
+            const totalBookings = data.totalBookings || values.reduce((sum, val) => sum + val, 0);
+
+            // Find most popular start time
             let maxIndex = 0;
             values.forEach((value, index) => {
                 if (value > values[maxIndex]) maxIndex = index;
             });
-            
+
             const mostPopular = labels[maxIndex];
             const mostPopularPct = ((values[maxIndex] / totalBookings) * 100).toFixed(1);
-            
+
             // Update summary cards
             document.getElementById('totalBookings').textContent = totalBookings.toLocaleString();
-            document.getElementById('avgDuration').textContent = avgDuration.toFixed(1);
-            document.getElementById('mostPopular').textContent = `${mostPopular} hours`;
-            
+            document.getElementById('avgDuration').textContent = '-';
+            document.getElementById('mostPopular').textContent = `${mostPopular} (${mostPopularPct}%)`;
+
             // Update data table
             const tbody = document.getElementById('dataTableBody');
             tbody.innerHTML = '';
-            
+
             labels.forEach((label, index) => {
                 const percentage = ((values[index] / totalBookings) * 100).toFixed(1);
-                const status = getDurationStatus(parseFloat(label));
-                const statusClass = status === 'Short' ? 'text-success' : status === 'Medium' ? 'text-warning' : 'text-danger';
-                
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${label} hours</td>
+                    <td>${label}</td>
                     <td>${values[index].toLocaleString()}</td>
                     <td>${percentage}%</td>
-                    <td><span class="${statusClass}">${status}</span></td>
                 `;
                 tbody.appendChild(row);
             });
-            
+
             // Create charts
             createPieChart(labels, values);
             createBarChart(labels, values);
-            
-            // Agregar al historial
-            addToHistory(getFiltersSummary(), mostPopular, mostPopularPct, avgDuration.toFixed(1), totalBookings);
-            
+
+            addToHistory(getFiltersSummary(), mostPopular, mostPopularPct, '-', totalBookings);
+
             document.getElementById('dataContainer').classList.remove('d-none');
+            updateLastUpdated();
         }
 
         // Create pie chart
@@ -486,28 +612,56 @@
             if (hours <= 3) return 'Medium';
             return 'Long';
         }
-
-        // Apply filters
-        function applyFilters() {
-            loadData();
+        
+        function showLoading() {
+            document.getElementById('loadingSpinner').classList.remove('d-none');
+            document.getElementById('dataContainer').classList.add('d-none');
+            document.getElementById('errorMessage').classList.add('d-none');
+        }
+        
+        function hideLoading() {
+            document.getElementById('loadingSpinner').classList.add('d-none');
+        }
+        
+        function showError(message) {
+            document.getElementById('errorText').textContent = message;
+            document.getElementById('errorMessage').classList.remove('d-none');
+            document.getElementById('dataContainer').classList.add('d-none');
+        }
+        
+        function hideError() {
+            document.getElementById('errorMessage').classList.add('d-none');
         }
 
-        // Clear filters
-        function clearFilters() {
-            ['sportsOptions','citiesOptions','rinkSizesOptions','facilitiesOptions'].forEach(id => {
-                const container = document.getElementById(id);
-                Array.from(container.querySelectorAll('input[type=checkbox]')).forEach(cb => cb.checked = false);
-            });
-            updateDropdownLabel('sportsOptions','All Sports','sportsDropdownLabel');
-            updateDropdownLabel('citiesOptions','All Cities','citiesDropdownLabel');
-            updateDropdownLabel('rinkSizesOptions','All Sizes','rinkSizesDropdownLabel');
-            updateDropdownLabel('facilitiesOptions','All Facilities','facilitiesDropdownLabel');
-            // Limpiar fechas
-            document.getElementById('createdDateFrom').value = '';
-            document.getElementById('createdDateTo').value = '';
-            document.getElementById('happeningDateFrom').value = '';
-            document.getElementById('happeningDateTo').value = '';
-            loadData();
+        // Update last updated timestamp
+        function updateLastUpdated() {
+            const lastUpdatedElement = document.getElementById('lastUpdated');
+            if (lastUpdatedElement) {
+                lastUpdatedElement.textContent = new Date().toLocaleString();
+            }
+        }
+
+        // Get filters summary for history
+        function getFiltersSummary() {
+            const sports = getSelectedDropdownValues('sportsOptions');
+            const cities = getSelectedDropdownValues('citiesOptions');
+            const rinkSizes = getSelectedDropdownValues('rinkSizesOptions');
+            const facilities = getSelectedDropdownValues('facilitiesOptions');
+            const createdDateFrom = document.getElementById('createdDateFrom').value;
+            const createdDateTo = document.getElementById('createdDateTo').value;
+            const happeningDateFrom = document.getElementById('happeningDateFrom').value;
+            const happeningDateTo = document.getElementById('happeningDateTo').value;
+            
+            const parts = [];
+            if (sports.length) parts.push(`Sports: ${sports.join(', ')}`);
+            if (cities.length) parts.push(`Cities: ${cities.join(', ')}`);
+            if (rinkSizes.length) parts.push(`Sizes: ${rinkSizes.join(', ')}`);
+            if (facilities.length) parts.push(`Facilities: ${facilities.join(', ')}`);
+            if (createdDateFrom) parts.push(`Created From: ${createdDateFrom}`);
+            if (createdDateTo) parts.push(`Created To: ${createdDateTo}`);
+            if (happeningDateFrom) parts.push(`Happening From: ${happeningDateFrom}`);
+            if (happeningDateTo) parts.push(`Happening To: ${happeningDateTo}`);
+            return parts.length ? parts.join(' | ') : 'All Data';
         }
 
         // Export data
@@ -517,8 +671,8 @@
                 return;
             }
             
-            const labels = Object.keys(currentData);
-            const values = Object.values(currentData);
+            const labels = Object.keys(currentData.data);
+            const values = Object.values(currentData.data);
             const totalBookings = values.reduce((sum, val) => sum + val, 0);
             
             const csvContent = "data:text/csv;charset=utf-8," 
@@ -538,38 +692,9 @@
         }
 
         // Utility functions
-        function showLoading() {
-            document.getElementById('loadingSpinner').classList.remove('d-none');
-            document.getElementById('dataContainer').classList.add('d-none');
-        }
-
-        function hideLoading() {
-            document.getElementById('loadingSpinner').classList.add('d-none');
-        }
-
-        function showError(message) {
-            document.getElementById('errorText').textContent = message;
-            document.getElementById('errorMessage').classList.remove('d-none');
-        }
-
-        function hideError() {
-            document.getElementById('errorMessage').classList.add('d-none');
-        }
-
-        function updateLastUpdated() {
-            document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
-        }
-
         function getSelectedDropdownValues(containerId) {
             const checkboxes = document.querySelectorAll(`#${containerId} input[type="checkbox"]:checked`);
             return Array.from(checkboxes).map(cb => cb.value);
-        }
-
-        function updateDropdownLabel(containerId, defaultLabel, labelId) {
-            const container = document.getElementById(containerId);
-            const selectedOptions = Array.from(container.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
-            const labelText = selectedOptions.length > 0 ? selectedOptions.join(', ') : defaultLabel;
-            document.getElementById(labelId).textContent = labelText;
         }
 
         function addToHistory(filtersSummary, mostPopular, mostPopularPct, avgDuration, total) {
@@ -587,6 +712,8 @@
 
         function renderHistory() {
             const tbody = document.getElementById('historyTableBody');
+            if (!tbody) return;
+            
             tbody.innerHTML = '';
             queryHistory.forEach(item => {
                 const row = document.createElement('tr');
@@ -601,43 +728,36 @@
             });
         }
 
-        function clearHistory() {
-            queryHistory = [];
-            renderHistory();
-            localStorage.removeItem('bookingDurationBreakdownHistory');
-        }
-
         function saveHistoryToStorage() {
-            localStorage.setItem('bookingDurationBreakdownHistory', JSON.stringify(queryHistory));
-        }
-
-        function loadHistoryFromStorage() {
-            const saved = localStorage.getItem('bookingDurationBreakdownHistory');
-            if (saved) {
-                queryHistory = JSON.parse(saved);
-                renderHistory();
+            try {
+                localStorage.setItem('bookingDurationHistory', JSON.stringify(queryHistory));
+            } catch (error) {
+                console.error('Error saving history:', error);
             }
         }
 
-        function getFiltersSummary() {
-            const sports = getSelectedDropdownValues('sportsOptions');
-            const cities = getSelectedDropdownValues('citiesOptions');
-            const rinkSizes = getSelectedDropdownValues('rinkSizesOptions');
-            const facilities = getSelectedDropdownValues('facilitiesOptions');
-            const createdDateFrom = document.getElementById('createdDateFrom').value;
-            const createdDateTo = document.getElementById('createdDateTo').value;
-            const happeningDateFrom = document.getElementById('happeningDateFrom').value;
-            const happeningDateTo = document.getElementById('happeningDateTo').value;
-            const parts = [];
-            if (sports.length) parts.push(`Sport: ${sports.join(', ')}`);
-            if (cities.length) parts.push(`City: ${cities.join(', ')}`);
-            if (rinkSizes.length) parts.push(`Rink Size: ${rinkSizes.join(', ')}`);
-            if (facilities.length) parts.push(`Facility: ${facilities.join(', ')}`);
-            if (createdDateFrom) parts.push(`Created From: ${createdDateFrom}`);
-            if (createdDateTo) parts.push(`Created To: ${createdDateTo}`);
-            if (happeningDateFrom) parts.push(`Happening From: ${happeningDateFrom}`);
-            if (happeningDateTo) parts.push(`Happening To: ${happeningDateTo}`);
-            return parts.length ? parts.join(' | ') : 'All Data';
+        function loadHistoryFromStorage() {
+            try {
+                const stored = localStorage.getItem('bookingDurationHistory');
+                if (stored) {
+                    queryHistory = JSON.parse(stored);
+                    renderHistory();
+                }
+            } catch (error) {
+                console.error('Error loading history:', error);
+                queryHistory = [];
+            }
         }
+
+        // Initialize tooltips and history
+        document.addEventListener('DOMContentLoaded', function() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.forEach(function(tooltipTriggerEl) {
+                new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+            
+            // Load history on page load
+            loadHistoryFromStorage();
+        });
     </script>
 } 

@@ -34,10 +34,10 @@ namespace CatchCornerStats.Core.Entities
         public DateTime HappeningDate { get; set; }
 
         [Column("StartTime")]
-        public TimeSpan StartTime { get; set; }
+        public TimeSpan? StartTime { get; set; }
 
         [Column("EndTime")]
-        public TimeSpan EndTime { get; set; }
+        public TimeSpan? EndTime { get; set; }
 
         [Column("Charged Amount")]
         public decimal? ChargedAmount { get; set; }
