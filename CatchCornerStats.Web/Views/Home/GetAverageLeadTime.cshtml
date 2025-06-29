@@ -7,11 +7,16 @@
     <div class="row mb-4">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h1 class="h2 mb-1 fw-bold text-primary">
-                        <i class="bi bi-clock-history me-2"></i>Average Lead Time
-                    </h1>
-                    <p class="text-muted mb-0">Average days in advance that bookings are made</p>
+                <div class="d-flex align-items-center gap-2">
+                    <a href="/" class="btn btn-outline-secondary btn-sm me-2" title="Volver al inicio">
+                        <i class="bi bi-arrow-left"></i>
+                    </a>
+                    <div>
+                        <h1 class="h2 mb-1 fw-bold text-primary">
+                            <i class="bi bi-clock-history me-2"></i>Average Lead Time
+                        </h1>
+                        <p class="text-muted mb-0">Average days in advance that bookings are made</p>
+                    </div>
                 </div>
                 <div class="d-flex gap-2">
                     <button class="btn btn-primary" onclick="loadData()">
@@ -162,10 +167,10 @@
                             <table class="table table-bordered">
                                 <thead class="table-light">
                                     <tr>
-                                        <th>Filters</th>
-                                        <th>Average Lead Time (Days)</th>
-                                        <th>Total Bookings</th>
-                                        <th>Category</th>
+                                        <th>Filters <i class="bi bi-info-circle" data-bs-toggle="tooltip" title="Resumen de los filtros aplicados para esta consulta."></i></th>
+                                        <th>Average Lead Time (Days) <i class="bi bi-info-circle" data-bs-toggle="tooltip" title="Promedio de días entre la creación y la fecha de uso de la reserva."></i></th>
+                                        <th>Total Bookings <i class="bi bi-info-circle" data-bs-toggle="tooltip" title="Cantidad total de reservas que cumplen los filtros."></i></th>
+                                        <th>Category <i class="bi bi-info-circle" data-bs-toggle="tooltip" title="Clasificación del lead time: Short (≤1 día), Medium (2-7 días), Long (>7 días)"></i></th>
                                     </tr>
                                 </thead>
                                 <tbody id="resultsTable">
@@ -187,6 +192,26 @@
                         <!-- Last Updated -->
                         <div class="mt-3 text-muted small">
                             Last updated: <span id="lastUpdated">Never</span>
+                        </div>
+
+                        <!-- Historial de Consultas -->
+                        <div class="mt-4">
+                            <h6 class="fw-bold mb-2"><i class="bi bi-clock-history me-2"></i>Historial de Consultas</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Fecha/Hora</th>
+                                            <th>Filtros</th>
+                                            <th>Lead Time</th>
+                                            <th>Bookings</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="historyTable">
+                                        <!-- Historial se llena por JS -->
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -374,6 +399,17 @@
 
             document.getElementById('data').classList.remove('d-none');
             document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+
+            // Guardar en historial (solo si hay datos)
+            if (data && data.averageLeadTime !== undefined && data.totalBookings !== undefined) {
+                saveHistoryEntry({
+                    date: new Date().toLocaleString(),
+                    filters: filtersSummary,
+                    leadTime: data.averageLeadTime.toFixed(2),
+                    bookings: formatNumber(data.totalBookings || 0)
+                });
+                renderHistory();
+            }
         }
 
         // Categorizar lead time
@@ -412,5 +448,46 @@
         function formatNumber(num) {
             return new Intl.NumberFormat().format(num);
         }
+
+        // Guardar historial en localStorage
+        function saveHistoryEntry(entry) {
+            let history = JSON.parse(localStorage.getItem('leadTimeHistory') || '[]');
+            history.unshift(entry); // Agrega al inicio
+            if (history.length > 20) history = history.slice(0, 20); // Máximo 20 entradas
+            localStorage.setItem('leadTimeHistory', JSON.stringify(history));
+        }
+
+        // Mostrar historial en la tabla
+        function renderHistory() {
+            const tbody = document.getElementById('historyTable');
+            if (!tbody) return;
+            let history = JSON.parse(localStorage.getItem('leadTimeHistory') || '[]');
+            tbody.innerHTML = '';
+            if (history.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">No hay historial</td></tr>';
+                return;
+            }
+            history.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${item.date}</td>
+                    <td>${item.filters}</td>
+                    <td>${item.leadTime}</td>
+                    <td>${item.bookings}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Renderizar historial al cargar
+        document.addEventListener('DOMContentLoaded', renderHistory);
+
+        // Inicializar tooltips de Bootstrap
+        document.addEventListener('DOMContentLoaded', function () {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+                new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
     </script>
 } 
