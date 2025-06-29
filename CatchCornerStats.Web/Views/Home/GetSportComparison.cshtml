@@ -701,7 +701,21 @@
 
         function getSelectedDropdownValues(containerId) {
             const checkboxes = document.querySelectorAll(`#${containerId} input[type="checkbox"]:checked`);
-            return Array.from(checkboxes).map(cb => cb.value);
+            const values = Array.from(checkboxes).map(cb => cb.value);
+            
+            // Procesar rink sizes para extraer solo el número
+            if (containerId === 'rinkSizesOptions') {
+                return values.map(value => {
+                    if (value.includes('selected')) {
+                        const numericValue = value.replace(/\s*selected.*$/, '').trim();
+                        console.log(`Processing rink size: "${value}" -> "${numericValue}"`);
+                        return numericValue;
+                    }
+                    return value;
+                });
+            }
+            
+            return values;
         }
 
         function updateDropdownLabel(containerId, defaultLabel, labelId) {

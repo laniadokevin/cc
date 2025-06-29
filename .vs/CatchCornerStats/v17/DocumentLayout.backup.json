@@ -62,8 +62,7 @@
               "RelativeToolTip": "CatchCornerStats.Web\\wwwroot\\js\\config.js",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAA5AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
-              "WhenOpened": "2025-06-29T10:51:03.849Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-06-29T10:51:03.849Z"
             },
             {
               "$type": "Document",
@@ -75,8 +74,7 @@
               "RelativeToolTip": "CatchCornerStats.Web\\Views\\Home\\Index.cshtml",
               "ViewState": "AgIAABwAAAAAAAAAAAD4vywAAAArAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-06-29T10:50:50.299Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-06-29T10:50:50.299Z"
             },
             {
               "$type": "Document",
@@ -88,8 +86,7 @@
               "RelativeToolTip": "CatchCornerStats.Core\\Interfaces\\IStatsRepository.cs",
               "ViewState": "AgIAACkAAAAAAAAAAAAswDQAAAApAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-29T10:45:19.521Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-06-29T10:45:19.521Z"
             },
             {
               "$type": "Document",
@@ -99,7 +96,7 @@
               "RelativeDocumentMoniker": "CatchCornerStats.Data\\Implementations\\Repositories\\StatsRepository.cs",
               "ToolTip": "C:\\Users\\lania\\Desktop\\Proyectos\\CatchCornerStats\\CatchCornerStats.Data\\Implementations\\Repositories\\StatsRepository.cs",
               "RelativeToolTip": "CatchCornerStats.Data\\Implementations\\Repositories\\StatsRepository.cs",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAQwAoAAAAjAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAjAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-06-29T10:43:27.781Z",
               "EditorCaption": ""
@@ -114,8 +111,7 @@
               "RelativeToolTip": "CatchCornerStats.Presentation\\Controllers\\StatsController.cs",
               "ViewState": "AgIAAJEAAAAAAAAAAAAAAJEAAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-29T06:10:04.291Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-06-29T06:10:04.291Z"
             },
             {
               "$type": "Document",

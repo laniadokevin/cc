@@ -347,9 +347,9 @@
         }
         
         // Construir objeto de filtros para la API (usando la función compartida)
-        function buildApiParameters() {
+        function buildBookingsByDayParameters() {
             // Usar la función compartida de shared-filters.js
-            const urlParams = window.buildApiParameters ? window.buildApiParameters() : new URLSearchParams();
+            const urlParams = buildApiParameters();
             
             // Agregar parámetros específicos de esta vista
             const month = document.getElementById('monthFilter').value || null;
@@ -358,11 +358,11 @@
             }
             
             // Log detallado de los parámetros
-            console.log('=== buildApiParameters START ===');
+            console.log('=== buildBookingsByDayParameters START ===');
             console.log('Using shared buildApiParameters function');
             console.log('URL Params:', urlParams.toString());
             console.log('Month filter:', month);
-            console.log('=== buildApiParameters END ===');
+            console.log('=== buildBookingsByDayParameters END ===');
 
             return urlParams;
         }
@@ -400,7 +400,7 @@
             try {
                 showLoading();
                 hideError();
-                const params = buildApiParameters();
+                const params = buildBookingsByDayParameters();
                 const data = await API_UTILS.loadStatsData('bookingsByDay', params);
                 displayData(mapKeysToPascalCase(data), 'Carga inicial sin filtros');
             } catch (error) {
@@ -438,7 +438,7 @@
                 hideError();
                 
                 console.log('Building API parameters...');
-                const params = buildApiParameters();
+                const params = buildBookingsByDayParameters();
                 console.log('API parameters built:', params);
                 
                 console.log('Calling API_UTILS.loadStatsData...');

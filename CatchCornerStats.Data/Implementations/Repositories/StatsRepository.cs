@@ -368,6 +368,18 @@ namespace CatchCornerStats.Data.Repositories
 
         public async Task<(double averageLeadTime, int totalBookings)> GetAverageLeadTimeWithCountAsync(List<string>? sports, List<string>? cities, List<string>? rinkSizes, List<string>? facilities, DateTime? createdDateFrom, DateTime? createdDateTo, DateTime? happeningDateFrom, DateTime? happeningDateTo)
         {
+            // Log de entrada
+            Console.WriteLine("=== StatsRepository.GetAverageLeadTimeWithCountAsync START ===");
+            Console.WriteLine($"Parameters received:");
+            Console.WriteLine($"  sports: [{string.Join(", ", sports ?? new List<string>())}] (null: {sports == null})");
+            Console.WriteLine($"  cities: [{string.Join(", ", cities ?? new List<string>())}] (null: {cities == null})");
+            Console.WriteLine($"  rinkSizes: [{string.Join(", ", rinkSizes ?? new List<string>())}] (null: {rinkSizes == null})");
+            Console.WriteLine($"  facilities: [{string.Join(", ", facilities ?? new List<string>())}] (null: {facilities == null})");
+            Console.WriteLine($"  createdDateFrom: {createdDateFrom} (null: {createdDateFrom == null})");
+            Console.WriteLine($"  createdDateTo: {createdDateTo} (null: {createdDateTo == null})");
+            Console.WriteLine($"  happeningDateFrom: {happeningDateFrom} (null: {happeningDateFrom == null})");
+            Console.WriteLine($"  happeningDateTo: {happeningDateTo} (null: {happeningDateTo == null})");
+
             var query = BuildBaseQuery(sports, cities, rinkSizes, facilities);
             ApplyDateFilters(ref query, createdDateFrom, createdDateTo, happeningDateFrom, happeningDateTo);
 
@@ -387,7 +399,13 @@ namespace CatchCornerStats.Data.Repositories
                 })
                 .FirstOrDefaultAsync();
 
-            return result != null ? (result.AverageLeadTime, result.TotalBookings) : (0, 0);
+            var averageLeadTime = result?.AverageLeadTime ?? 0;
+            var totalBookings = result?.TotalBookings ?? 0;
+
+            Console.WriteLine($"Query executed successfully. Result: AverageLeadTime = {averageLeadTime:F2} days, TotalBookings = {totalBookings}");
+            Console.WriteLine("=== StatsRepository.GetAverageLeadTimeWithCountAsync END ===");
+
+            return (averageLeadTime, totalBookings);
         }
 
         public async Task<List<BookingsByDayDto>> GetBookingsByDayReportAsync(
@@ -408,103 +426,96 @@ namespace CatchCornerStats.Data.Repositories
             Console.WriteLine($"  happeningDateFrom: {happeningDateFrom} (null: {happeningDateFrom == null})");
             Console.WriteLine($"  happeningDateTo: {happeningDateTo} (null: {happeningDateTo == null})");
 
-            var sql = @"
-            WITH FilteredBookings AS (
-                SELECT
-                    b.[Booking Number] AS BookingNumber,
-                    b.[Happening Date] AS HappeningDate,
-                    a.[Sport],
-                    a.[Area] AS City,
-                    a.[Size] AS RinkSize,
-                    b.[Facility]
-                FROM [powerBI].[VW_Bookings] b
-                INNER JOIN [powerBI].[VW_Arena] a ON b.[FacilityId] = a.[FacilityId]
-                WHERE
-                    (@sports IS NULL OR a.[Sport] IN (SELECT value FROM STRING_SPLIT(@sports, ',')))
-                    AND (@cities IS NULL OR a.[Area] IN (SELECT value FROM STRING_SPLIT(@cities, ',')))
-                    AND (@rinkSizes IS NULL OR a.[Size] IN (SELECT value FROM STRING_SPLIT(@rinkSizes, ',')))
-                    AND (@facilities IS NULL OR b.[Facility] IN (SELECT value FROM STRING_SPLIT(@facilities, ',')))
-                    AND (@month IS NULL OR MONTH(b.[Happening Date]) = @month)
-                    AND (@year IS NULL OR YEAR(b.[Happening Date]) = @year)
-                    AND (@createdDateFrom IS NULL OR b.[Created Date UTC] >= @createdDateFrom)
-                    AND (@createdDateTo IS NULL OR b.[Created Date UTC] <= @createdDateTo)
-                    AND (@happeningDateFrom IS NULL OR b.[Happening Date] >= @happeningDateFrom)
-                    AND (@happeningDateTo IS NULL OR b.[Happening Date] <= @happeningDateTo)
-            )
-            , DayStats AS (
-                SELECT
-                    DATENAME(weekday, HappeningDate) AS DayOfWeek,
-                    COUNT(DISTINCT BookingNumber) AS BookingsCount
-                FROM FilteredBookings
-                GROUP BY DATENAME(weekday, HappeningDate)
-            )
-            , TotalStats AS (
-                SELECT SUM(BookingsCount) AS TotalBookings FROM DayStats
-            )
-            SELECT
-                d.DayOfWeek,
-                d.BookingsCount,
-                t.TotalBookings,
-                CAST(100.0 * d.BookingsCount / t.TotalBookings AS DECIMAL(5,2)) AS Percentage
-            FROM DayStats d
-            CROSS JOIN TotalStats t
-            ORDER BY
-                CASE d.DayOfWeek
-                    WHEN 'Monday' THEN 1
-                    WHEN 'Tuesday' THEN 2
-                    WHEN 'Wednesday' THEN 3
-                    WHEN 'Thursday' THEN 4
-                    WHEN 'Friday' THEN 5
-                    WHEN 'Saturday' THEN 6
-                    WHEN 'Sunday' THEN 7
-                END
-            ";
+            // Use Entity Framework LINQ instead of raw SQL to avoid STRING_SPLIT issues
+            var query = from b in _context.Bookings
+                        join a in _context.Arenas on b.FacilityId equals a.FacilityId
+                        select new
+                        {
+                            b.BookingNumber,
+                            b.HappeningDate,
+                            a.Sport,
+                            City = a.Area,
+                            RinkSize = a.Size,
+                            b.Facility
+                        };
 
-            // Convertir listas a strings separados por comas
-            var sportsParam = sports?.Any() == true ? string.Join(",", sports) : null;
-            var citiesParam = cities?.Any() == true ? string.Join(",", cities) : null;
-            var rinkSizesParam = rinkSizes?.Any() == true ? string.Join(",", rinkSizes) : null;
-            var facilitiesParam = facilities?.Any() == true ? string.Join(",", facilities) : null;
+            // Apply filters
+            if (sports?.Any() == true)
+                query = query.Where(x => sports.Contains(x.Sport));
 
-            var parameters = new[]
+            if (cities?.Any() == true)
+                query = query.Where(x => cities.Contains(x.City));
+
+            if (rinkSizes?.Any() == true)
+                query = query.Where(x => rinkSizes.Contains(x.RinkSize));
+
+            if (facilities?.Any() == true)
+                query = query.Where(x => facilities.Contains(x.Facility));
+
+            if (month.HasValue)
+                query = query.Where(x => x.HappeningDate.Month == month.Value);
+
+            if (year.HasValue)
+                query = query.Where(x => x.HappeningDate.Year == year.Value);
+
+            if (createdDateFrom.HasValue)
+                query = query.Where(x => b.CreatedDateUtc >= createdDateFrom.Value);
+
+            if (createdDateTo.HasValue)
+                query = query.Where(x => b.CreatedDateUtc <= createdDateTo.Value);
+
+            if (happeningDateFrom.HasValue)
+                query = query.Where(x => x.HappeningDate >= happeningDateFrom.Value);
+
+            if (happeningDateTo.HasValue)
+                query = query.Where(x => x.HappeningDate <= happeningDateTo.Value);
+
+            // Group by day of week and calculate statistics
+            var dayStats = await query
+                .GroupBy(x => x.HappeningDate.DayOfWeek)
+                .Select(g => new
+                {
+                    DayOfWeek = g.Key,
+                    BookingsCount = g.Select(x => x.BookingNumber).Distinct().Count()
+                })
+                .ToListAsync();
+
+            var totalBookings = dayStats.Sum(x => x.BookingsCount);
+
+            // Convert to DTO format
+            var result = dayStats.Select(x => new BookingsByDayDto
             {
-                new SqlParameter("@sports", (object?)sportsParam ?? DBNull.Value),
-                new SqlParameter("@cities", (object?)citiesParam ?? DBNull.Value),
-                new SqlParameter("@rinkSizes", (object?)rinkSizesParam ?? DBNull.Value),
-                new SqlParameter("@facilities", (object?)facilitiesParam ?? DBNull.Value),
-                new SqlParameter("@month", (object?)month ?? DBNull.Value),
-                new SqlParameter("@year", (object?)year ?? DBNull.Value),
-                new SqlParameter("@createdDateFrom", (object?)createdDateFrom ?? DBNull.Value),
-                new SqlParameter("@createdDateTo", (object?)createdDateTo ?? DBNull.Value),
-                new SqlParameter("@happeningDateFrom", (object?)happeningDateFrom ?? DBNull.Value),
-                new SqlParameter("@happeningDateTo", (object?)happeningDateTo ?? DBNull.Value)
-            };
+                DayOfWeek = x.DayOfWeek.ToString(),
+                BookingsCount = x.BookingsCount,
+                TotalBookings = totalBookings,
+                Percentage = totalBookings > 0 ? (double)x.BookingsCount / totalBookings * 100 : 0
+            })
+            .OrderBy(x => GetDayOrder(x.DayOfWeek))
+            .ToList();
 
-            // Log de parámetros SQL
-            Console.WriteLine("SQL Parameters:");
-            foreach (var param in parameters)
-            {
-                Console.WriteLine($"  {param.ParameterName}: {param.Value} (Type: {param.Value?.GetType().Name ?? "DBNull"})");
-            }
-
-            // Log adicional para verificar valores específicos
-            Console.WriteLine("Parameter verification:");
-            Console.WriteLine($"  sports parameter: [{string.Join(", ", sports ?? new List<string>())}] -> SQL: {sportsParam}");
-            Console.WriteLine($"  cities parameter: [{string.Join(", ", cities ?? new List<string>())}] -> SQL: {citiesParam}");
-            Console.WriteLine($"  rinkSizes parameter: [{string.Join(", ", rinkSizes ?? new List<string>())}] -> SQL: {rinkSizesParam}");
-            Console.WriteLine($"  facilities parameter: [{string.Join(", ", facilities ?? new List<string>())}] -> SQL: {facilitiesParam}");
-
-            Console.WriteLine("Executing SQL query...");
-            var result = await _context.Set<BookingsByDayDto>().FromSqlRaw(sql, parameters).ToListAsync();
-            
             Console.WriteLine($"Query executed successfully. Returned {result.Count} results:");
             foreach (var item in result)
             {
-                Console.WriteLine($"  {item.DayOfWeek}: {item.BookingsCount} bookings ({item.Percentage}%)");
+                Console.WriteLine($"  {item.DayOfWeek}: {item.BookingsCount} bookings ({item.Percentage:F2}%)");
             }
             
             Console.WriteLine("=== StatsRepository.GetBookingsByDayReportAsync END ===");
             return result;
+        }
+
+        private int GetDayOrder(string dayOfWeek)
+        {
+            return dayOfWeek switch
+            {
+                "Monday" => 1,
+                "Tuesday" => 2,
+                "Wednesday" => 3,
+                "Thursday" => 4,
+                "Friday" => 5,
+                "Saturday" => 6,
+                "Sunday" => 7,
+                _ => 8
+            };
         }
 
         #region Helper Methods

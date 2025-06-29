@@ -97,9 +97,24 @@ namespace CatchCornerStats.Presentation.Controllers
             var stopwatch = Stopwatch.StartNew();
             try
             {
+                _logger.LogInformation("=== GetAverageLeadTime START ===");
+                _logger.LogInformation("Received parameters:");
+                _logger.LogInformation($"  sports: [{string.Join(", ", sports ?? new List<string>())}] (null: {sports == null})");
+                _logger.LogInformation($"  cities: [{string.Join(", ", cities ?? new List<string>())}] (null: {cities == null})");
+                _logger.LogInformation($"  rinkSizes: [{string.Join(", ", rinkSizes ?? new List<string>())}] (null: {rinkSizes == null})");
+                _logger.LogInformation($"  facilities: [{string.Join(", ", facilities ?? new List<string>())}] (null: {facilities == null})");
+                _logger.LogInformation($"  createdDateFrom: {createdDateFrom} (null: {createdDateFrom == null})");
+                _logger.LogInformation($"  createdDateTo: {createdDateTo} (null: {createdDateTo == null})");
+                _logger.LogInformation($"  happeningDateFrom: {happeningDateFrom} (null: {happeningDateFrom == null})");
+                _logger.LogInformation($"  happeningDateTo: {happeningDateTo} (null: {happeningDateTo == null})");
+
                 var (averageLeadTime, totalBookings) = await _statsRepository.GetAverageLeadTimeWithCountAsync(sports, cities, rinkSizes, facilities, createdDateFrom, createdDateTo, happeningDateFrom, happeningDateTo);
                 stopwatch.Stop();
+                
+                _logger.LogInformation($"Repository returned: AverageLeadTime = {averageLeadTime:F2} days, TotalBookings = {totalBookings}");
                 _logger.LogInformation($"GetAverageLeadTime completed in {stopwatch.ElapsedMilliseconds}ms - Result: {averageLeadTime:F2} days, {totalBookings} bookings");
+                _logger.LogInformation("=== GetAverageLeadTime END ===");
+                
                 return Ok(new { averageLeadTime, totalBookings });
             }
             catch (Exception ex)

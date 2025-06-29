@@ -197,6 +197,14 @@ const API_UTILS = {
             return null;
         }
         
+        // Si ya es un URLSearchParams object, retornarlo directamente
+        if (params instanceof URLSearchParams) {
+            const result = params.toString();
+            console.log('Input is already URLSearchParams, returning:', result);
+            console.log('=== buildParams END ===');
+            return result ? params : null;
+        }
+        
         const urlParams = new URLSearchParams();
         Object.entries(params).forEach(([key, value]) => {
             console.log(`Processing parameter: ${key} = ${value} (type: ${typeof value})`);

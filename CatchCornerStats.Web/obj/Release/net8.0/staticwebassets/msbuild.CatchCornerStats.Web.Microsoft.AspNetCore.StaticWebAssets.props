@@ -66,8 +66,8 @@
       <RelatedAsset></RelatedAsset>
       <AssetTraitName></AssetTraitName>
       <AssetTraitValue></AssetTraitValue>
-      <Fingerprint>vwrynf0mxd</Fingerprint>
-      <Integrity>z1R0zCkM8jAZJthtQN9bZjS9VyB1s6PIYJ5dU3BcBfs=</Integrity>
+      <Fingerprint>n5j67zlmul</Fingerprint>
+      <Integrity>hbZ7+/wP5IDfX9wveKNlWDfM04FXuNk+vQclmjhl8zw=</Integrity>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\js\api-utils.js'))</OriginalItemSpec>
@@ -138,8 +138,8 @@
       <RelatedAsset></RelatedAsset>
       <AssetTraitName></AssetTraitName>
       <AssetTraitValue></AssetTraitValue>
-      <Fingerprint>ekpghv5ep5</Fingerprint>
-      <Integrity>bkLJbRPblOB2ZvkcmoOWb0cFLwsGI+0wdJ/qigGpbT8=</Integrity>
+      <Fingerprint>gkxdbvr1u4</Fingerprint>
+      <Integrity>MKIQ7Tr8VF1roXz/1F+9nGQACjpfkK0bq7fkoiCsSm8=</Integrity>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\js\shared-filters.js'))</OriginalItemSpec>

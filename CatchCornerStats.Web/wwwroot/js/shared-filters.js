@@ -558,6 +558,22 @@ function getCurrentFilterSelections() {
 }
 
 /**
+ * Process rink size value to extract only the number
+ */
+function processRinkSizeValue(value) {
+    if (!value) return value;
+    
+    // Si contiene "selected", extraer solo el número
+    if (value.includes('selected')) {
+        const numericValue = value.replace(/\s*selected.*$/, '').trim();
+        console.log(`Processing rink size: "${value}" -> "${numericValue}"`);
+        return numericValue;
+    }
+    
+    return value;
+}
+
+/**
  * Build API parameters from current selections
  */
 function buildApiParameters() {
@@ -566,7 +582,7 @@ function buildApiParameters() {
     // Add array parameters
     SharedFilters.selections.sports.forEach(sport => params.append('sports', sport));
     SharedFilters.selections.cities.forEach(city => params.append('cities', city));
-    SharedFilters.selections.rinkSizes.forEach(size => params.append('rinkSizes', size));
+    SharedFilters.selections.rinkSizes.forEach(size => params.append('rinkSizes', processRinkSizeValue(size)));
     SharedFilters.selections.facilities.forEach(facility => params.append('facilities', facility));
     
     // Add date parameters
