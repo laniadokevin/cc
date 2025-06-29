@@ -113,7 +113,7 @@ namespace CatchCornerStats.Data.Repositories
                 .Select(g => g.First())
                 .ToListAsync();
 
-            var totalBookings = bookings.Count;
+            var totalBookings = bookings.Select(x => x.BookingNumber).Distinct().Count();
 
             if (totalBookings == 0) return new Dictionary<string, double>();
 
@@ -183,8 +183,8 @@ namespace CatchCornerStats.Data.Repositories
             var bookings = await query
                 .Where(x => x.StartTime != null && x.EndTime != null)
                 .Select(x => new { x.BookingNumber, x.StartTime, x.EndTime })
-                .Distinct()
                 .ToListAsync();
+            var totalBookings = bookings.Select(x => x.BookingNumber).Distinct().Count();
 
             if (!bookings.Any()) return new BookingDurationBreakdownResult { TotalBookings = 0, Data = new Dictionary<string, int>() };
 
@@ -199,7 +199,6 @@ namespace CatchCornerStats.Data.Repositories
                 .OrderBy(x => x.Duration)
                 .ToList();
 
-            var totalBookings = durations.Sum(x => x.UniqueBookings);
             if (totalBookings == 0) return new BookingDurationBreakdownResult { TotalBookings = 0, Data = new Dictionary<string, int>() };
 
             var avgDuration = bookings

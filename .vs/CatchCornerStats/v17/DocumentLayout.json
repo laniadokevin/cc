@@ -7,6 +7,10 @@
       "RelativeMoniker": "D:0:0:{E4372CD9-3F10-44B3-A8C2-2C960153BE80}|CatchCornerStats.Data\\CatchCornerStats.Data.csproj|solutionrelative:catchcornerstats.data\\implementations\\repositories\\statsrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{3EA53F1D-EA5A-4A6F-9F65-0F96DF879132}|CatchCornerStats.Presentation\\CatchCornerStats.Presentation.csproj|c:\\users\\lania\\desktop\\proyectos\\catchcornerstats\\catchcornerstats.presentation\\controllers\\statscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3EA53F1D-EA5A-4A6F-9F65-0F96DF879132}|CatchCornerStats.Presentation\\CatchCornerStats.Presentation.csproj|solutionrelative:catchcornerstats.presentation\\controllers\\statscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{A69D1384-7FF4-CA1C-1086-8B404896608A}|CatchCornerStats.Web\\CatchCornerStats.Web.csproj|c:\\users\\lania\\desktop\\proyectos\\catchcornerstats\\catchcornerstats.web\\views\\home\\getbookingdurationbreakdown.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{A69D1384-7FF4-CA1C-1086-8B404896608A}|CatchCornerStats.Web\\CatchCornerStats.Web.csproj|solutionrelative:catchcornerstats.web\\views\\home\\getbookingdurationbreakdown.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     }
@@ -18,7 +22,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 5,
+          "SelectedChildIndex": 6,
           "Children": [
             {
               "$type": "Bookmark",
@@ -39,6 +43,19 @@
             {
               "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "StatsController.cs",
+              "DocumentMoniker": "C:\\Users\\lania\\Desktop\\Proyectos\\CatchCornerStats\\CatchCornerStats.Presentation\\Controllers\\StatsController.cs",
+              "RelativeDocumentMoniker": "CatchCornerStats.Presentation\\Controllers\\StatsController.cs",
+              "ToolTip": "C:\\Users\\lania\\Desktop\\Proyectos\\CatchCornerStats\\CatchCornerStats.Presentation\\Controllers\\StatsController.cs",
+              "RelativeToolTip": "CatchCornerStats.Presentation\\Controllers\\StatsController.cs",
+              "ViewState": "AgIAAOcAAAAAAAAAAAAcwPQAAAAQAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-29T19:03:58.982Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "GetBookingDurationBreakdown.cshtml",
               "DocumentMoniker": "C:\\Users\\lania\\Desktop\\Proyectos\\CatchCornerStats\\CatchCornerStats.Web\\Views\\Home\\GetBookingDurationBreakdown.cshtml",
               "RelativeDocumentMoniker": "CatchCornerStats.Web\\Views\\Home\\GetBookingDurationBreakdown.cshtml",
@@ -57,7 +74,7 @@
               "RelativeDocumentMoniker": "CatchCornerStats.Data\\Implementations\\Repositories\\StatsRepository.cs",
               "ToolTip": "C:\\Users\\lania\\Desktop\\Proyectos\\CatchCornerStats\\CatchCornerStats.Data\\Implementations\\Repositories\\StatsRepository.cs",
               "RelativeToolTip": "CatchCornerStats.Data\\Implementations\\Repositories\\StatsRepository.cs",
-              "ViewState": "AgIAAJQBAAAAAAAAAAAIwJUBAAAcAAAAAAAAAA==",
+              "ViewState": "AgIAALMAAAAAAAAAAAAUwLoAAAAMAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-06-29T18:03:16.349Z",
               "EditorCaption": ""
