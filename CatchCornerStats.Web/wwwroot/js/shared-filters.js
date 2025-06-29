@@ -46,7 +46,7 @@ const SharedFilters = {
 };
 
 // API configuration (use centralized config if available)
-const FILTER_API_BASE = CatchCornerStatsConfig?.api?.baseUrl || 'https://localhost:7254/api';
+const FILTER_API_BASE = CatchCornerStatsConfig?.api?.baseUrl;
 
 /**
  * Load filter cache from localStorage
@@ -101,7 +101,12 @@ function saveFilterCacheToStorage() {
  */
 async function initializeSharedFilters() {
     console.log('🔧 [SharedFilters] ===== INICIANDO SISTEMA DE FILTROS COMPARTIDOS =====');
-    
+    // Esperar a que la precarga global termine si existe
+    if (window.catchCornerStatsFiltersLoading && typeof window.catchCornerStatsFiltersLoading.then === 'function') {
+        console.log('🔧 [SharedFilters] ⏳ Esperando a que la precarga global de filtros termine...');
+        await window.catchCornerStatsFiltersLoading;
+        console.log('🔧 [SharedFilters] ✅ Precarga global de filtros terminada.');
+    }
     // If already initialized, return immediately
     if (SharedFilters.isInitialized) {
         console.log('🔧 [SharedFilters] ✅ Ya inicializado, retornando...');
@@ -179,14 +184,30 @@ function areFiltersReady() {
  */
 async function loadFilterOptionsIfNeeded() {
     console.log('🔧 [SharedFilters] Verificando cache de opciones...');
-    
     // Check if cache is valid
     if (isFilterCacheValid()) {
-        console.log('🔧 [SharedFilters] ✅ Cache válido, usando opciones cacheadas');
+        console.log('🔧 [SharedFilters] ✅ Cache válido en memoria, usando opciones cacheadas (NO se hace petición a la API)');
         return SharedFilters.cache;
     }
-    
-    console.log('🔧 [SharedFilters] ❌ Cache expirado o no existe, cargando desde API...');
+    // Intentar cargar de localStorage (precarga global)
+    try {
+        const raw = localStorage.getItem('catchCornerStats_filterCache');
+        if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed && parsed.lastLoadTime && (Date.now() - parsed.lastLoadTime) < SharedFilters.cache.cacheExpiry) {
+                SharedFilters.cache = {
+                    ...SharedFilters.cache,
+                    ...parsed
+                };
+                console.log('🔧 [SharedFilters] ✅ Cache global de filtros cargado de localStorage (NO se hace petición a la API)');
+                return SharedFilters.cache;
+            }
+        }
+    } catch (e) {
+        console.warn('🔧 [SharedFilters] Error leyendo cache global de filtros:', e);
+    }
+    // Si no hay cache válido, cargar desde la API
+    console.log('🔧 [SharedFilters] ❌ Cache expirado o no existe, SE HACE PETICIÓN A LA API...');
     
     // If already loading, wait for existing promise
     if (SharedFilters.loadPromise) {

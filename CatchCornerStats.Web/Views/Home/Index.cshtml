@@ -116,4 +116,45 @@
             </div>
         </div>
     </div>
-</div> 
+</div>
+
+@section Scripts {
+    <script>
+        // Precarga global de filtros al entrar al index
+        window.catchCornerStatsFiltersLoading = window.catchCornerStatsFiltersLoading || new Promise(async (resolve) => {
+            const CACHE_KEY = 'catchCornerStats_filterCache';
+            const CACHE_EXPIRY = 30 * 60 * 1000; // 30 minutos
+            let cache = null;
+            try {
+                const raw = localStorage.getItem(CACHE_KEY);
+                if (raw) {
+                    cache = JSON.parse(raw);
+                }
+            } catch {}
+            const now = Date.now();
+            if (!cache || !cache.lastLoadTime || (now - cache.lastLoadTime) > CACHE_EXPIRY) {
+                // No hay cache o está expirado, cargar de la API
+                try {
+                    if (window.API_UTILS && typeof API_UTILS.loadAllFilterOptions === 'function') {
+                        const filterData = await API_UTILS.loadAllFilterOptions();
+                        const cacheData = {
+                            sports: filterData.sports || [],
+                            cities: filterData.cities || [],
+                            rinkSizes: filterData.rinkSizes || [],
+                            facilities: filterData.facilities || [],
+                            lastLoadTime: now
+                        };
+                        localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
+                        console.log('[Index] Filtros precargados y cacheados globalmente');
+                    }
+                } catch (e) {
+                    console.warn('[Index] Error precargando filtros:', e);
+                }
+            } else {
+                console.log('[Index] Cache de filtros ya válido, no se recarga');
+            }
+            window.catchCornerStatsFiltersReady = true;
+            resolve();
+        });
+    </script>
+} 

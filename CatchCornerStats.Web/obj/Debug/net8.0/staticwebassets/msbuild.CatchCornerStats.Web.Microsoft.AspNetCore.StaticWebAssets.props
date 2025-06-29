@@ -138,8 +138,8 @@
       <RelatedAsset></RelatedAsset>
       <AssetTraitName></AssetTraitName>
       <AssetTraitValue></AssetTraitValue>
-      <Fingerprint>hn9s7l6et6</Fingerprint>
-      <Integrity>3do9NLvFpUNSo3vsV33VpBQoogZfrGrA69LZxhoqM6Y=</Integrity>
+      <Fingerprint>ltrbps4ofy</Fingerprint>
+      <Integrity>Z7VTggL1XXafFLt+ktw0XMILM3sd1Twg83vupMpqHKg=</Integrity>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\js\shared-filters.js'))</OriginalItemSpec>
