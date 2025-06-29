@@ -166,19 +166,10 @@ namespace CatchCornerStats.Data.Repositories
             };
         }
 
-        public async Task<Dictionary<string, double>> GetBookingDurationBreakdownAsync(string? sport, string? city, string? rinkSize, string? facility, DateTime? createdDateFrom, DateTime? createdDateTo, DateTime? happeningDateFrom, DateTime? happeningDateTo)
+        public async Task<BookingDurationBreakdownResult> GetBookingDurationBreakdownAsync(List<string>? sports, List<string>? cities, List<string>? rinkSizes, List<string>? facilities, DateTime? createdDateFrom, DateTime? createdDateTo, DateTime? happeningDateFrom, DateTime? happeningDateTo)
         {
-            // Si los filtros están en Bookings, evitamos el JOIN
-            var query = _context.Bookings.AsQueryable();
-
-            if (!string.IsNullOrEmpty(sport))
-                query = query.Where(x => x.Sport == sport);
-            if (!string.IsNullOrEmpty(city))
-                query = query.Where(x => x.City == city);
-            if (!string.IsNullOrEmpty(rinkSize))
-                query = query.Where(x => x.RinkSize == rinkSize);
-            if (!string.IsNullOrEmpty(facility))
-                query = query.Where(x => x.Facility == facility);
+            // Usar BuildBaseQuery para poder filtrar por rinkSizes (JOIN con Arena)
+            var query = BuildBaseQuery(sports, null, rinkSizes, facilities);
             if (createdDateFrom.HasValue)
                 query = query.Where(x => x.CreatedDateUtc >= createdDateFrom.Value);
             if (createdDateTo.HasValue)
@@ -190,30 +181,38 @@ namespace CatchCornerStats.Data.Repositories
 
             // Traer solo BookingNumber, StartTime y EndTime únicos
             var bookings = await query
-                .Where(x => EF.Property<object>(x, "StartTime") != null && EF.Property<object>(x, "EndTime") != null)
+                .Where(x => x.StartTime != null && x.EndTime != null)
                 .Select(x => new { x.BookingNumber, x.StartTime, x.EndTime })
                 .Distinct()
                 .ToListAsync();
 
-            if (!bookings.Any()) return new Dictionary<string, double>();
+            if (!bookings.Any()) return new BookingDurationBreakdownResult { TotalBookings = 0, Data = new Dictionary<string, int>() };
 
             var durations = bookings
                 .GroupBy(x => Math.Round((x.EndTime.Value - x.StartTime.Value).TotalHours, 1))
-                .Where(g => g.Key > 0) // Solo duraciones positivas
+                .Where(g => g.Key > 0)
                 .Select(g => new
                 {
                     Duration = $"{g.Key} hr",
                     UniqueBookings = g.Count()
                 })
+                .OrderBy(x => x.Duration)
                 .ToList();
 
             var totalBookings = durations.Sum(x => x.UniqueBookings);
-            if (totalBookings == 0) return new Dictionary<string, double>();
+            if (totalBookings == 0) return new BookingDurationBreakdownResult { TotalBookings = 0, Data = new Dictionary<string, int>() };
 
-            return durations.ToDictionary(
-                x => x.Duration,
-                x => (double)x.UniqueBookings / totalBookings * 100
-            );
+            var avgDuration = bookings
+                .Select(x => (x.EndTime.Value - x.StartTime.Value).TotalHours)
+                .Where(d => d > 0)
+                .DefaultIfEmpty(0)
+                .Average();
+
+            return new BookingDurationBreakdownResult {
+                TotalBookings = totalBookings,
+                Data = durations.ToDictionary(x => x.Duration, x => x.UniqueBookings),
+                AverageDuration = avgDuration
+            };
         }
 
         public async Task<List<MonthlyReportResult>> GetMonthlyReportAsync(string? sport, string? city, string? rinkSize, string? facility)
@@ -585,8 +584,11 @@ namespace CatchCornerStats.Data.Repositories
             if (cities?.Any(x => !string.IsNullOrWhiteSpace(x)) == true)
                 query = query.Where(x => cities.Contains(x.City));
 
-            if (rinkSizes?.Any(x => !string.IsNullOrWhiteSpace(x)) == true)
-                query = query.Where(x => rinkSizes.Contains(x.RinkSize));
+            if (rinkSizes != null && rinkSizes.Any())
+            {
+                var normalizedRinkSizes = rinkSizes.Select(r => r.Trim().ToLower()).ToList();
+                query = query.Where(x => normalizedRinkSizes.Contains(x.RinkSize.Trim().ToLower()));
+            }
 
             if (facilities?.Any(x => !string.IsNullOrWhiteSpace(x)) == true)
                 query = query.Where(x => facilities.Contains(x.Facility));

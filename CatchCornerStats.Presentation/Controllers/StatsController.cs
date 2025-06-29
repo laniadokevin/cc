@@ -230,10 +230,10 @@ namespace CatchCornerStats.Presentation.Controllers
         /// <returns>A dictionary where key = duration (in hours), value = percentage of bookings.</returns>
         [HttpGet("GetBookingDurationBreakdown")]
         public async Task<IActionResult> GetBookingDurationBreakdown(
-            [FromQuery] string? sport,
-            [FromQuery] string? city,
-            [FromQuery] string? rinkSize,
-            [FromQuery] string? facility,
+            [FromQuery] List<string>? sports,
+            [FromQuery] List<string>? cities,
+            [FromQuery] List<string>? rinkSizes,
+            [FromQuery] List<string>? facilities,
             [FromQuery] DateTime? createdDateFrom,
             [FromQuery] DateTime? createdDateTo,
             [FromQuery] DateTime? happeningDateFrom,
@@ -242,9 +242,9 @@ namespace CatchCornerStats.Presentation.Controllers
             var stopwatch = Stopwatch.StartNew();
             try
             {
-                var result = await _statsRepository.GetBookingDurationBreakdownAsync(sport, city, rinkSize, facility, createdDateFrom, createdDateTo, happeningDateFrom, happeningDateTo);
+                var result = await _statsRepository.GetBookingDurationBreakdownAsync(sports, cities, rinkSizes, facilities, createdDateFrom, createdDateTo, happeningDateFrom, happeningDateTo);
                 stopwatch.Stop();
-                _logger.LogInformation($"GetBookingDurationBreakdown completed in {stopwatch.ElapsedMilliseconds}ms - {result.Count} duration categories");
+                _logger.LogInformation($"GetBookingDurationBreakdown completed in {stopwatch.ElapsedMilliseconds}ms - {result.Data.Count} start time categories");
                 return Ok(result);
             }
             catch (Exception ex)

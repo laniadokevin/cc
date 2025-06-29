@@ -162,7 +162,7 @@
                                             <i class="bi bi-hourglass display-5"></i>
                                         </div>
                                         <h2 class="fw-bold mb-1" id="avgDuration">0</h2>
-                                        <p class="mb-0">Average Duration (Hours)</p>
+                                        <p class="mb-0">Average Duration</p>
                                     </div>
                                 </div>
                             </div>
@@ -173,7 +173,7 @@
                                             <i class="bi bi-hourglass-split display-5"></i>
                                         </div>
                                         <h2 class="fw-bold mb-1" id="mostPopular">-</h2>
-                                        <p class="mb-0">Most Popular Duration</p>
+                                        <p class="mb-0">Most Popular Start Time</p>
                                     </div>
                                 </div>
                             </div>
@@ -416,35 +416,25 @@
         // Build API parameters from shared filters
         function buildApiParameters() {
             const params = new URLSearchParams();
-            
             // Get values from shared filters
             const sports = getSelectedDropdownValues('sportsOptions');
             const cities = getSelectedDropdownValues('citiesOptions');
             const rinkSizes = getSelectedDropdownValues('rinkSizesOptions');
             const facilities = getSelectedDropdownValues('facilitiesOptions');
-            
             // Get additional filters
             const createdDateFrom = document.getElementById('createdDateFrom').value;
             const createdDateTo = document.getElementById('createdDateTo').value;
             const happeningDateFrom = document.getElementById('happeningDateFrom').value;
             const happeningDateTo = document.getElementById('happeningDateTo').value;
-            
-            console.log('🔍 Building API parameters:', {
-                sports, cities, rinkSizes, facilities,
-                createdDateFrom, createdDateTo, happeningDateFrom, happeningDateTo
-            });
-            
-            // Add parameters (using new List<string> format)
-            if (sports.length) sports.forEach(sport => params.append('sports', sport));
-            if (cities.length) cities.forEach(city => params.append('cities', city));
-            if (rinkSizes.length) rinkSizes.forEach(size => params.append('rinkSizes', size));
-            if (facilities.length) facilities.forEach(facility => params.append('facilities', facility));
+            // Enviar todos los valores seleccionados como parámetros múltiples
+            sports.forEach(sport => params.append('sports', sport));
+            cities.forEach(city => params.append('cities', city));
+            rinkSizes.forEach(size => params.append('rinkSizes', size));
+            facilities.forEach(facility => params.append('facilities', facility));
             if (createdDateFrom) params.append('createdDateFrom', createdDateFrom);
             if (createdDateTo) params.append('createdDateTo', createdDateTo);
             if (happeningDateFrom) params.append('happeningDateFrom', happeningDateFrom);
             if (happeningDateTo) params.append('happeningDateTo', happeningDateTo);
-            
-            console.log('📤 Final API parameters:', params.toString());
             return params;
         }
 
@@ -475,7 +465,11 @@
 
             // Update summary cards
             document.getElementById('totalBookings').textContent = totalBookings.toLocaleString();
-            document.getElementById('avgDuration').textContent = '-';
+            const avg = data.averageDuration;
+            document.getElementById('avgDuration').textContent =
+                (avg !== undefined && avg !== null && avg > 0)
+                    ? avg.toFixed(1)
+                    : '-';
             document.getElementById('mostPopular').textContent = `${mostPopular} (${mostPopularPct}%)`;
 
             // Update data table
@@ -483,12 +477,18 @@
             tbody.innerHTML = '';
 
             labels.forEach((label, index) => {
+                // Extraer el valor numérico de la duración (ej: "1.5 hr" => 1.5)
+                const hours = parseFloat(label);
                 const percentage = ((values[index] / totalBookings) * 100).toFixed(1);
+                const status = getDurationStatus(hours);
+                const statusClass = status === 'Short' ? 'text-success' : status === 'Medium' ? 'text-warning' : 'text-danger';
+
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${label}</td>
                     <td>${values[index].toLocaleString()}</td>
                     <td>${percentage}%</td>
+                    <td><span class="${statusClass}">${status}</span></td>
                 `;
                 tbody.appendChild(row);
             });

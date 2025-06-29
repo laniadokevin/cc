@@ -492,35 +492,47 @@
         ],
         "parameters": [
           {
-            "name": "sport",
+            "name": "sports",
             "in": "query",
             "style": "form",
             "schema": {
-              "type": "string"
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             }
           },
           {
-            "name": "city",
+            "name": "cities",
             "in": "query",
             "style": "form",
             "schema": {
-              "type": "string"
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             }
           },
           {
-            "name": "rinkSize",
+            "name": "rinkSizes",
             "in": "query",
             "style": "form",
             "schema": {
-              "type": "string"
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             }
           },
           {
-            "name": "facility",
+            "name": "facilities",
             "in": "query",
             "style": "form",
             "schema": {
-              "type": "string"
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             }
           },
           {

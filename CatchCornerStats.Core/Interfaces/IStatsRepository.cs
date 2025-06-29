@@ -74,10 +74,10 @@ namespace CatchCornerStats.Core.Interfaces
         /// <summary>
         /// Returns the percentage distribution of booking durations.
         /// </summary>
-        /// <param name="sport">Sport to filter by (optional).</param>
-        /// <param name="city">City to filter by (optional).</param>
-        /// <param name="rinkSize">Rink size to filter by (optional).</param>
-        /// <param name="facility">Facility to filter by (optional).</param>
+        /// <param name="sports">Sports to filter by (optional).</param>
+        /// <param name="cities">Cities to filter by (optional).</param>
+        /// <param name="rinkSizes">Rink sizes to filter by (optional).</param>
+        /// <param name="facilities">Facilities to filter by (optional).</param>
         /// <param name="createdDateFrom">Start date to filter bookings (optional).</param>
         /// <param name="createdDateTo">End date to filter bookings (optional).</param>
         /// <param name="happeningDateFrom">Start date to filter bookings (optional).</param>
@@ -86,7 +86,7 @@ namespace CatchCornerStats.Core.Interfaces
         /// Dictionary where key = duration (e.g., "1 hr"), 
         /// value = percentage of bookings.
         /// </returns>
-        Task<Dictionary<string, double>> GetBookingDurationBreakdownAsync(string? sport, string? city, string? rinkSize, string? facility, DateTime? createdDateFrom, DateTime? createdDateTo, DateTime? happeningDateFrom, DateTime? happeningDateTo);
+        Task<BookingDurationBreakdownResult> GetBookingDurationBreakdownAsync(List<string>? sports, List<string>? cities, List<string>? rinkSizes, List<string>? facilities, DateTime? createdDateFrom, DateTime? createdDateTo, DateTime? happeningDateFrom, DateTime? happeningDateTo);
 
         /// <summary>
         /// Returns the number of bookings per facility, month by month.
