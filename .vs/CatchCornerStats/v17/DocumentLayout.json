@@ -50,8 +50,7 @@
               "RelativeToolTip": "CatchCornerStats.Presentation\\Controllers\\StatsController.cs",
               "ViewState": "AgIAAOcAAAAAAAAAAAAcwPQAAAAQAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-29T19:03:58.982Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-06-29T19:03:58.982Z"
             },
             {
               "$type": "Document",
@@ -63,8 +62,7 @@
               "RelativeToolTip": "CatchCornerStats.Web\\Views\\Home\\GetBookingDurationBreakdown.cshtml",
               "ViewState": "AgIAAMgBAAAAAAAAAAAowNIBAABQAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-06-29T18:24:56.835Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-06-29T18:24:56.835Z"
             },
             {
               "$type": "Document",
@@ -74,7 +72,7 @@
               "RelativeDocumentMoniker": "CatchCornerStats.Data\\Implementations\\Repositories\\StatsRepository.cs",
               "ToolTip": "C:\\Users\\lania\\Desktop\\Proyectos\\CatchCornerStats\\CatchCornerStats.Data\\Implementations\\Repositories\\StatsRepository.cs",
               "RelativeToolTip": "CatchCornerStats.Data\\Implementations\\Repositories\\StatsRepository.cs",
-              "ViewState": "AgIAALMAAAAAAAAAAAAUwLoAAAAMAAAAAAAAAA==",
+              "ViewState": "AgIAAAABAAAAAAAAAAAmwAIBAAAkAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-06-29T18:03:16.349Z",
               "EditorCaption": ""

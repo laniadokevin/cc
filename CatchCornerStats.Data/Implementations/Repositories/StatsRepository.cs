@@ -181,10 +181,12 @@ namespace CatchCornerStats.Data.Repositories
 
             // Traer solo BookingNumber, StartTime y EndTime únicos
             var bookings = await query
-                .Where(x => x.StartTime != null && x.EndTime != null)
-                .Select(x => new { x.BookingNumber, x.StartTime, x.EndTime })
-                .ToListAsync();
-            var totalBookings = bookings.Select(x => x.BookingNumber).Distinct().Count();
+                       .Where(x => x.StartTime != null && x.EndTime != null)
+                       .Select(x => new { x.BookingNumber, x.StartTime, x.EndTime })
+                       .Distinct()
+                       .ToListAsync();
+            
+            var totalBookings = bookings.Count();
 
             if (!bookings.Any()) return new BookingDurationBreakdownResult { TotalBookings = 0, Data = new Dictionary<string, int>() };
 
@@ -214,11 +216,10 @@ namespace CatchCornerStats.Data.Repositories
             };
         }
 
-        public async Task<List<MonthlyReportResult>> GetMonthlyReportAsync(string? sport, string? city, string? rinkSize, string? facility)
+        public async Task<MonthlyReportResponseDto> GetMonthlyReportAsync(string? sport, string? city, string? rinkSize, string? facility)
         {
             var query = BuildBaseQuery(sport, city, rinkSize, facility);
 
-            // OPTIMIZACIÓN: Agregación en SQL con cálculo de mes anterior
             var monthlyData = await query
                 .GroupBy(x => new
                 {
@@ -238,40 +239,69 @@ namespace CatchCornerStats.Data.Repositories
                 .ThenBy(x => x.Month)
                 .ToListAsync();
 
-            var report = new List<MonthlyReportResult>();
-
-            foreach (var current in monthlyData)
+            // Construir tabla dinámica
+            var facilitiesDict = new Dictionary<string, MonthlyReportFacilityDto>();
+            var allMonths = new HashSet<string>();
+            foreach (var row in monthlyData)
             {
-                // Calcular mes anterior de forma más eficiente
-                var (prevMonth, prevYear) = GetPreviousMonth(current.Month, current.Year);
-                
-                var previousMonthBookings = monthlyData
-                    .FirstOrDefault(x => x.FacilityName == current.FacilityName && 
-                                       x.Month == prevMonth && 
-                                       x.Year == prevYear)
-                    ?.TotalBookings;
-
-                var percentageDrop = previousMonthBookings.HasValue && previousMonthBookings.Value > 0
-                    ? (double)(previousMonthBookings.Value - current.TotalBookings) / previousMonthBookings.Value * 100
-                    : (double?)null;
-
-                var isFlagged = current.TotalBookings >= 10 &&
-                                previousMonthBookings.HasValue &&
-                                percentageDrop.HasValue &&
-                                percentageDrop.Value >= 50;
-
-                report.Add(new MonthlyReportResult
+                var monthYear = $"{row.Month:D2}/{row.Year}";
+                allMonths.Add(monthYear);
+                if (!facilitiesDict.TryGetValue(row.FacilityName, out var facilityDto))
                 {
-                    FacilityName = current.FacilityName,
-                    MonthYear = $"{current.Month}/{current.Year}",
-                    TotalBookings = current.TotalBookings,
-                    PreviousMonthBookings = previousMonthBookings,
-                    PercentageDrop = percentageDrop,
-                    IsFlagged = isFlagged
-                });
+                    facilityDto = new MonthlyReportFacilityDto { FacilityName = row.FacilityName };
+                    facilitiesDict[row.FacilityName] = facilityDto;
+                }
+                facilityDto.MonthlyBookings[monthYear] = row.TotalBookings;
             }
 
-            return report;
+            // Flags
+            var flagged = new List<MonthlyReportFlaggedDto>();
+            foreach (var facilityDto in facilitiesDict.Values)
+            {
+                var monthsOrdered = facilityDto.MonthlyBookings.Keys.OrderBy(m => m).ToList();
+                for (int i = 1; i < monthsOrdered.Count; i++)
+                {
+                    var prevMonth = monthsOrdered[i - 1];
+                    var currMonth = monthsOrdered[i];
+                    var prevBookings = facilityDto.MonthlyBookings[prevMonth];
+                    var currBookings = facilityDto.MonthlyBookings[currMonth];
+                    if (prevBookings >= 10)
+                    {
+                        var drop = prevBookings > 0 ? (double)(prevBookings - currBookings) / prevBookings * 100 : 0;
+                        if (drop >= 50)
+                        {
+                            flagged.Add(new MonthlyReportFlaggedDto
+                            {
+                                FacilityName = facilityDto.FacilityName,
+                                MonthYear = currMonth,
+                                PreviousMonthBookings = prevBookings,
+                                CurrentMonthBookings = currBookings,
+                                PercentageDrop = drop
+                            });
+                        }
+                    }
+                }
+            }
+
+            // Normalizar: asegurar que todos los meses estén presentes en cada facility (con 0 si falta)
+            var allMonthsOrdered = allMonths.OrderBy(m => m).ToList();
+            foreach (var facilityDto in facilitiesDict.Values)
+            {
+                foreach (var month in allMonthsOrdered)
+                {
+                    if (!facilityDto.MonthlyBookings.ContainsKey(month))
+                        facilityDto.MonthlyBookings[month] = 0;
+                }
+                // Ordenar el diccionario por mes
+                facilityDto.MonthlyBookings = facilityDto.MonthlyBookings.OrderBy(kv => kv.Key)
+                    .ToDictionary(kv => kv.Key, kv => kv.Value);
+            }
+
+            return new MonthlyReportResponseDto
+            {
+                Facilities = facilitiesDict.Values.ToList(),
+                FlaggedFacilities = flagged
+            };
         }
 
         public async Task<List<SportComparisonResult>> GetSportComparisonReportAsync(string? city, int? month)

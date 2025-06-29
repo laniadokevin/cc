@@ -97,9 +97,9 @@ namespace CatchCornerStats.Core.Interfaces
         /// <param name="rinkSize">Rink size to filter by (optional).</param>
         /// <param name="facility">Facility to filter by (optional).</param>
         /// <returns>
-        /// List of MonthlyReportResult with the number of bookings and flag status.
+        /// MonthlyReportResponseDto with the number of bookings and flag status.
         /// </returns>
-        Task<List<MonthlyReportResult>> GetMonthlyReportAsync(string? sport, string? city, string? rinkSize, string? facility);
+        Task<MonthlyReportResponseDto> GetMonthlyReportAsync(string? sport, string? city, string? rinkSize, string? facility);
 
         /// <summary>
         /// Compares sport bookings to actual results on a per-city basis.

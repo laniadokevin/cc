@@ -275,7 +275,7 @@ namespace CatchCornerStats.Presentation.Controllers
             {
                 var result = await _statsRepository.GetMonthlyReportAsync(sport, city, rinkSize, facility);
                 stopwatch.Stop();
-                _logger.LogInformation($"GetMonthlyReport completed in {stopwatch.ElapsedMilliseconds}ms - {result.Count} monthly reports");
+                _logger.LogInformation($"GetMonthlyReport completed in {stopwatch.ElapsedMilliseconds}ms - {result.Facilities.Count} facilities, {result.FlaggedFacilities.Count} flagged");
                 return Ok(result);
             }
             catch (Exception ex)
