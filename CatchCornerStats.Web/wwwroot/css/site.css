@@ -1,6 +1,20 @@
 /* Fix para dropdowns de filtros solapados */
 .dropdown-menu {
     z-index: 2050 !important;
+    margin-top: 0 !important;
+    padding-top: 0.1rem !important;
+    background: #fff !important;
+    box-shadow: 0 4px 24px 0 rgba(0,0,0,0.12), 0 1.5px 4px 0 rgba(0,0,0,0.03);
+    border-radius: 0.5rem !important;
+    border: 1px solid #e9ecef;
+}
+
+.dropdown-menu .form-control.mb-2 {
+    margin-top: 0.25rem !important;
+}
+
+.dropdown-menu .form-check {
+    background: transparent;
 }
 
 /* Opcional: asegurar que los padres no oculten el dropdown */

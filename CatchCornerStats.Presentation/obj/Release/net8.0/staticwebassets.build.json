@@ -1,0 +1,20 @@
+{
+  "Version": 1,
+  "Hash": "zR/bY2IKHfYwiABdYtDqMsw+3YRRuLY/I9LoEdVYSQE=",
+  "Source": "CatchCornerStats.Presentation",
+  "BasePath": "_content/CatchCornerStats.Presentation",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "CatchCornerStats.Presentation\\wwwroot",
+      "Source": "CatchCornerStats.Presentation",
+      "ContentRoot": "C:\\Users\\lania\\Desktop\\Proyectos\\CatchCornerStats\\CatchCornerStats.Presentation\\wwwroot\\",
+      "BasePath": "_content/CatchCornerStats.Presentation",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [],
+  "Endpoints": []
+}

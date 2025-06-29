@@ -43,7 +43,7 @@
                                     <span id="sportsDropdownLabel">All Sports</span>
                                 </button>
                                 <ul class="dropdown-menu w-100 p-2" aria-labelledby="sportsDropdown" style="max-height: 300px; overflow-y: auto; z-index: 1051;">
-                                    <input type="text" class="form-control mb-2" placeholder="Search..." onkeyup="filterDropdownOptions(this, 'sportsOptions')">
+                                    <input type="text" class="form-control mb-2" placeholder="Search..." oninput="if(SharedFilters && SharedFilters.isInitialized) simpleFilterDropdown({containerId:'sportsOptions',type:'sports',labelId:'sportsDropdownLabel',defaultLabel:'All Sports'})">
                                     <div id="sportsOptions"></div>
                                 </ul>
                             </div>
@@ -55,7 +55,7 @@
                                     <span id="citiesDropdownLabel">All Cities</span>
                                 </button>
                                 <ul class="dropdown-menu w-100 p-2" aria-labelledby="citiesDropdown" style="max-height: 300px; overflow-y: auto; z-index: 1051;">
-                                    <input type="text" class="form-control mb-2" placeholder="Search..." onkeyup="filterDropdownOptions(this, 'citiesOptions')">
+                                    <input type="text" class="form-control mb-2" placeholder="Search..." oninput="if(SharedFilters && SharedFilters.isInitialized) simpleFilterDropdown({containerId:'citiesOptions',type:'cities',labelId:'citiesDropdownLabel',defaultLabel:'All Cities'})">
                                     <div id="citiesOptions"></div>
                                 </ul>
                             </div>
@@ -67,7 +67,7 @@
                                     <span id="rinkSizesDropdownLabel">All Sizes</span>
                                 </button>
                                 <ul class="dropdown-menu w-100 p-2" aria-labelledby="rinkSizesDropdown" style="max-height: 300px; overflow-y: auto; z-index: 1051;">
-                                    <input type="text" class="form-control mb-2" placeholder="Search..." onkeyup="filterDropdownOptions(this, 'rinkSizesOptions')">
+                                    <input type="text" class="form-control mb-2" placeholder="Search..." oninput="if(SharedFilters && SharedFilters.isInitialized) simpleFilterDropdown({containerId:'rinkSizesOptions',type:'rinkSizes',labelId:'rinkSizesDropdownLabel',defaultLabel:'All Sizes'})">
                                     <div id="rinkSizesOptions"></div>
                                 </ul>
                             </div>
@@ -79,7 +79,7 @@
                                     <span id="facilitiesDropdownLabel">All Facilities</span>
                                 </button>
                                 <ul class="dropdown-menu w-100 p-2" aria-labelledby="facilitiesDropdown" style="max-height: 300px; overflow-y: auto; z-index: 1051;">
-                                    <input type="text" class="form-control mb-2" placeholder="Search..." onkeyup="filterDropdownOptions(this, 'facilitiesOptions')">
+                                    <input type="text" class="form-control mb-2" placeholder="Search..." oninput="if(SharedFilters && SharedFilters.isInitialized) simpleFilterDropdown({containerId:'facilitiesOptions',type:'facilities',labelId:'facilitiesDropdownLabel',defaultLabel:'All Facilities'})">
                                     <div id="facilitiesOptions"></div>
                                 </ul>
                             </div>

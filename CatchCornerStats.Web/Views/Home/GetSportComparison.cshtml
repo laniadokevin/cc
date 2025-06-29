@@ -43,7 +43,7 @@
                                     <span id="sportsDropdownLabel">All Sports</span>
                                 </button>
                                 <ul class="dropdown-menu w-100 p-2" aria-labelledby="sportsDropdown" style="max-height: 300px; overflow-y: auto; z-index: 1051;">
-                                    <input type="text" class="form-control mb-2" placeholder="Search..." onkeyup="filterDropdownOptions(this, 'sportsOptions')">
+                                    <input type="text" class="form-control mb-2" placeholder="Search..." oninput="if(SharedFilters && SharedFilters.isInitialized) simpleFilterDropdown({containerId:'sportsOptions',type:'sports',labelId:'sportsDropdownLabel',defaultLabel:'All Sports'})">
                                     <div id="sportsOptions"></div>
                                 </ul>
                             </div>
@@ -55,7 +55,7 @@
                                     <span id="citiesDropdownLabel">All Cities</span>
                                 </button>
                                 <ul class="dropdown-menu w-100 p-2" aria-labelledby="citiesDropdown" style="max-height: 300px; overflow-y: auto; z-index: 1051;">
-                                    <input type="text" class="form-control mb-2" placeholder="Search..." onkeyup="filterDropdownOptions(this, 'citiesOptions')">
+                                    <input type="text" class="form-control mb-2" placeholder="Search..." oninput="if(SharedFilters && SharedFilters.isInitialized) simpleFilterDropdown({containerId:'citiesOptions',type:'cities',labelId:'citiesDropdownLabel',defaultLabel:'All Cities'})">
                                     <div id="citiesOptions"></div>
                                 </ul>
                             </div>
@@ -67,7 +67,7 @@
                                     <span id="rinkSizesDropdownLabel">All Sizes</span>
                                 </button>
                                 <ul class="dropdown-menu w-100 p-2" aria-labelledby="rinkSizesDropdown" style="max-height: 300px; overflow-y: auto; z-index: 1051;">
-                                    <input type="text" class="form-control mb-2" placeholder="Search..." onkeyup="filterDropdownOptions(this, 'rinkSizesOptions')">
+                                    <input type="text" class="form-control mb-2" placeholder="Search..." oninput="if(SharedFilters && SharedFilters.isInitialized) simpleFilterDropdown({containerId:'rinkSizesOptions',type:'rinkSizes',labelId:'rinkSizesDropdownLabel',defaultLabel:'All Sizes'})">
                                     <div id="rinkSizesOptions"></div>
                                 </ul>
                             </div>
@@ -79,7 +79,7 @@
                                     <span id="facilitiesDropdownLabel">All Facilities</span>
                                 </button>
                                 <ul class="dropdown-menu w-100 p-2" aria-labelledby="facilitiesDropdown" style="max-height: 300px; overflow-y: auto; z-index: 1051;">
-                                    <input type="text" class="form-control mb-2" placeholder="Search..." onkeyup="filterDropdownOptions(this, 'facilitiesOptions')">
+                                    <input type="text" class="form-control mb-2" placeholder="Search..." oninput="if(SharedFilters && SharedFilters.isInitialized) simpleFilterDropdown({containerId:'facilitiesOptions',type:'facilities',labelId:'facilitiesDropdownLabel',defaultLabel:'All Facilities'})">
                                     <div id="facilitiesOptions"></div>
                                 </ul>
                             </div>
@@ -308,59 +308,54 @@
     <script>
         let currentData = null;
         let chart = null;
-        let selectedFilters = {
-            sports: [],
-            cities: [],
-            rinkSizes: [],
-            facilities: [],
-            dateRange: 'all',
-            metric: 'bookings',
-            chartType: 'bar'
-        };
         let queryHistory = [];
+        let filtersReady = false;
 
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Sport Comparison page loaded');
-            loadFilterOptions();
-            loadData();
-            setupEventListeners();
-        });
+        // Inicializar filtros y vista
+        document.addEventListener('DOMContentLoaded', initializeView);
 
-        // Setup event listeners
+        async function initializeView() {
+            try {
+                if (typeof initializeSharedFilters !== 'function') {
+                    console.error('SharedFilters not available');
+                    return;
+                }
+                await initializeSharedFilters();
+                filtersReady = true;
+                populateAllDropdowns();
+                restoreFilterSelections();
+                setupEventListeners();
+                loadData();
+            } catch (error) {
+                console.error('Error initializing filters:', error);
+            }
+        }
+
+        function populateAllDropdowns() {
+            const mappings = [
+                { containerId: 'sportsOptions', type: 'sports', labelId: 'sportsDropdownLabel', defaultLabel: 'All Sports' },
+                { containerId: 'citiesOptions', type: 'cities', labelId: 'citiesDropdownLabel', defaultLabel: 'All Cities' },
+                { containerId: 'rinkSizesOptions', type: 'rinkSizes', labelId: 'rinkSizesDropdownLabel', defaultLabel: 'All Sizes' },
+                { containerId: 'facilitiesOptions', type: 'facilities', labelId: 'facilitiesDropdownLabel', defaultLabel: 'All Facilities' }
+            ];
+            mappings.forEach(mapping => {
+                simpleFilterDropdown(mapping);
+            });
+        }
+
         function setupEventListeners() {
             document.getElementById('dateRangeFilter').addEventListener('change', function() {
                 if (this.value === 'custom') {
-                    // TODO: Show custom date picker
                     alert('Custom date range feature coming soon!');
                     this.value = 'all';
                 }
             });
-
             document.getElementById('metricFilter').addEventListener('change', function() {
-                selectedFilters.metric = this.value;
-                if (currentData) {
-                    updateChart();
-                }
+                if (currentData) updateChart();
             });
-
             document.getElementById('chartTypeFilter').addEventListener('change', function() {
-                selectedFilters.chartType = this.value;
-                if (currentData) {
-                    updateChart();
-                }
+                if (currentData) updateChart();
             });
-        }
-
-        // Load filter options
-        async function loadFilterOptions() {
-            console.log('Loading filter options for sport comparison');
-            await Promise.all([
-                populateCheckboxDropdown('sportsOptions', 'GetSports', 'All Sports', 'sportsDropdownLabel'),
-                populateCheckboxDropdown('citiesOptions', 'GetCities', 'All Cities', 'citiesDropdownLabel'),
-                populateCheckboxDropdown('rinkSizesOptions', 'GetRinkSizes', 'All Sizes', 'rinkSizesDropdownLabel'),
-                populateCheckboxDropdown('facilitiesOptions', 'GetFacilities', 'All Facilities', 'facilitiesDropdownLabel')
-            ]);
         }
 
         // Load data from API
@@ -483,7 +478,7 @@
             const chartData = prepareChartData();
 
             chart = new Chart(ctx, {
-                type: selectedFilters.chartType,
+                type: document.getElementById('chartTypeFilter').value,
                 data: chartData,
                 options: {
                     responsive: true,
@@ -494,10 +489,10 @@
                         },
                         title: {
                             display: true,
-                            text: `Sport Comparison - ${selectedFilters.metric.charAt(0).toUpperCase() + selectedFilters.metric.slice(1)}`
+                            text: `Sport Comparison - ${document.getElementById('metricFilter').value.charAt(0).toUpperCase() + document.getElementById('metricFilter').value.slice(1)}`
                         }
                     },
-                    scales: selectedFilters.chartType === 'bar' ? {
+                    scales: document.getElementById('chartTypeFilter').value === 'bar' ? {
                         y: {
                             beginAtZero: true
                         }
@@ -510,7 +505,7 @@
         function prepareChartData() {
             const labels = currentData.map(item => item.sport || 'Unknown');
             const values = currentData.map(item => {
-                switch (selectedFilters.metric) {
+                switch (document.getElementById('metricFilter').value) {
                     case 'bookings': return item.totalBookings || 0;
                     case 'revenue': return item.revenue || 0;
                     case 'leadtime': return item.avgLeadTime || 0;
@@ -528,7 +523,7 @@
             return {
                 labels: labels,
                 datasets: [{
-                    label: selectedFilters.metric.charAt(0).toUpperCase() + selectedFilters.metric.slice(1),
+                    label: document.getElementById('metricFilter').value.charAt(0).toUpperCase() + document.getElementById('metricFilter').value.slice(1),
                     data: values,
                     backgroundColor: colors.slice(0, labels.length),
                     borderColor: colors.slice(0, labels.length),
@@ -577,45 +572,29 @@
 
         // Apply filters
         function applyFilters() {
-            // Update selected filters
-            selectedFilters.sports = getSelectedDropdownValues('sportsOptions');
-            selectedFilters.cities = getSelectedDropdownValues('citiesOptions');
-            selectedFilters.rinkSizes = getSelectedDropdownValues('rinkSizesOptions');
-            selectedFilters.facilities = getSelectedDropdownValues('facilitiesOptions');
-            selectedFilters.dateRange = document.getElementById('dateRangeFilter').value;
-            selectedFilters.metric = document.getElementById('metricFilter').value;
-            selectedFilters.chartType = document.getElementById('chartTypeFilter').value;
-
-            // Reload data with filters
+            // Los filtros seleccionados ya están en SharedFilters.selections
             loadData();
         }
 
-        // Clear filters
         function clearFilters() {
-            // Clear dropdown selections
-            clearDropdownSelections('sportsOptions', 'sportsDropdownLabel', 'All Sports');
-            clearDropdownSelections('citiesOptions', 'citiesDropdownLabel', 'All Cities');
-            clearDropdownSelections('rinkSizesOptions', 'rinkSizesDropdownLabel', 'All Sizes');
-            clearDropdownSelections('facilitiesOptions', 'facilitiesDropdownLabel', 'All Facilities');
-
-            // Reset other filters
-            document.getElementById('dateRangeFilter').value = 'all';
-            document.getElementById('metricFilter').value = 'bookings';
-            document.getElementById('chartTypeFilter').value = 'bar';
-
-            // Reset selected filters
-            selectedFilters = {
-                sports: [],
-                cities: [],
-                rinkSizes: [],
-                facilities: [],
-                dateRange: 'all',
-                metric: 'bookings',
-                chartType: 'bar'
-            };
-
-            // Reload data
+            clearAllFilters();
             loadData();
+        }
+
+        function getFiltersSummary() {
+            const s = SharedFilters.selections;
+            const parts = [];
+            if (s.sports.length) parts.push(`Sport: ${s.sports.join(', ')}`);
+            if (s.cities.length) parts.push(`City: ${s.cities.join(', ')}`);
+            if (s.rinkSizes.length) parts.push(`Rink Size: ${s.rinkSizes.join(', ')}`);
+            if (s.facilities.length) parts.push(`Facility: ${s.facilities.join(', ')}`);
+            const dateRange = document.getElementById('dateRangeFilter')?.value;
+            const metric = document.getElementById('metricFilter')?.value;
+            const chartType = document.getElementById('chartTypeFilter')?.value;
+            if (dateRange && dateRange !== 'all') parts.push(`Date: ${dateRange}`);
+            if (metric && metric !== 'bookings') parts.push(`Metric: ${metric}`);
+            if (chartType && chartType !== 'bar') parts.push(`Chart: ${chartType}`);
+            return parts.length ? parts.join(' | ') : 'All Data';
         }
 
         // Export data
@@ -702,65 +681,6 @@
             document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
         }
 
-        // Dropdown utility functions (reused from other views)
-        function populateCheckboxDropdown(containerId, endpoint, defaultLabel, labelId) {
-            const container = document.getElementById(containerId);
-            const label = document.getElementById(labelId);
-            
-            // Simulate API call - replace with actual endpoint
-            const mockData = getMockDataForEndpoint(endpoint);
-            
-            container.innerHTML = '';
-            
-            mockData.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'form-check';
-                div.innerHTML = `
-                    <input class="form-check-input" type="checkbox" value="${item}" id="check_${item.replace(/\s+/g, '_')}">
-                    <label class="form-check-label" for="check_${item.replace(/\s+/g, '_')}">
-                        ${item}
-                    </label>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        function getMockDataForEndpoint(endpoint) {
-            switch (endpoint) {
-                case 'GetSports':
-                    return ['Hockey', 'Soccer', 'Basketball', 'Tennis', 'Volleyball', 'Baseball'];
-                case 'GetCities':
-                    return ['Toronto', 'Vancouver', 'Montreal', 'Calgary', 'Edmonton', 'Ottawa'];
-                case 'GetRinkSizes':
-                    return ['Full Size', 'Half Size', 'Quarter Size', 'Mini Rink'];
-                case 'GetFacilities':
-                    return ['Sports Complex A', 'Community Center B', 'Arena C', 'Recreation Center D'];
-                default:
-                    return [];
-            }
-        }
-
-        function getSelectedDropdownValues(containerId) {
-            const checkboxes = document.querySelectorAll(`#${containerId} input[type="checkbox"]:checked`);
-            return Array.from(checkboxes).map(cb => cb.value);
-        }
-
-        function clearDropdownSelections(containerId, labelId, defaultLabel) {
-            const checkboxes = document.querySelectorAll(`#${containerId} input[type="checkbox"]`);
-            checkboxes.forEach(cb => cb.checked = false);
-            document.getElementById(labelId).textContent = defaultLabel;
-        }
-
-        function filterDropdownOptions(input, containerId) {
-            const filter = input.value.toLowerCase();
-            const options = document.querySelectorAll(`#${containerId} .form-check`);
-            
-            options.forEach(option => {
-                const text = option.textContent.toLowerCase();
-                option.style.display = text.includes(filter) ? 'block' : 'none';
-            });
-        }
-
         function addToHistory(filtersSummary, topSport, flaggedCount, totalBookings) {
             const now = new Date().toLocaleString();
             queryHistory.unshift({
@@ -792,25 +712,6 @@
         function clearHistory() {
             queryHistory = [];
             renderHistory();
-        }
-
-        function getFiltersSummary() {
-            const sports = getSelectedDropdownValues('sportsOptions');
-            const cities = getSelectedDropdownValues('citiesOptions');
-            const rinkSizes = getSelectedDropdownValues('rinkSizesOptions');
-            const facilities = getSelectedDropdownValues('facilitiesOptions');
-            const dateRange = document.getElementById('dateRangeFilter')?.value;
-            const metric = document.getElementById('metricFilter')?.value;
-            const chartType = document.getElementById('chartTypeFilter')?.value;
-            const parts = [];
-            if (sports.length) parts.push(`Sport: ${sports.join(', ')}`);
-            if (cities.length) parts.push(`City: ${cities.join(', ')}`);
-            if (rinkSizes.length) parts.push(`Rink Size: ${rinkSizes.join(', ')}`);
-            if (facilities.length) parts.push(`Facility: ${facilities.join(', ')}`);
-            if (dateRange && dateRange !== 'all') parts.push(`Date: ${dateRange}`);
-            if (metric && metric !== 'bookings') parts.push(`Metric: ${metric}`);
-            if (chartType && chartType !== 'bar') parts.push(`Chart: ${chartType}`);
-            return parts.length ? parts.join(' | ') : 'All Data';
         }
 
         function getTopSport(data) {

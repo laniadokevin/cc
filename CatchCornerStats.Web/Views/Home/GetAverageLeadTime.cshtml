@@ -44,10 +44,10 @@
                                 <button class="btn btn-outline-secondary w-100 text-start dropdown-toggle" type="button" id="sportsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                     <span id="sportsDropdownLabel">All Sports</span>
                                 </button>
-                                <ul class="dropdown-menu w-100 p-2" aria-labelledby="sportsDropdown" style="max-height: 300px; overflow-y: auto;">
-                                    <input type="text" class="form-control mb-2" placeholder="Search..." onkeyup="filterDropdownOptions(this, 'sportsOptions')">
+                                <div class="dropdown-menu w-100 p-2" aria-labelledby="sportsDropdown" style="max-height: 300px; overflow-y: auto;">
+                                    <input type="text" class="form-control mb-2" placeholder="Search..." oninput="if(SharedFilters && SharedFilters.isInitialized) simpleFilterDropdown({containerId:'sportsOptions',type:'sports',labelId:'sportsDropdownLabel',defaultLabel:'All Sports'})">
                                     <div id="sportsOptions"></div>
-                                </ul>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-3">
@@ -56,10 +56,10 @@
                                 <button class="btn btn-outline-secondary w-100 text-start dropdown-toggle" type="button" id="citiesDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                     <span id="citiesDropdownLabel">All Cities</span>
                                 </button>
-                                <ul class="dropdown-menu w-100 p-2" aria-labelledby="citiesDropdown" style="max-height: 300px; overflow-y: auto;">
-                                    <input type="text" class="form-control mb-2" placeholder="Search..." onkeyup="filterDropdownOptions(this, 'citiesOptions')">
+                                <div class="dropdown-menu w-100 p-2" aria-labelledby="citiesDropdown" style="max-height: 300px; overflow-y: auto;">
+                                    <input type="text" class="form-control mb-2" placeholder="Search..." oninput="if(SharedFilters && SharedFilters.isInitialized) simpleFilterDropdown({containerId:'citiesOptions',type:'cities',labelId:'citiesDropdownLabel',defaultLabel:'All Cities'})">
                                     <div id="citiesOptions"></div>
-                                </ul>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-3">
@@ -68,10 +68,10 @@
                                 <button class="btn btn-outline-secondary w-100 text-start dropdown-toggle" type="button" id="rinkSizesDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                     <span id="rinkSizesDropdownLabel">All Sizes</span>
                                 </button>
-                                <ul class="dropdown-menu w-100 p-2" aria-labelledby="rinkSizesDropdown" style="max-height: 300px; overflow-y: auto;">
-                                    <input type="text" class="form-control mb-2" placeholder="Search..." onkeyup="filterDropdownOptions(this, 'rinkSizesOptions')">
+                                <div class="dropdown-menu w-100 p-2" aria-labelledby="rinkSizesDropdown" style="max-height: 300px; overflow-y: auto;">
+                                    <input type="text" class="form-control mb-2" placeholder="Search..." oninput="if(SharedFilters && SharedFilters.isInitialized) simpleFilterDropdown({containerId:'rinkSizesOptions',type:'rinkSizes',labelId:'rinkSizesDropdownLabel',defaultLabel:'All Sizes'})">
                                     <div id="rinkSizesOptions"></div>
-                                </ul>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-3">
@@ -80,10 +80,10 @@
                                 <button class="btn btn-outline-secondary w-100 text-start dropdown-toggle" type="button" id="facilitiesDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                     <span id="facilitiesDropdownLabel">All Facilities</span>
                                 </button>
-                                <ul class="dropdown-menu w-100 p-2" aria-labelledby="facilitiesDropdown" style="max-height: 300px; overflow-y: auto;">
-                                    <input type="text" class="form-control mb-2" placeholder="Search..." onkeyup="filterDropdownOptions(this, 'facilitiesOptions')">
+                                <div class="dropdown-menu w-100 p-2" aria-labelledby="facilitiesDropdown" style="max-height: 300px; overflow-y: auto;">
+                                    <input type="text" class="form-control mb-2" placeholder="Search..." oninput="if(SharedFilters && SharedFilters.isInitialized) simpleFilterDropdown({containerId:'facilitiesOptions',type:'facilities',labelId:'facilitiesDropdownLabel',defaultLabel:'All Facilities'})">
                                     <div id="facilitiesOptions"></div>
-                                </ul>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-3">
@@ -168,9 +168,9 @@
                                 <thead class="table-light">
                                     <tr>
                                         <th>Filters <i class="bi bi-info-circle" data-bs-toggle="tooltip" title="Resumen de los filtros aplicados para esta consulta."></i></th>
-                                        <th>Average Lead Time (Days) <i class="bi bi-info-circle" data-bs-toggle="tooltip" title="Promedio de días entre la creación y la fecha de uso de la reserva."></i></th>
+                                        <th>Average Lead Time (Days) <i class="bi bi-info-circle" data-bs-toggle="tooltip" title="Average days between booking creation and usage date."></i></th>
                                         <th>Total Bookings <i class="bi bi-info-circle" data-bs-toggle="tooltip" title="Cantidad total de reservas que cumplen los filtros."></i></th>
-                                        <th>Category <i class="bi bi-info-circle" data-bs-toggle="tooltip" title="Clasificación del lead time: Short (≤1 día), Medium (2-7 días), Long (>7 días)"></i></th>
+                                        <th>Category <i class="bi bi-info-circle" data-bs-toggle="tooltip" title="Lead time classification: Short (≤1 day), Medium (2-7 days), Long (>7 days)"></i></th>
                                     </tr>
                                 </thead>
                                 <tbody id="resultsTable">
@@ -233,7 +233,7 @@
                 
                 // Verificar que SharedFilters esté disponible
                 if (typeof initializeSharedFilters !== 'function') {
-                    ConfigHelpers.logError('SharedFilters no está disponible');
+                    ConfigHelpers.logError('SharedFilters not available');
                     return;
                 }
                 
@@ -453,7 +453,7 @@
         function saveHistoryEntry(entry) {
             let history = JSON.parse(localStorage.getItem('leadTimeHistory') || '[]');
             history.unshift(entry); // Agrega al inicio
-            if (history.length > 20) history = history.slice(0, 20); // Máximo 20 entradas
+            if (history.length > 20) history = history.slice(0, 20); // Max 20 entries
             localStorage.setItem('leadTimeHistory', JSON.stringify(history));
         }
 

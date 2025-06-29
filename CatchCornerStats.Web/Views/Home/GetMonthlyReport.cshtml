@@ -43,7 +43,7 @@
                                     <span id="sportsDropdownLabel">All Sports</span>
                                 </button>
                                 <ul class="dropdown-menu w-100 p-2" aria-labelledby="sportsDropdown" style="max-height: 300px; overflow-y: auto; z-index: 1051;">
-                                    <input type="text" class="form-control mb-2" placeholder="Search..." onkeyup="filterDropdownOptions(this, 'sportsOptions')">
+                                    <input type="text" class="form-control mb-2" placeholder="Search..." oninput="if(SharedFilters && SharedFilters.isInitialized) simpleFilterDropdown({containerId:'sportsOptions',type:'sports',labelId:'sportsDropdownLabel',defaultLabel:'All Sports'})">
                                     <div id="sportsOptions"></div>
                                 </ul>
                             </div>
@@ -55,7 +55,7 @@
                                     <span id="citiesDropdownLabel">All Cities</span>
                                 </button>
                                 <ul class="dropdown-menu w-100 p-2" aria-labelledby="citiesDropdown" style="max-height: 300px; overflow-y: auto; z-index: 1051;">
-                                    <input type="text" class="form-control mb-2" placeholder="Search..." onkeyup="filterDropdownOptions(this, 'citiesOptions')">
+                                    <input type="text" class="form-control mb-2" placeholder="Search..." oninput="if(SharedFilters && SharedFilters.isInitialized) simpleFilterDropdown({containerId:'citiesOptions',type:'cities',labelId:'citiesDropdownLabel',defaultLabel:'All Cities'})">
                                     <div id="citiesOptions"></div>
                                 </ul>
                             </div>
@@ -67,7 +67,7 @@
                                     <span id="rinkSizesDropdownLabel">All Sizes</span>
                                 </button>
                                 <ul class="dropdown-menu w-100 p-2" aria-labelledby="rinkSizesDropdown" style="max-height: 300px; overflow-y: auto; z-index: 1051;">
-                                    <input type="text" class="form-control mb-2" placeholder="Search..." onkeyup="filterDropdownOptions(this, 'rinkSizesOptions')">
+                                    <input type="text" class="form-control mb-2" placeholder="Search..." oninput="if(SharedFilters && SharedFilters.isInitialized) simpleFilterDropdown({containerId:'rinkSizesOptions',type:'rinkSizes',labelId:'rinkSizesDropdownLabel',defaultLabel:'All Sizes'})">
                                     <div id="rinkSizesOptions"></div>
                                 </ul>
                             </div>
@@ -79,7 +79,7 @@
                                     <span id="facilitiesDropdownLabel">All Facilities</span>
                                 </button>
                                 <ul class="dropdown-menu w-100 p-2" aria-labelledby="facilitiesDropdown" style="max-height: 300px; overflow-y: auto; z-index: 1051;">
-                                    <input type="text" class="form-control mb-2" placeholder="Search..." onkeyup="filterDropdownOptions(this, 'facilitiesOptions')">
+                                    <input type="text" class="form-control mb-2" placeholder="Search..." oninput="if(SharedFilters && SharedFilters.isInitialized) simpleFilterDropdown({containerId:'facilitiesOptions',type:'facilities',labelId:'facilitiesDropdownLabel',defaultLabel:'All Facilities'})">
                                     <div id="facilitiesOptions"></div>
                                 </ul>
                             </div>
@@ -354,16 +354,40 @@
         let sortDirection = 'asc';
         const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         let queryHistory = [];
+        let filtersReady = false;
 
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Monthly Report page loaded');
-            loadFilterOptions();
-            loadData();
-            setupEventListeners();
-        });
+        // Inicializar filtros y vista
+        document.addEventListener('DOMContentLoaded', initializeView);
 
-        // Setup event listeners
+        async function initializeView() {
+            try {
+                if (typeof initializeSharedFilters !== 'function') {
+                    console.error('SharedFilters not available');
+                    return;
+                }
+                await initializeSharedFilters();
+                filtersReady = true;
+                populateAllDropdowns();
+                restoreFilterSelections();
+                setupEventListeners();
+                loadData();
+            } catch (error) {
+                console.error('Error initializing filters:', error);
+            }
+        }
+
+        function populateAllDropdowns() {
+            const mappings = [
+                { containerId: 'sportsOptions', type: 'sports', labelId: 'sportsDropdownLabel', defaultLabel: 'All Sports' },
+                { containerId: 'citiesOptions', type: 'cities', labelId: 'citiesDropdownLabel', defaultLabel: 'All Cities' },
+                { containerId: 'rinkSizesOptions', type: 'rinkSizes', labelId: 'rinkSizesDropdownLabel', defaultLabel: 'All Sizes' },
+                { containerId: 'facilitiesOptions', type: 'facilities', labelId: 'facilitiesDropdownLabel', defaultLabel: 'All Facilities' }
+            ];
+            mappings.forEach(mapping => {
+                simpleFilterDropdown(mapping);
+            });
+        }
+
         function setupEventListeners() {
             document.getElementById('yearRangeFilter').addEventListener('change', function() {
                 if (this.value === 'custom') {
@@ -371,23 +395,37 @@
                     this.value = 'all';
                 }
             });
-
+            document.getElementById('reportTypeFilter').addEventListener('change', function() {
+                if (currentData) updateChart();
+            });
             document.getElementById('chartTypeFilter').addEventListener('change', function() {
-                if (currentData) {
-                    updateTrendChart();
-                }
+                if (currentData) updateChart();
             });
         }
 
-        // Load filter options
-        async function loadFilterOptions() {
-            console.log('Loading filter options for monthly report');
-            await Promise.all([
-                populateCheckboxDropdown('sportsOptions', 'GetSports', 'All Sports', 'sportsDropdownLabel'),
-                populateCheckboxDropdown('citiesOptions', 'GetCities', 'All Cities', 'citiesDropdownLabel'),
-                populateCheckboxDropdown('rinkSizesOptions', 'GetRinkSizes', 'All Sizes', 'rinkSizesDropdownLabel'),
-                populateCheckboxDropdown('facilitiesOptions', 'GetFacilities', 'All Facilities', 'facilitiesDropdownLabel')
-            ]);
+        function applyFilters() {
+            loadData();
+        }
+
+        function clearFilters() {
+            clearAllFilters();
+            loadData();
+        }
+
+        function getFiltersSummary() {
+            const s = SharedFilters.selections;
+            const parts = [];
+            if (s.sports.length) parts.push(`Sport: ${s.sports.join(', ')}`);
+            if (s.cities.length) parts.push(`City: ${s.cities.join(', ')}`);
+            if (s.rinkSizes.length) parts.push(`Rink Size: ${s.rinkSizes.join(', ')}`);
+            if (s.facilities.length) parts.push(`Facility: ${s.facilities.join(', ')}`);
+            const yearRange = document.getElementById('yearRangeFilter')?.value;
+            const reportType = document.getElementById('reportTypeFilter')?.value;
+            const chartType = document.getElementById('chartTypeFilter')?.value;
+            if (yearRange && yearRange !== 'all') parts.push(`Year: ${yearRange}`);
+            if (reportType && reportType !== 'all') parts.push(`Report: ${reportType}`);
+            if (chartType && chartType !== 'line') parts.push(`Chart: ${chartType}`);
+            return parts.length ? parts.join(' | ') : 'All Data';
         }
 
         // Load data from API
@@ -423,7 +461,7 @@
                 previousMonth: item.previousMonthBookings,
                 change: item.percentageDrop,
                 dropFlag: item.isFlagged,
-                // Puedes agregar más campos si los necesitas
+                // You can add more fields if needed
             }));
         }
 
@@ -718,33 +756,6 @@
             insightsContainer.innerHTML = insights.join('');
         }
 
-        // Apply filters
-        function applyFilters() {
-            const selectedSports = getSelectedDropdownValues('sportsOptions');
-            const selectedCities = getSelectedDropdownValues('citiesOptions');
-            const selectedRinkSizes = getSelectedDropdownValues('rinkSizesOptions');
-            const selectedFacilities = getSelectedDropdownValues('facilitiesOptions');
-            const yearRange = document.getElementById('yearRangeFilter').value;
-            const reportType = document.getElementById('reportTypeFilter').value;
-
-            // Reload data with filters
-            loadData();
-        }
-
-        // Clear filters
-        function clearFilters() {
-            clearDropdownSelections('sportsOptions', 'sportsDropdownLabel', 'All Sports');
-            clearDropdownSelections('citiesOptions', 'citiesDropdownLabel', 'All Cities');
-            clearDropdownSelections('rinkSizesOptions', 'rinkSizesDropdownLabel', 'All Sizes');
-            clearDropdownSelections('facilitiesOptions', 'facilitiesDropdownLabel', 'All Facilities');
-
-            document.getElementById('yearRangeFilter').value = 'all';
-            document.getElementById('reportTypeFilter').value = 'all';
-            document.getElementById('chartTypeFilter').value = 'line';
-
-            loadData();
-        }
-
         // Sort table
         function sortTable(column) {
             if (sortColumn === column) {
@@ -887,64 +898,6 @@
             document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
         }
 
-        // Dropdown utility functions
-        function populateCheckboxDropdown(containerId, endpoint, defaultLabel, labelId) {
-            const container = document.getElementById(containerId);
-            const label = document.getElementById(labelId);
-            
-            const mockData = getMockDataForEndpoint(endpoint);
-            
-            container.innerHTML = '';
-            
-            mockData.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'form-check';
-                div.innerHTML = `
-                    <input class="form-check-input" type="checkbox" value="${item}" id="check_${item.replace(/\s+/g, '_')}">
-                    <label class="form-check-label" for="check_${item.replace(/\s+/g, '_')}">
-                        ${item}
-                    </label>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        function getMockDataForEndpoint(endpoint) {
-            switch (endpoint) {
-                case 'GetSports':
-                    return ['Hockey', 'Soccer', 'Basketball', 'Tennis', 'Volleyball', 'Baseball'];
-                case 'GetCities':
-                    return ['Toronto', 'Vancouver', 'Montreal', 'Calgary', 'Edmonton', 'Ottawa'];
-                case 'GetRinkSizes':
-                    return ['Full Size', 'Half Size', 'Quarter Size', 'Mini Rink'];
-                case 'GetFacilities':
-                    return ['Sports Complex A', 'Community Center B', 'Arena C', 'Recreation Center D'];
-                default:
-                    return [];
-            }
-        }
-
-        function getSelectedDropdownValues(containerId) {
-            const checkboxes = document.querySelectorAll(`#${containerId} input[type="checkbox"]:checked`);
-            return Array.from(checkboxes).map(cb => cb.value);
-        }
-
-        function clearDropdownSelections(containerId, labelId, defaultLabel) {
-            const checkboxes = document.querySelectorAll(`#${containerId} input[type="checkbox"]`);
-            checkboxes.forEach(cb => cb.checked = false);
-            document.getElementById(labelId).textContent = defaultLabel;
-        }
-
-        function filterDropdownOptions(input, containerId) {
-            const filter = input.value.toLowerCase();
-            const options = document.querySelectorAll(`#${containerId} .form-check`);
-            
-            options.forEach(option => {
-                const text = option.textContent.toLowerCase();
-                option.style.display = text.includes(filter) ? 'block' : 'none';
-            });
-        }
-
         function addToHistory(filtersSummary, biggestDrop, totalBookings, dropFlags) {
             const now = new Date().toLocaleString();
             queryHistory.unshift({
@@ -976,25 +929,6 @@
         function clearHistory() {
             queryHistory = [];
             renderHistory();
-        }
-
-        function getFiltersSummary() {
-            const sports = getSelectedDropdownValues('sportsOptions');
-            const cities = getSelectedDropdownValues('citiesOptions');
-            const rinkSizes = getSelectedDropdownValues('rinkSizesOptions');
-            const facilities = getSelectedDropdownValues('facilitiesOptions');
-            const yearRange = document.getElementById('yearRangeFilter')?.value;
-            const reportType = document.getElementById('reportTypeFilter')?.value;
-            const chartType = document.getElementById('chartTypeFilter')?.value;
-            const parts = [];
-            if (sports.length) parts.push(`Sport: ${sports.join(', ')}`);
-            if (cities.length) parts.push(`City: ${cities.join(', ')}`);
-            if (rinkSizes.length) parts.push(`Rink Size: ${rinkSizes.join(', ')}`);
-            if (facilities.length) parts.push(`Facility: ${facilities.join(', ')}`);
-            if (yearRange && yearRange !== 'all') parts.push(`Year: ${yearRange}`);
-            if (reportType && reportType !== 'all') parts.push(`Report: ${reportType}`);
-            if (chartType && chartType !== 'line') parts.push(`Chart: ${chartType}`);
-            return parts.length ? parts.join(' | ') : 'All Data';
         }
 
         function getBiggestDrop(data) {

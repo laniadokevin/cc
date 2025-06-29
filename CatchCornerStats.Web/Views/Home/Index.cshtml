@@ -133,7 +133,7 @@
             } catch {}
             const now = Date.now();
             if (!cache || !cache.lastLoadTime || (now - cache.lastLoadTime) > CACHE_EXPIRY) {
-                // No hay cache o está expirado, cargar de la API
+                // No cache or expired, load from API
                 try {
                     if (window.API_UTILS && typeof API_UTILS.loadAllFilterOptions === 'function') {
                         const filterData = await API_UTILS.loadAllFilterOptions();
@@ -151,7 +151,7 @@
                     console.warn('[Index] Error precargando filtros:', e);
                 }
             } else {
-                console.log('[Index] Cache de filtros ya válido, no se recarga');
+                console.log('[Index] Filter cache already valid, not reloading');
             }
             window.catchCornerStatsFiltersReady = true;
             resolve();
