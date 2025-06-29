@@ -7,7 +7,7 @@ const CatchCornerStatsConfig = {
         baseUrl: 'https://localhost:7254/api',
         stats: {
             averageLeadTime: '/Stats/GetAverageLeadTime',
-            bookingsByDay: '/Stats/GetBookingsByDay',
+            bookingsByDay: '/Stats/GetBookingsByDayReport',
             bookingsByStartTime: '/Stats/GetBookingsByStartTime',
             bookingDurationBreakdown: '/Stats/GetBookingDurationBreakdown',
             leadTimeBreakdown: '/Stats/GetLeadTimeBreakdown',
@@ -83,12 +83,22 @@ console.log('[Config] Configuración cargada:', CatchCornerStatsConfig);
 
 // Helper function to build API URLs
 function buildApiUrl(endpoint, params = null) {
-    let url = CatchCornerStatsConfig.api.baseUrl + endpoint;
+    console.log('=== buildApiUrl START ===');
+    console.log('Endpoint:', endpoint);
+    console.log('Params:', params);
     
-    if (params && params.toString()) {
+    let url = CatchCornerStatsConfig.api.baseUrl + endpoint;
+    console.log('Base URL:', url);
+    
+    if (params && params.toString && params.toString() !== '') {
         url += '?' + params.toString();
+        console.log('URL with params:', url);
+    } else {
+        console.log('No params to add');
     }
     
+    console.log('Final URL:', url);
+    console.log('=== buildApiUrl END ===');
     return url;
 }
 

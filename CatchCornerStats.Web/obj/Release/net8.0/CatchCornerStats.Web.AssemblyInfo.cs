@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CatchCornerStats.Web")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9375eade289ac6ef28b5bac1fbba8268ed7371f4")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+aacb53bf0a6f0e42db558fefdd5d8c81e2be3aff")]
 [assembly: System.Reflection.AssemblyProductAttribute("CatchCornerStats.Web")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CatchCornerStats.Web")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

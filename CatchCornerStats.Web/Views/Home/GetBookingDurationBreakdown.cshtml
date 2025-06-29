@@ -8,9 +8,14 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                 <div>
-                    <h1 class="h2 mb-1 fw-bold text-warning">
-                        <i class="bi bi-hourglass-split me-2"></i>Booking Duration Breakdown
-                    </h1>
+                    <div class="d-flex align-items-center gap-3 mb-2">
+                        <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-arrow-left me-1"></i>Back
+                        </a>
+                        <h1 class="h2 mb-0 fw-bold text-warning">
+                            <i class="bi bi-hourglass-split me-2"></i>Booking Duration Breakdown
+                        </h1>
+                    </div>
                     <p class="text-muted mb-0">See which booking durations are most popular. Analyze by sport, city, rink size, and facility.</p>
                 </div>
                 <div class="d-flex gap-2">
@@ -43,7 +48,7 @@
                                     <span id="sportsDropdownLabel">All Sports</span>
                                 </button>
                                 <ul class="dropdown-menu w-100 p-2" aria-labelledby="sportsDropdown" style="max-height: 300px; overflow-y: auto; z-index: 1051;">
-                                    <input type="text" class="form-control mb-2" placeholder="Search..." oninput="if(SharedFilters && SharedFilters.isInitialized) simpleFilterDropdown({containerId:'sportsOptions',type:'sports',labelId:'sportsDropdownLabel',defaultLabel:'All Sports'})">
+                                    <input type="text" class="form-control mb-2" placeholder="Search..." oninput="simpleFilterDropdown({containerId:'sportsOptions',type:'sports',labelId:'sportsDropdownLabel',defaultLabel:'All Sports'})">
                                     <div id="sportsOptions"></div>
                                 </ul>
                             </div>
@@ -55,7 +60,7 @@
                                     <span id="citiesDropdownLabel">All Cities</span>
                                 </button>
                                 <ul class="dropdown-menu w-100 p-2" aria-labelledby="citiesDropdown" style="max-height: 300px; overflow-y: auto; z-index: 1051;">
-                                    <input type="text" class="form-control mb-2" placeholder="Search..." oninput="if(SharedFilters && SharedFilters.isInitialized) simpleFilterDropdown({containerId:'citiesOptions',type:'cities',labelId:'citiesDropdownLabel',defaultLabel:'All Cities'})">
+                                    <input type="text" class="form-control mb-2" placeholder="Search..." oninput="simpleFilterDropdown({containerId:'citiesOptions',type:'cities',labelId:'citiesDropdownLabel',defaultLabel:'All Cities'})">
                                     <div id="citiesOptions"></div>
                                 </ul>
                             </div>
@@ -67,7 +72,7 @@
                                     <span id="rinkSizesDropdownLabel">All Sizes</span>
                                 </button>
                                 <ul class="dropdown-menu w-100 p-2" aria-labelledby="rinkSizesDropdown" style="max-height: 300px; overflow-y: auto; z-index: 1051;">
-                                    <input type="text" class="form-control mb-2" placeholder="Search..." oninput="if(SharedFilters && SharedFilters.isInitialized) simpleFilterDropdown({containerId:'rinkSizesOptions',type:'rinkSizes',labelId:'rinkSizesDropdownLabel',defaultLabel:'All Sizes'})">
+                                    <input type="text" class="form-control mb-2" placeholder="Search..." oninput="simpleFilterDropdown({containerId:'rinkSizesOptions',type:'rinkSizes',labelId:'rinkSizesDropdownLabel',defaultLabel:'All Sizes'})">
                                     <div id="rinkSizesOptions"></div>
                                 </ul>
                             </div>
@@ -79,7 +84,7 @@
                                     <span id="facilitiesDropdownLabel">All Facilities</span>
                                 </button>
                                 <ul class="dropdown-menu w-100 p-2" aria-labelledby="facilitiesDropdown" style="max-height: 300px; overflow-y: auto; z-index: 1051;">
-                                    <input type="text" class="form-control mb-2" placeholder="Search..." oninput="if(SharedFilters && SharedFilters.isInitialized) simpleFilterDropdown({containerId:'facilitiesOptions',type:'facilities',labelId:'facilitiesDropdownLabel',defaultLabel:'All Facilities'})">
+                                    <input type="text" class="form-control mb-2" placeholder="Search..." oninput="simpleFilterDropdown({containerId:'facilitiesOptions',type:'facilities',labelId:'facilitiesDropdownLabel',defaultLabel:'All Facilities'})">
                                     <div id="facilitiesOptions"></div>
                                 </ul>
                             </div>
@@ -259,7 +264,18 @@
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
-            loadData();
+            // Load history from localStorage
+            loadHistoryFromStorage();
+            
+            // Initialize shared filters and load data
+            if (typeof SharedFilters !== 'undefined' && SharedFilters.initialize) {
+                SharedFilters.initialize().then(() => {
+                    loadData();
+                });
+            } else {
+                // Fallback if SharedFilters not available
+                loadData();
+            }
         });
 
         // Load data from API
@@ -289,7 +305,7 @@
                 if (happeningFrom) params.append('happeningDateFrom', happeningFrom);
                 if (happeningTo) params.append('happeningDateTo', happeningTo);
                 
-                const url = `https://localhost:7254/api/Stats/GetBookingDurationBreakdown${params.toString() ? '?' + params.toString() : ''}`;
+                const url = `${API_BASE_URL}/api/Stats/GetBookingDurationBreakdown${params.toString() ? '?' + params.toString() : ''}`;
                 const response = await fetch(url);
                 
                 if (!response.ok) {
@@ -548,19 +564,12 @@
             const checkboxes = document.querySelectorAll(`#${containerId} input[type="checkbox"]:checked`);
             return Array.from(checkboxes).map(cb => cb.value);
         }
+
         function updateDropdownLabel(containerId, defaultLabel, labelId) {
             const container = document.getElementById(containerId);
             const selectedOptions = Array.from(container.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
             const labelText = selectedOptions.length > 0 ? selectedOptions.join(', ') : defaultLabel;
             document.getElementById(labelId).textContent = labelText;
-        }
-        function filterDropdownOptions(input, containerId) {
-            const filter = input.value.toLowerCase();
-            const options = document.querySelectorAll(`#${containerId} .form-check`);
-            options.forEach(option => {
-                const text = option.textContent.toLowerCase();
-                option.style.display = text.includes(filter) ? 'block' : 'none';
-            });
         }
 
         function addToHistory(filtersSummary, mostPopular, mostPopularPct, avgDuration, total) {
@@ -573,7 +582,9 @@
                 total: total
             });
             renderHistory();
+            saveHistoryToStorage();
         }
+
         function renderHistory() {
             const tbody = document.getElementById('historyTableBody');
             tbody.innerHTML = '';
@@ -589,15 +600,30 @@
                 tbody.appendChild(row);
             });
         }
+
         function clearHistory() {
             queryHistory = [];
             renderHistory();
+            localStorage.removeItem('bookingDurationBreakdownHistory');
         }
+
+        function saveHistoryToStorage() {
+            localStorage.setItem('bookingDurationBreakdownHistory', JSON.stringify(queryHistory));
+        }
+
+        function loadHistoryFromStorage() {
+            const saved = localStorage.getItem('bookingDurationBreakdownHistory');
+            if (saved) {
+                queryHistory = JSON.parse(saved);
+                renderHistory();
+            }
+        }
+
         function getFiltersSummary() {
-            const sports = getCheckedValues('sportsOptions');
-            const cities = getCheckedValues('citiesOptions');
-            const rinkSizes = getCheckedValues('rinkSizesOptions');
-            const facilities = getCheckedValues('facilitiesOptions');
+            const sports = getSelectedDropdownValues('sportsOptions');
+            const cities = getSelectedDropdownValues('citiesOptions');
+            const rinkSizes = getSelectedDropdownValues('rinkSizesOptions');
+            const facilities = getSelectedDropdownValues('facilitiesOptions');
             const createdDateFrom = document.getElementById('createdDateFrom').value;
             const createdDateTo = document.getElementById('createdDateTo').value;
             const happeningDateFrom = document.getElementById('happeningDateFrom').value;

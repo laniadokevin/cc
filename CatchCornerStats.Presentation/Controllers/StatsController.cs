@@ -146,43 +146,6 @@ namespace CatchCornerStats.Presentation.Controllers
         }
 
         /// <summary>
-        /// Get the percentage distribution of bookings by day of the week.
-        /// </summary>
-        /// <param name="sport">Sport to filter by (optional).</param>
-        /// <param name="city">City to filter by (optional).</param>
-        /// <param name="rinkSize">Rink size to filter by (optional).</param>
-        /// <param name="facility">Facility to filter by (optional).</param>
-        /// <param name="month">Month to filter by (optional).</param>
-        /// <returns>A dictionary where key = day of the week, value = percentage of bookings.</returns>
-        [HttpGet("GetBookingsByDay")]
-        public async Task<IActionResult> GetBookingsByDay(
-            [FromQuery] string? sport,
-            [FromQuery] string? city,
-            [FromQuery] string? rinkSize,
-            [FromQuery] string? facility,
-            [FromQuery] int? month,
-            [FromQuery] DateTime? createdDateFrom,
-            [FromQuery] DateTime? createdDateTo,
-            [FromQuery] DateTime? happeningDateFrom,
-            [FromQuery] DateTime? happeningDateTo)
-        {
-            var stopwatch = Stopwatch.StartNew();
-            try
-            {
-                var result = await _statsRepository.GetBookingsByDayAsync(sport, city, rinkSize, facility, month, createdDateFrom, createdDateTo, happeningDateFrom, happeningDateTo);
-                stopwatch.Stop();
-                _logger.LogInformation($"GetBookingsByDay completed in {stopwatch.ElapsedMilliseconds}ms - {result.Count} days");
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                stopwatch.Stop();
-                _logger.LogError(ex, $"GetBookingsByDay failed after {stopwatch.ElapsedMilliseconds}ms");
-                throw;
-            }
-        }
-
-        /// <summary>
         /// Get the percentage distribution of bookings by start time.
         /// </summary>
         /// <param name="sport">Sport to filter by (optional).</param>
@@ -503,6 +466,58 @@ namespace CatchCornerStats.Presentation.Controllers
                 stopwatch.Stop();
                 _logger.LogError(ex, $"GetAllFilters failed after {stopwatch.ElapsedMilliseconds}ms");
                 throw;
+            }
+        }
+
+        [HttpGet("GetBookingsByDayReport")]
+        public async Task<IActionResult> GetBookingsByDayReport(
+            [FromQuery] List<string>? sports,
+            [FromQuery] List<string>? cities,
+            [FromQuery] List<string>? rinkSizes,
+            [FromQuery] List<string>? facilities,
+            [FromQuery] int? month,
+            [FromQuery] int? year,
+            [FromQuery] DateTime? createdDateFrom,
+            [FromQuery] DateTime? createdDateTo,
+            [FromQuery] DateTime? happeningDateFrom,
+            [FromQuery] DateTime? happeningDateTo)
+        {
+            try
+            {
+                _logger.LogInformation("=== GetBookingsByDayReport START ===");
+                _logger.LogInformation("Received parameters:");
+                _logger.LogInformation($"  sports: [{string.Join(", ", sports ?? new List<string>())}] (null: {sports == null})");
+                _logger.LogInformation($"  cities: [{string.Join(", ", cities ?? new List<string>())}] (null: {cities == null})");
+                _logger.LogInformation($"  rinkSizes: [{string.Join(", ", rinkSizes ?? new List<string>())}] (null: {rinkSizes == null})");
+                _logger.LogInformation($"  facilities: [{string.Join(", ", facilities ?? new List<string>())}] (null: {facilities == null})");
+                _logger.LogInformation($"  month: {month} (null: {month == null})");
+                _logger.LogInformation($"  year: {year} (null: {year == null})");
+                _logger.LogInformation($"  createdDateFrom: {createdDateFrom} (null: {createdDateFrom == null})");
+                _logger.LogInformation($"  createdDateTo: {createdDateTo} (null: {createdDateTo == null})");
+                _logger.LogInformation($"  happeningDateFrom: {happeningDateFrom} (null: {happeningDateFrom == null})");
+                _logger.LogInformation($"  happeningDateTo: {happeningDateTo} (null: {happeningDateTo == null})");
+
+                var result = await _statsRepository.GetBookingsByDayReportAsync(
+                    sports, cities, rinkSizes, facilities, month, year,
+                    createdDateFrom, createdDateTo, happeningDateFrom, happeningDateTo);
+                
+                _logger.LogInformation($"Repository returned {result?.Count ?? 0} results");
+                if (result?.Any() == true)
+                {
+                    _logger.LogInformation("Sample results:");
+                    foreach (var item in result.Take(3))
+                    {
+                        _logger.LogInformation($"  {item.DayOfWeek}: {item.BookingsCount} bookings ({item.Percentage}%)");
+                    }
+                }
+                
+                _logger.LogInformation("=== GetBookingsByDayReport END ===");
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error en GetBookingsByDayReport: {Message}", ex.Message);
+                return StatusCode(500, new { error = "Error al obtener el reporte de bookings por día.", details = ex.Message });
             }
         }
     }

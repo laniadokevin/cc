@@ -120,5 +120,8 @@ namespace CatchCornerStats.Core.Interfaces
         Task<List<string>> GetFacilitiesAsync();
         Task<List<StatsRawDto>> GetAllStatsRawAsync();
         Task<(double averageLeadTime, int totalBookings)> GetAverageLeadTimeWithCountAsync(List<string>? sports, List<string>? cities, List<string>? rinkSizes, List<string>? facilities, DateTime? createdDateFrom, DateTime? createdDateTo, DateTime? happeningDateFrom, DateTime? happeningDateTo);
+        Task<List<BookingsByDayDto>> GetBookingsByDayReportAsync(
+            List<string>? sports, List<string>? cities, List<string>? rinkSizes, List<string>? facilities, int? month, int? year,
+            DateTime? createdDateFrom = null, DateTime? createdDateTo = null, DateTime? happeningDateFrom = null, DateTime? happeningDateTo = null);
     }
 }

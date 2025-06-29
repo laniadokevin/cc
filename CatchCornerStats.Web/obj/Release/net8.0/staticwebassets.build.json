@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "k13vpNmCEEGNV9aWfbfLEndoh/33i18dsptIAKPAYmk=",
+  "Hash": "83vdu4tGpQjz/oVqoc+KGOl3I0fAZcLfXSvs5ACjz1U=",
   "Source": "CatchCornerStats.Web",
   "BasePath": "_content/CatchCornerStats.Web",
   "Mode": "Default",
@@ -94,8 +94,8 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "1dtzi798op",
-      "Integrity": "myIJ/JUpp//Mb7VsYzjkfkUZ5REhwyPszeaRrsSe4Bs=",
+      "Fingerprint": "vwrynf0mxd",
+      "Integrity": "z1R0zCkM8jAZJthtQN9bZjS9VyB1s6PIYJ5dU3BcBfs=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\js\\api-utils.js"
@@ -136,8 +136,8 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "185enqjbw2",
-      "Integrity": "8SA/v8u9nxIkpyNJcUXG8gxNIRCX7oCCXluDrOTzM6Y=",
+      "Fingerprint": "i0wgf8gqxs",
+      "Integrity": "7upJeNZWJKWqtfV91kMfZ+gjzYvK5x9s0k86FxX04bc=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\js\\config.js"
@@ -1630,51 +1630,6 @@
       ]
     },
     {
-      "Route": "js/api-utils.1dtzi798op.js",
-      "AssetFile": "C:\\Users\\lania\\Desktop\\Proyectos\\CatchCornerStats\\CatchCornerStats.Web\\wwwroot\\js\\api-utils.js",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "10494"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "text/javascript"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"myIJ/JUpp//Mb7VsYzjkfkUZ5REhwyPszeaRrsSe4Bs=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Sun, 29 Jun 2025 06:08:51 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "max-age=31536000, immutable"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "fingerprint",
-          "Value": "1dtzi798op"
-        },
-        {
-          "Name": "label",
-          "Value": "js/api-utils.js"
-        },
-        {
-          "Name": "integrity",
-          "Value": "sha256-myIJ/JUpp//Mb7VsYzjkfkUZ5REhwyPszeaRrsSe4Bs="
-        }
-      ]
-    },
-    {
       "Route": "js/api-utils.js",
       "AssetFile": "C:\\Users\\lania\\Desktop\\Proyectos\\CatchCornerStats\\CatchCornerStats.Web\\wwwroot\\js\\api-utils.js",
       "Selectors": [],
@@ -1685,7 +1640,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "10494"
+          "Value": "12647"
         },
         {
           "Name": "Content-Type",
@@ -1693,11 +1648,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"myIJ/JUpp//Mb7VsYzjkfkUZ5REhwyPszeaRrsSe4Bs=\""
+          "Value": "\"z1R0zCkM8jAZJthtQN9bZjS9VyB1s6PIYJ5dU3BcBfs=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sun, 29 Jun 2025 06:08:51 GMT"
+          "Value": "Sun, 29 Jun 2025 11:34:58 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -1707,7 +1662,52 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-myIJ/JUpp//Mb7VsYzjkfkUZ5REhwyPszeaRrsSe4Bs="
+          "Value": "sha256-z1R0zCkM8jAZJthtQN9bZjS9VyB1s6PIYJ5dU3BcBfs="
+        }
+      ]
+    },
+    {
+      "Route": "js/api-utils.vwrynf0mxd.js",
+      "AssetFile": "C:\\Users\\lania\\Desktop\\Proyectos\\CatchCornerStats\\CatchCornerStats.Web\\wwwroot\\js\\api-utils.js",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "12647"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"z1R0zCkM8jAZJthtQN9bZjS9VyB1s6PIYJ5dU3BcBfs=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sun, 29 Jun 2025 11:34:58 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "vwrynf0mxd"
+        },
+        {
+          "Name": "label",
+          "Value": "js/api-utils.js"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-z1R0zCkM8jAZJthtQN9bZjS9VyB1s6PIYJ5dU3BcBfs="
         }
       ]
     },
@@ -1794,7 +1794,7 @@
       ]
     },
     {
-      "Route": "js/config.185enqjbw2.js",
+      "Route": "js/config.i0wgf8gqxs.js",
       "AssetFile": "C:\\Users\\lania\\Desktop\\Proyectos\\CatchCornerStats\\CatchCornerStats.Web\\wwwroot\\js\\config.js",
       "Selectors": [],
       "ResponseHeaders": [
@@ -1804,7 +1804,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "3011"
+          "Value": "3395"
         },
         {
           "Name": "Content-Type",
@@ -1812,11 +1812,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"8SA/v8u9nxIkpyNJcUXG8gxNIRCX7oCCXluDrOTzM6Y=\""
+          "Value": "\"7upJeNZWJKWqtfV91kMfZ+gjzYvK5x9s0k86FxX04bc=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sun, 29 Jun 2025 06:48:42 GMT"
+          "Value": "Sun, 29 Jun 2025 11:35:05 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -1826,7 +1826,7 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "185enqjbw2"
+          "Value": "i0wgf8gqxs"
         },
         {
           "Name": "label",
@@ -1834,7 +1834,7 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-8SA/v8u9nxIkpyNJcUXG8gxNIRCX7oCCXluDrOTzM6Y="
+          "Value": "sha256-7upJeNZWJKWqtfV91kMfZ+gjzYvK5x9s0k86FxX04bc="
         }
       ]
     },
@@ -1849,7 +1849,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "3011"
+          "Value": "3395"
         },
         {
           "Name": "Content-Type",
@@ -1857,11 +1857,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"8SA/v8u9nxIkpyNJcUXG8gxNIRCX7oCCXluDrOTzM6Y=\""
+          "Value": "\"7upJeNZWJKWqtfV91kMfZ+gjzYvK5x9s0k86FxX04bc=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sun, 29 Jun 2025 06:48:42 GMT"
+          "Value": "Sun, 29 Jun 2025 11:35:05 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -1871,7 +1871,7 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-8SA/v8u9nxIkpyNJcUXG8gxNIRCX7oCCXluDrOTzM6Y="
+          "Value": "sha256-7upJeNZWJKWqtfV91kMfZ+gjzYvK5x9s0k86FxX04bc="
         }
       ]
     },
@@ -1980,7 +1980,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sun, 29 Jun 2025 08:28:08 GMT"
+          "Value": "Sun, 29 Jun 2025 09:55:14 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -2025,7 +2025,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sun, 29 Jun 2025 08:28:08 GMT"
+          "Value": "Sun, 29 Jun 2025 09:55:14 GMT"
         },
         {
           "Name": "Cache-Control",

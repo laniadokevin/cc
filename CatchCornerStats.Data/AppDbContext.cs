@@ -1,4 +1,5 @@
 ﻿using CatchCornerStats.Core.Entities;
+using CatchCornerStats.Core.Results;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
@@ -22,6 +23,7 @@ namespace CatchCornerStats.Data
             modelBuilder.Entity<Listing>().ToTable("VW_Listings", "powerBI").HasNoKey();
             modelBuilder.Entity<Neighborhood>().ToTable("VW_Neighborhoods", "powerBI").HasNoKey();
             modelBuilder.Entity<Organization>().ToTable("VW_Organization", "powerBI").HasNoKey();
+            modelBuilder.Entity<BookingsByDayDto>().HasNoKey();
 
             modelBuilder.Entity<Arena>().HasNoKey()
                     .Property(a => a.FacilityId)

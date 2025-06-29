@@ -16,7 +16,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     ));
 builder.Services.AddRazorPages();
 
-builder.Services.AddScoped<IStatsRepository, StatsRepositoryOptimized>();
+builder.Services.AddScoped<IStatsRepository, StatsRepository>();
 builder.Services.AddScoped<IArenaRepository, ArenaRepository>();
 builder.Services.AddScoped<IArenaLinkRepository, ArenaLinkRepository>();
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();

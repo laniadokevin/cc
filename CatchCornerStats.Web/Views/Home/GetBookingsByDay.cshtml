@@ -3,21 +3,23 @@
 }
 
 <div class="container-fluid py-4">
-    <!-- Header Section -->
-    <div class="row mb-4">  
+    <!-- Header --> 
+    <div class="row mb-4">
         <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                <div>
-                    <h1 class="h2 mb-1 fw-bold text-success">
-                        <i class="bi bi-calendar-week me-2"></i>Bookings by Day
-                    </h1>
-                    <p class="text-muted mb-0">See which days people book the most. Analyze by sport, city, rink size, facility, and month.</p>
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-2">
+                    <a href="/" class="btn btn-outline-secondary btn-sm me-2" title="Volver al inicio">
+                        <i class="bi bi-arrow-left"></i>
+                    </a>
+                    <div>
+                        <h1 class="h2 mb-1 fw-bold text-success">
+                            <i class="bi bi-calendar-week me-2"></i>Bookings by Day
+                        </h1>
+                        <p class="text-muted mb-0">See which days people book the most. Analyze by sport, city, rink size, facility, and month.</p>
+                    </div>
                 </div>
                 <div class="d-flex gap-2">
-                    <button class="btn btn-outline-primary shadow-sm" onclick="exportData()">
-                        <i class="bi bi-download me-2"></i>Export
-                    </button>
-                    <button class="btn btn-primary shadow-sm" onclick="loadData()">
+                    <button class="btn btn-primary" onclick="loadData()">
                         <i class="bi bi-arrow-clockwise me-2"></i>Refresh
                     </button>
                 </div>
@@ -25,63 +27,63 @@
         </div>
     </div>
 
-    <!-- Filters Section -->
+    <!-- Filters -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom-0">
-                    <h5 class="card-title mb-0 text-secondary">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
                         <i class="bi bi-funnel me-2"></i>Filters
                     </h5>
                 </div>
-                <div class="card-body pb-2">
-                    <div class="row g-3 mb-3">
+                <div class="card-body">
+                    <div class="row g-3 mb-2">
                         <div class="col-md-2">
-                            <label class="form-label fw-semibold">Sport</label>
+                            <label class="form-label fw-semibold">Sports</label>
                             <div class="dropdown w-100">
                                 <button class="btn btn-outline-secondary w-100 text-start dropdown-toggle" type="button" id="sportsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                     <span id="sportsDropdownLabel">All Sports</span>
                                 </button>
-                                <ul class="dropdown-menu w-100 p-2" aria-labelledby="sportsDropdown" style="max-height: 300px; overflow-y: auto; z-index: 1051;">
+                                <div class="dropdown-menu w-100 p-2" aria-labelledby="sportsDropdown" style="max-height: 300px; overflow-y: auto;">
                                     <input type="text" class="form-control mb-2" placeholder="Search..." oninput="if(SharedFilters && SharedFilters.isInitialized) simpleFilterDropdown({containerId:'sportsOptions',type:'sports',labelId:'sportsDropdownLabel',defaultLabel:'All Sports'})">
                                     <div id="sportsOptions"></div>
-                                </ul>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-2">
-                            <label class="form-label fw-semibold">City</label>
+                            <label class="form-label fw-semibold">Cities</label>
                             <div class="dropdown w-100">
                                 <button class="btn btn-outline-secondary w-100 text-start dropdown-toggle" type="button" id="citiesDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                     <span id="citiesDropdownLabel">All Cities</span>
                                 </button>
-                                <ul class="dropdown-menu w-100 p-2" aria-labelledby="citiesDropdown" style="max-height: 300px; overflow-y: auto; z-index: 1051;">
+                                <div class="dropdown-menu w-100 p-2" aria-labelledby="citiesDropdown" style="max-height: 300px; overflow-y: auto;">
                                     <input type="text" class="form-control mb-2" placeholder="Search..." oninput="if(SharedFilters && SharedFilters.isInitialized) simpleFilterDropdown({containerId:'citiesOptions',type:'cities',labelId:'citiesDropdownLabel',defaultLabel:'All Cities'})">
                                     <div id="citiesOptions"></div>
-                                </ul>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-2">
-                            <label class="form-label fw-semibold">Rink Size</label>
+                            <label class="form-label fw-semibold">Rink Sizes</label>
                             <div class="dropdown w-100">
                                 <button class="btn btn-outline-secondary w-100 text-start dropdown-toggle" type="button" id="rinkSizesDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                     <span id="rinkSizesDropdownLabel">All Sizes</span>
                                 </button>
-                                <ul class="dropdown-menu w-100 p-2" aria-labelledby="rinkSizesDropdown" style="max-height: 300px; overflow-y: auto; z-index: 1051;">
+                                <div class="dropdown-menu w-100 p-2" aria-labelledby="rinkSizesDropdown" style="max-height: 300px; overflow-y: auto;">
                                     <input type="text" class="form-control mb-2" placeholder="Search..." oninput="if(SharedFilters && SharedFilters.isInitialized) simpleFilterDropdown({containerId:'rinkSizesOptions',type:'rinkSizes',labelId:'rinkSizesDropdownLabel',defaultLabel:'All Sizes'})">
                                     <div id="rinkSizesOptions"></div>
-                                </ul>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-2">
-                            <label class="form-label fw-semibold">Facility</label>
+                            <label class="form-label fw-semibold">Facilities</label>
                             <div class="dropdown w-100">
                                 <button class="btn btn-outline-secondary w-100 text-start dropdown-toggle" type="button" id="facilitiesDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                     <span id="facilitiesDropdownLabel">All Facilities</span>
                                 </button>
-                                <ul class="dropdown-menu w-100 p-2" aria-labelledby="facilitiesDropdown" style="max-height: 300px; overflow-y: auto; z-index: 1051;">
+                                <div class="dropdown-menu w-100 p-2" aria-labelledby="facilitiesDropdown" style="max-height: 300px; overflow-y: auto;">
                                     <input type="text" class="form-control mb-2" placeholder="Search..." oninput="if(SharedFilters && SharedFilters.isInitialized) simpleFilterDropdown({containerId:'facilitiesOptions',type:'facilities',labelId:'facilitiesDropdownLabel',defaultLabel:'All Facilities'})">
                                     <div id="facilitiesOptions"></div>
-                                </ul>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-2">
@@ -118,83 +120,78 @@
                             <label class="form-label fw-semibold">Happening Date (To)</label>
                             <input type="date" class="form-control" id="happeningDateTo">
                         </div>
-                        <div class="col-md-2 d-flex align-items-end">
-                            <div class="d-flex gap-1 w-100">
-                                <button class="btn btn-primary px-4 shadow-sm w-50" onclick="applyFilters()">
-                                    <i class="bi bi-funnel me-2"></i>Apply
-                                </button>
-                                <button class="btn btn-outline-secondary px-4 shadow-sm w-50" onclick="clearFilters()">
-                                    <i class="bi bi-x-circle me-2"></i>Clear
-                                </button>
-                            </div>
-                        </div>
+                    </div>
+                    <div class="d-flex gap-2 mb-2">
+                        <button class="btn btn-primary px-4 shadow-sm" onclick="applyFilters()">
+                            <i class="bi bi-funnel me-2"></i>Apply Filters
+                        </button>
+                        <button class="btn btn-outline-secondary px-4 shadow-sm" onclick="clearFilters()">
+                            <i class="bi bi-x-circle me-2"></i>Clear Filters
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Results Section -->
+    <!-- Results -->
     <div class="row">
         <div class="col-12">
-            <div class="card border-0 shadow-lg">
-                <div class="card-header bg-white border-bottom-0">
-                    <h5 class="card-title mb-0 text-success">
-                        <i class="bi bi-calendar-week me-2"></i>Bookings by Day Results
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-calendar-week me-2"></i>Results
                     </h5>
                 </div>
                 <div class="card-body">
-                    <div id="loadingSpinner" class="text-center d-none py-5">
-                        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+                    <!-- Loading -->
+                    <div id="loading" class="text-center d-none py-5">
+                        <div class="spinner-border text-primary" role="status">
                             <span class="visually-hidden">Loading...</span>
                         </div>
-                        <p class="mt-3 text-primary">Loading data...</p>
+                        <p class="mt-3">Loading data...</p>
                     </div>
-                    <div id="errorMessage" class="alert alert-danger d-none" role="alert">
+
+                    <!-- Error -->
+                    <div id="error" class="alert alert-danger d-none" role="alert">
                         <i class="bi bi-exclamation-triangle me-2"></i>
-                        <span id="errorText">An error occurred while loading data.</span>
+                        <span id="errorText">An error occurred</span>
                     </div>
-                    <div id="dataContainer" class="d-none">
+
+                    <!-- Data -->
+                    <div id="data" class="d-none">
                         <!-- Summary Cards -->
-                        <div class="row mb-4 g-3">
+                        <div class="row mb-4">
                             <div class="col-md-4">
-                                <div class="card bg-gradient-success text-white shadow-sm h-100">
+                                <div class="card bg-success text-white">
                                     <div class="card-body text-center">
-                                        <div class="mb-2">
-                                            <i class="bi bi-clipboard-data display-5"></i>
-                                        </div>
-                                        <h2 class="fw-bold mb-1" id="totalBookings">0</h2>
+                                        <h3 class="mb-0" id="totalBookings">0</h3>
                                         <p class="mb-0">Total Bookings</p>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="card bg-gradient-primary text-white shadow-sm h-100">
+                                <div class="card bg-primary text-white">
                                     <div class="card-body text-center">
-                                        <div class="mb-2">
-                                            <i class="bi bi-calendar2-week display-5"></i>
-                                        </div>
-                                        <h2 class="fw-bold mb-1" id="busiestDay">-</h2>
+                                        <h3 class="mb-0" id="busiestDay">-</h3>
                                         <p class="mb-0">Busiest Day</p>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="card bg-gradient-warning text-white shadow-sm h-100">
+                                <div class="card bg-warning text-white">
                                     <div class="card-body text-center">
-                                        <div class="mb-2">
-                                            <i class="bi bi-calendar-x display-5"></i>
-                                        </div>
-                                        <h2 class="fw-bold mb-1" id="quietestDay">-</h2>
+                                        <h3 class="mb-0" id="quietestDay">-</h3>
                                         <p class="mb-0">Quietest Day</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
                         <!-- Chart -->
                         <div class="row mb-4">
                             <div class="col-12">
-                                <div class="card border-0 bg-light shadow-sm">
+                                <div class="card">
                                     <div class="card-body">
                                         <div class="chart-container" style="height: 400px;">
                                             <canvas id="bookingsChart"></canvas>
@@ -203,51 +200,57 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- Data Table -->
-                        <div class="table-responsive mb-3">
-                            <table class="table table-hover align-middle rounded shadow-sm">
+
+                        <!-- Results Table -->
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
                                 <thead class="table-light">
                                     <tr>
-                                        <th>Day of Week</th>
-                                        <th>Bookings Count</th>
-                                        <th>Percentage</th>
-                                        <th>Status</th>
+                                        <th>Day of Week <i class="bi bi-info-circle" data-bs-toggle="tooltip" title="Day of the week when bookings were made."></i></th>
+                                        <th>Bookings Count <i class="bi bi-info-circle" data-bs-toggle="tooltip" title="Number of bookings for this day."></i></th>
+                                        <th>Percentage <i class="bi bi-info-circle" data-bs-toggle="tooltip" title="Percentage of total bookings for this day."></i></th>
+                                        <th>Status <i class="bi bi-info-circle" data-bs-toggle="tooltip" title="Performance status: High (>15%), Medium (5-15%), Low (<5%)"></i></th>
                                     </tr>
                                 </thead>
-                                <tbody id="dataTableBody">
+                                <tbody id="resultsTable">
                                     <!-- Data will be populated here -->
                                 </tbody>
                             </table>
                         </div>
-                        <!-- Query History Table -->
-                        <div class="table-responsive mb-3">
-                            <h6 class="fw-bold mt-4 mb-2">
-                                <i class="bi bi-clock-history me-2"></i>Query History
-                                <button class="btn btn-sm btn-outline-danger ms-2" onclick="clearHistory()" title="Clear History">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </h6>
-                            <table class="table table-sm table-bordered align-middle" id="historyTable">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Date/Time <span data-bs-toggle="tooltip" title="When this query was made."><i class="bi bi-info-circle"></i></span></th>
-                                        <th>Filters <span data-bs-toggle="tooltip" title="Filters applied for this query."><i class="bi bi-info-circle"></i></span></th>
-                                        <th>Busiest Day <span data-bs-toggle="tooltip" title="Day of the week with the highest number of bookings."><i class="bi bi-info-circle"></i></span></th>
-                                        <th>Quietest Day <span data-bs-toggle="tooltip" title="Day of the week with the lowest number of bookings."><i class="bi bi-info-circle"></i></span></th>
-                                        <th>Total Bookings <span data-bs-toggle="tooltip" title="Total bookings for this query."><i class="bi bi-info-circle"></i></span></th>
-                                    </tr>
-                                </thead>
-                                <tbody id="historyTableBody">
-                                    <!-- History rows go here -->
-                                </tbody>
-                            </table>
+
+                        <!-- Legend -->
+                        <div class="mt-3">
+                            <small class="text-muted">
+                                <strong>Status:</strong>
+                                <span class="text-success">High</span> (>15%),
+                                <span class="text-warning">Medium</span> (5-15%),
+                                <span class="text-danger">Low</span> (<5%)
+                            </small>
                         </div>
-                        <div class="d-flex justify-content-between align-items-center mt-3 small">
-                            <div>
-                                <span class="text-muted">Last updated: <span id="lastUpdated">Never</span></span>
-                            </div>
-                            <div>
-                                <span class="text-muted">API Endpoint: <code>/api/Stats/GetBookingsByDay</code></span>
+
+                        <!-- Last Updated -->
+                        <div class="mt-3 text-muted small">
+                            Last updated: <span id="lastUpdated">Never</span>
+                        </div>
+
+                        <!-- Historial de Consultas -->
+                        <div class="mt-4">
+                            <h6 class="fw-bold mb-2"><i class="bi bi-clock-history me-2"></i>Historial de Consultas</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Fecha/Hora</th>
+                                            <th>Filtros</th>
+                                            <th>Día Más Ocupado</th>
+                                            <th>Día Más Tranquilo</th>
+                                            <th>Total Bookings</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="historyTable">
+                                        <!-- Historial se llena por JS -->
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -261,119 +264,284 @@
     <script>
         let currentData = null;
         let chart = null;
+        let filtersReady = false;
+        let initialDataLoaded = false;
         const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        let queryHistory = [];
-
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', function() {
-            loadData();
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            tooltipTriggerList.forEach(function (tooltipTriggerEl) {
-                new bootstrap.Tooltip(tooltipTriggerEl);
-            });
-        });
-
-        // Load data from API
-        async function loadData() {
-            showLoading();
-            hideError();
-            
+        
+        // Función para inicializar la vista
+        async function initializeView() {
             try {
-                const params = new URLSearchParams();
-                const sports = getSelectedDropdownValues('sportsOptions');
-                const cities = getSelectedDropdownValues('citiesOptions');
-                const rinkSizes = getSelectedDropdownValues('rinkSizesOptions');
-                const facilities = getSelectedDropdownValues('facilitiesOptions');
-                const month = document.getElementById('monthFilter').value;
+                ConfigHelpers.log('Iniciando vista GetBookingsByDay...');
                 
-                if (sports.length) params.append('sport', sports.join(','));
-                if (cities.length) params.append('city', cities.join(','));
-                if (rinkSizes.length) params.append('rinkSize', rinkSizes.join(','));
-                if (facilities.length) params.append('facility', facilities.join(','));
-                if (month) params.append('month', month);
-                
-                // Fechas
-                const createdFrom = document.getElementById('createdDateFrom').value;
-                const createdTo = document.getElementById('createdDateTo').value;
-                const happeningFrom = document.getElementById('happeningDateFrom').value;
-                const happeningTo = document.getElementById('happeningDateTo').value;
-                if (createdFrom) params.append('createdDateFrom', createdFrom);
-                if (createdTo) params.append('createdDateTo', createdTo);
-                if (happeningFrom) params.append('happeningDateFrom', happeningFrom);
-                if (happeningTo) params.append('happeningDateTo', happeningTo);
-                
-                const url = `https://localhost:7254/api/Stats/GetBookingsByDay${params.toString() ? '?' + params.toString() : ''}`;
-                const response = await fetch(url);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                // Verificar que SharedFilters esté disponible
+                if (typeof initializeSharedFilters !== 'function') {
+                    ConfigHelpers.logError('SharedFilters not available');
+                    return;
                 }
                 
-                currentData = await response.json();
+                // CARGAR DATOS INMEDIATAMENTE (sin filtros)
+                ConfigHelpers.log('Cargando datos iniciales sin filtros...');
+                await loadDataWithoutFilters();
+                initialDataLoaded = true;
                 
-                displayData();
-                updateLastUpdated();
+                // INICIALIZAR FILTROS EN PARALELO (sin bloquear)
+                ConfigHelpers.log('Inicializando filtros en paralelo...');
+                initializeFiltersAsync();
                 
             } catch (error) {
-                console.error('Error loading data:', error);
-                showError('Failed to load data: ' + error.message);
+                ConfigHelpers.logError('Error inicializando vista:', error);
+                showError('Error inicializando la vista: ' + error.message);
+            }
+        }
+        
+        // Inicializar filtros de forma asíncrona
+        async function initializeFiltersAsync() {
+            try {
+                // Inicializar filtros compartidos
+                await initializeSharedFilters();
+                ConfigHelpers.log('Filtros compartidos inicializados');
+                
+                // Verificar que los elementos del DOM estén listos
+                const requiredElements = ['sportsOptions', 'citiesOptions', 'rinkSizesOptions', 'facilitiesOptions'];
+                const missingElements = requiredElements.filter(id => !document.getElementById(id));
+                
+                if (missingElements.length > 0) {
+                    ConfigHelpers.logError('Elementos faltantes:', missingElements);
+                    return;
+                }
+                
+                // Inicializar UI de filtros
+                if (typeof initializeFilterUI === 'function') {
+                    initializeFilterUI();
+                    ConfigHelpers.log('Filtros visuales renderizados');
+                }
+                
+                filtersReady = true;
+                ConfigHelpers.log('Filtros listos');
+                
+                // Si ya se cargaron datos iniciales, recargar con filtros
+                if (initialDataLoaded) {
+                    ConfigHelpers.log('Recargando datos con filtros...');
+                    await loadData();
+                }
+                
+                // Configurar listener para cambios de filtros
+                addFilterChangeListener(() => {
+                    ConfigHelpers.log('Filtros cambiados, recargando datos...');
+                    loadData();
+                });
+                
+            } catch (error) {
+                ConfigHelpers.logError('Error inicializando filtros:', error);
+            }
+        }
+        
+        // Mapear claves camelCase a PascalCase para compatibilidad con el frontend
+        function mapKeysToPascalCase(data) {
+            return data.map(d => ({
+                DayOfWeek: d.dayOfWeek,
+                BookingsCount: d.bookingsCount,
+                TotalBookings: d.totalBookings,
+                Percentage: d.percentage
+            }));
+        }
+        
+        // Construir objeto de filtros para la API (usando la función compartida)
+        function buildApiParameters() {
+            // Usar la función compartida de shared-filters.js
+            const urlParams = window.buildApiParameters ? window.buildApiParameters() : new URLSearchParams();
+            
+            // Agregar parámetros específicos de esta vista
+            const month = document.getElementById('monthFilter').value || null;
+            if (month) {
+                urlParams.append('month', month);
+            }
+            
+            // Log detallado de los parámetros
+            console.log('=== buildApiParameters START ===');
+            console.log('Using shared buildApiParameters function');
+            console.log('URL Params:', urlParams.toString());
+            console.log('Month filter:', month);
+            console.log('=== buildApiParameters END ===');
+
+            return urlParams;
+        }
+
+        // Limpiar todos los filtros visuales y recargar datos
+        function clearAllFilters() {
+            // Limpiar dropdowns
+            document.getElementById('sportsDropdownLabel').textContent = 'All Sports';
+            document.getElementById('citiesDropdownLabel').textContent = 'All Cities';
+            document.getElementById('rinkSizesDropdownLabel').textContent = 'All Sizes';
+            document.getElementById('facilitiesDropdownLabel').textContent = 'All Facilities';
+            // Limpiar selects y fechas
+            document.getElementById('monthFilter').value = '';
+            document.getElementById('createdDateFrom').value = '';
+            document.getElementById('createdDateTo').value = '';
+            document.getElementById('happeningDateFrom').value = '';
+            document.getElementById('happeningDateTo').value = '';
+        }
+
+        // Botón para aplicar filtros
+        function applyFilters() {
+            ConfigHelpers.log('Aplicando filtros...');
+            loadData();
+        }
+
+        // Botón para limpiar filtros y recargar datos
+        function clearFilters() {
+            ConfigHelpers.log('Limpiando filtros...');
+            clearAllFilters();
+            loadData();
+        }
+
+        // Cargar datos sin filtros (carga inicial rápida)
+        async function loadDataWithoutFilters() {
+            try {
+                showLoading();
+                hideError();
+                const params = buildApiParameters();
+                const data = await API_UTILS.loadStatsData('bookingsByDay', params);
+                displayData(mapKeysToPascalCase(data), 'Carga inicial sin filtros');
+            } catch (error) {
+                ConfigHelpers.logError('Error cargando datos iniciales:', error);
+                const userMessage = API_UTILS.handleApiError(error, 'loadDataWithoutFilters');
+                showError(userMessage);
             } finally {
                 hideLoading();
             }
         }
 
-        // Display data
-        function displayData() {
-            if (!currentData) return;
+        // Inicializar cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', initializeView);
+        
+        // También inicializar si el DOM ya está listo (para navegación SPA)
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeView);
+        } else {
+            initializeView();
+        }
+
+        // Cargar datos desde la API usando los filtros globales
+        async function loadData() {
+            console.log('=== loadData START ===');
+            console.log('filtersReady:', filtersReady);
             
-            const labels = Object.keys(currentData);
-            const values = Object.values(currentData);
-            const totalBookings = values.reduce((sum, val) => sum + val, 0);
+            if (!filtersReady) {
+                console.log('loadData() abortado: filtros no listos');
+                return;
+            }
             
-            // Find busiest and quietest days
-            let maxIndex = 0, minIndex = 0;
-            values.forEach((value, index) => {
-                if (value > values[maxIndex]) maxIndex = index;
-                if (value < values[minIndex]) minIndex = index;
-            });
-            
-            // Update summary cards
-            document.getElementById('totalBookings').textContent = totalBookings.toLocaleString();
-            document.getElementById('busiestDay').textContent = dayNames[parseInt(labels[maxIndex])] || labels[maxIndex];
-            document.getElementById('quietestDay').textContent = dayNames[parseInt(labels[minIndex])] || labels[minIndex];
-            
-            // Update data table
-            const tbody = document.getElementById('dataTableBody');
-            tbody.innerHTML = '';
-            
-            labels.forEach((label, index) => {
-                const percentage = ((values[index] / totalBookings) * 100).toFixed(1);
-                const dayName = dayNames[parseInt(label)] || label;
-                const status = getDayStatus(percentage);
-                const statusClass = status === 'High' ? 'text-success' : status === 'Medium' ? 'text-warning' : 'text-danger';
+            try {
+                console.log('Showing loading...');
+                showLoading();
+                hideError();
                 
+                console.log('Building API parameters...');
+                const params = buildApiParameters();
+                console.log('API parameters built:', params);
+                
+                console.log('Calling API_UTILS.loadStatsData...');
+                const data = await API_UTILS.loadStatsData('bookingsByDay', params);
+                console.log('API response received:', data);
+                
+                console.log('Processing data...');
+                const processedData = mapKeysToPascalCase(data);
+                console.log('Processed data:', processedData);
+                
+                console.log('Displaying data...');
+                displayData(processedData);
+                
+                console.log('=== loadData END (SUCCESS) ===');
+            } catch (error) {
+                console.error('=== loadData ERROR ===', error);
+                showError('Error loading data: ' + error.message);
+            } finally {
+                console.log('Hiding loading...');
+                hideLoading();
+            }
+        }
+
+        // Utilidad para obtener el valor seleccionado de un dropdown
+        function getSelectedDropdownValue(dropdownId) {
+            console.log(`getSelectedDropdownValue called with dropdownId: ${dropdownId}`);
+            
+            const dropdown = document.getElementById(dropdownId);
+            if (!dropdown) {
+                console.log(`  Dropdown element not found: ${dropdownId}`);
+                return null;
+            }
+            
+            const label = dropdown.querySelector('span');
+            if (!label) {
+                console.log(`  Label span not found in dropdown: ${dropdownId}`);
+                return null;
+            }
+            
+            const value = label.textContent;
+            console.log(`  Raw label text: "${value}"`);
+            
+            if (value && !value.startsWith('All')) {
+                // Para rink sizes, extraer solo el número si contiene "selected"
+                if (dropdownId === 'rinkSizesDropdown' && value.includes('selected')) {
+                    const numericValue = value.replace(/\s*selected.*$/, '').trim();
+                    console.log(`  Extracted numeric value for rink size: "${numericValue}"`);
+                    return numericValue;
+                }
+                
+                console.log(`  Returning value: "${value}"`);
+                return value;
+            } else {
+                console.log(`  Returning null (value starts with 'All' or is empty)`);
+                return null;
+            }
+        }
+
+        // Mostrar datos en la UI
+        function displayData(data) {
+            if (!data || data.length === 0) {
+                showError('No data available for the selected filters');
+                return;
+            }
+
+            // Ordenar días de la semana
+            const weekOrder = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+            data.sort((a, b) => weekOrder.indexOf(a.DayOfWeek) - weekOrder.indexOf(b.DayOfWeek));
+
+            // Update summary cards
+            const totalBookings = data[0].TotalBookings;
+            document.getElementById('totalBookings').textContent = formatNumber(totalBookings);
+
+            // Busiest and quietest day
+            let busiest = data[0], quietest = data[0];
+            data.forEach(d => {
+                if (d.BookingsCount > busiest.BookingsCount) busiest = d;
+                if (d.BookingsCount < quietest.BookingsCount) quietest = d;
+            });
+            document.getElementById('busiestDay').textContent = busiest.DayOfWeek;
+            document.getElementById('quietestDay').textContent = quietest.DayOfWeek;
+
+            // Update results table
+            const tbody = document.getElementById('resultsTable');
+            tbody.innerHTML = '';
+            data.forEach(d => {
+                const status = getDayStatus(d.Percentage);
+                const statusClass = status === 'High' ? 'text-success' : status === 'Medium' ? 'text-warning' : 'text-danger';
+                let pct = (typeof d.Percentage === 'number' && !isNaN(d.Percentage)) ? d.Percentage.toFixed(1) : '0.0';
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${dayName}</td>
-                    <td>${values[index].toLocaleString()}</td>
-                    <td>${percentage}%</td>
+                    <td>${d.DayOfWeek}</td>
+                    <td>${formatNumber(d.BookingsCount)}</td>
+                    <td>${pct}%</td>
                     <td><span class="${statusClass}">${status}</span></td>
                 `;
                 tbody.appendChild(row);
             });
-            
-            // Create chart
-            createChart(labels, values);
-            
-            // Calculate most and least popular day
-            const busiestDay = labels[maxIndex];
-            const busiestPct = ((values[maxIndex] / totalBookings) * 100).toFixed(1);
-            const quietestDay = labels[minIndex];
-            const quietestPct = ((values[minIndex] / totalBookings) * 100).toFixed(1);
-            // Agregar al historial
-            addToHistory(getFiltersSummary(), busiestDay, busiestPct, quietestDay, quietestPct, totalBookings);
-            
-            document.getElementById('dataContainer').classList.remove('d-none');
+
+            // Chart
+            createChart(data.map(d => d.DayOfWeek), data.map(d => d.BookingsCount));
+            document.getElementById('data').classList.remove('d-none');
+            document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
         }
 
         // Create chart
@@ -394,8 +562,8 @@
                     datasets: [{
                         label: 'Bookings',
                         data: values,
-                        backgroundColor: '#0d6efd',
-                        borderColor: '#0d6efd',
+                        backgroundColor: '#198754',
+                        borderColor: '#198754',
                         borderWidth: 1
                     }]
                 },
@@ -409,175 +577,85 @@
                     },
                     scales: {
                         y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Number of Bookings'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Day of Week'
-                            }
+                            beginAtZero: true
                         }
                     }
                 }
             });
         }
 
-        // Get day status
+        // Categorizar día por porcentaje
         function getDayStatus(percentage) {
-            const percent = parseFloat(percentage);
-            if (percent >= 20) return 'High';
-            if (percent >= 10) return 'Medium';
+            const pct = parseFloat(percentage);
+            if (pct > 15) return 'High';
+            if (pct >= 5) return 'Medium';
             return 'Low';
         }
-
-        // Apply filters
-        function applyFilters() {
-            loadData();
-        }
-
-        // Clear filters
-        function clearFilters() {
-            ['sportsOptions','citiesOptions','rinkSizesOptions','facilitiesOptions'].forEach(id => {
-                const container = document.getElementById(id);
-                Array.from(container.querySelectorAll('input[type=checkbox]')).forEach(cb => cb.checked = false);
-            });
-            updateDropdownLabel('sportsOptions','All Sports','sportsDropdownLabel');
-            updateDropdownLabel('citiesOptions','All Cities','citiesDropdownLabel');
-            updateDropdownLabel('rinkSizesOptions','All Sizes','rinkSizesDropdownLabel');
-            updateDropdownLabel('facilitiesOptions','All Facilities','facilitiesDropdownLabel');
-            // Limpiar fechas
-            document.getElementById('createdDateFrom').value = '';
-            document.getElementById('createdDateTo').value = '';
-            document.getElementById('happeningDateFrom').value = '';
-            document.getElementById('happeningDateTo').value = '';
-            document.getElementById('monthFilter').value = '';
-            loadData();
-        }
-
-        // Export data
-        function exportData() {
-            if (!currentData) {
-                alert('No data to export');
-                return;
-            }
-            
-            const labels = Object.keys(currentData);
-            const values = Object.values(currentData);
-            const totalBookings = values.reduce((sum, val) => sum + val, 0);
-            
-            const csvContent = "data:text/csv;charset=utf-8," 
-                + "Day of Week,Bookings Count,Percentage\n"
-                + labels.map((label, index) => {
-                    const percentage = ((values[index] / totalBookings) * 100).toFixed(1);
-                    const dayName = dayNames[parseInt(label)] || label;
-                    return `${dayName},${values[index]},${percentage}%`;
-                }).join("\n");
-            
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "bookings_by_day.csv");
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        // Utility functions
+        
         function showLoading() {
-            document.getElementById('loadingSpinner').classList.remove('d-none');
-            document.getElementById('dataContainer').classList.add('d-none');
+            document.getElementById('loading').classList.remove('d-none');
+            document.getElementById('data').classList.add('d-none');
+            document.getElementById('error').classList.add('d-none');
         }
-
+        
         function hideLoading() {
-            document.getElementById('loadingSpinner').classList.add('d-none');
+            document.getElementById('loading').classList.add('d-none');
         }
-
+        
         function showError(message) {
             document.getElementById('errorText').textContent = message;
-            document.getElementById('errorMessage').classList.remove('d-none');
+            document.getElementById('error').classList.remove('d-none');
+            document.getElementById('data').classList.add('d-none');
         }
-
+        
         function hideError() {
-            document.getElementById('errorMessage').classList.add('d-none');
+            document.getElementById('error').classList.add('d-none');
+        }
+        
+        function formatNumber(num) {
+            return new Intl.NumberFormat().format(num);
         }
 
-        function updateLastUpdated() {
-            document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+        // Guardar historial en localStorage
+        function saveHistoryEntry(entry) {
+            let history = JSON.parse(localStorage.getItem('bookingsByDayHistory') || '[]');
+            history.unshift(entry); // Agrega al inicio
+            if (history.length > 20) history = history.slice(0, 20); // Max 20 entries
+            localStorage.setItem('bookingsByDayHistory', JSON.stringify(history));
         }
 
-        function getSelectedDropdownValues(containerId) {
-            const checkboxes = document.querySelectorAll(`#${containerId} input[type="checkbox"]:checked`);
-            return Array.from(checkboxes).map(cb => cb.value);
-        }
-        function updateDropdownLabel(containerId, defaultLabel, labelId) {
-            const container = document.getElementById(containerId);
-            const selectedOptions = Array.from(container.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
-            const labelText = selectedOptions.length > 0 ? selectedOptions.join(', ') : defaultLabel;
-            document.getElementById(labelId).textContent = labelText;
-        }
-        function filterDropdownOptions(input, containerId) {
-            const filter = input.value.toLowerCase();
-            const options = document.querySelectorAll(`#${containerId} .form-check`);
-            options.forEach(option => {
-                const text = option.textContent.toLowerCase();
-                option.style.display = text.includes(filter) ? 'block' : 'none';
-            });
-        }
-        function addToHistory(filtersSummary, busiest, busiestPct, quietest, quietestPct, total) {
-            const now = new Date().toLocaleString();
-            queryHistory.unshift({
-                date: now,
-                filters: filtersSummary,
-                busiest: `${busiest} (${busiestPct}%)`,
-                quietest: `${quietest} (${quietestPct}%)`,
-                total: total
-            });
-            renderHistory();
-        }
+        // Mostrar historial en la tabla
         function renderHistory() {
-            const tbody = document.getElementById('historyTableBody');
+            const tbody = document.getElementById('historyTable');
+            if (!tbody) return;
+            let history = JSON.parse(localStorage.getItem('bookingsByDayHistory') || '[]');
             tbody.innerHTML = '';
-            queryHistory.forEach(item => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
+            if (history.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No hay historial</td></tr>';
+                return;
+            }
+            history.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
                     <td>${item.date}</td>
                     <td>${item.filters}</td>
-                    <td>${item.busiest}</td>
-                    <td>${item.quietest}</td>
-                    <td>${item.total}</td>
+                    <td>${item.busiestDay}</td>
+                    <td>${item.quietestDay}</td>
+                    <td>${item.totalBookings}</td>
                 `;
-                tbody.appendChild(row);
+                tbody.appendChild(tr);
             });
         }
-        function clearHistory() {
-            queryHistory = [];
-            renderHistory();
-        }
-        function getFiltersSummary() {
-            const sports = getSelectedDropdownValues('sportsOptions');
-            const cities = getSelectedDropdownValues('citiesOptions');
-            const rinkSizes = getSelectedDropdownValues('rinkSizesOptions');
-            const facilities = getSelectedDropdownValues('facilitiesOptions');
-            const month = document.getElementById('monthFilter')?.value;
-            const createdDateFrom = document.getElementById('createdDateFrom').value;
-            const createdDateTo = document.getElementById('createdDateTo').value;
-            const happeningDateFrom = document.getElementById('happeningDateFrom').value;
-            const happeningDateTo = document.getElementById('happeningDateTo').value;
-            const parts = [];
-            if (sports.length) parts.push(`Sport: ${sports.join(', ')}`);
-            if (cities.length) parts.push(`City: ${cities.join(', ')}`);
-            if (rinkSizes.length) parts.push(`Rink Size: ${rinkSizes.join(', ')}`);
-            if (facilities.length) parts.push(`Facility: ${facilities.join(', ')}`);
-            if (month) parts.push(`Month: ${month}`);
-            if (createdDateFrom) parts.push(`Created From: ${createdDateFrom}`);
-            if (createdDateTo) parts.push(`Created To: ${createdDateTo}`);
-            if (happeningDateFrom) parts.push(`Happening From: ${happeningDateFrom}`);
-            if (happeningDateTo) parts.push(`Happening To: ${happeningDateTo}`);
-            return parts.length ? parts.join(' | ') : 'All Data';
-        }
+
+        // Renderizar historial al cargar
+        document.addEventListener('DOMContentLoaded', renderHistory);
+
+        // Inicializar tooltips de Bootstrap
+        document.addEventListener('DOMContentLoaded', function () {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+                new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
     </script>
 } 

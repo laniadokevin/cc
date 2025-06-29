@@ -16,7 +16,17 @@ const API_UTILS = {
     // Make API call with error handling and performance logging
     async fetchApi(endpoint, options = {}) {
         const startTime = performance.now();
-        const url = buildApiUrl(endpoint, options.params);
+        
+        // Construir parámetros de URL correctamente
+        const urlParams = this.buildParams(options.params);
+        const url = buildApiUrl(endpoint, urlParams);
+        
+        console.log('=== fetchApi START ===');
+        console.log('Endpoint:', endpoint);
+        console.log('Options:', options);
+        console.log('URL Params:', urlParams);
+        console.log('Final URL:', url);
+        console.log('Method:', options.method || 'GET');
         
         ConfigHelpers?.log(`🌐 API Request: ${options.method || 'GET'} ${url}`);
         
@@ -30,8 +40,16 @@ const API_UTILS = {
         };
 
         try {
+            console.log('Making fetch request...');
             const response = await fetch(url, fetchOptions);
             const responseTime = performance.now() - startTime;
+            
+            console.log('Response received:', {
+                status: response.status,
+                statusText: response.statusText,
+                ok: response.ok,
+                responseTime: responseTime.toFixed(2) + 'ms'
+            });
             
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
@@ -39,15 +57,24 @@ const API_UTILS = {
             
             const data = await response.json();
             
+            console.log('Response data:', data);
+            
             ConfigHelpers?.log(`✅ API Response (${responseTime.toFixed(2)}ms):`, {
                 url,
                 status: response.status,
                 dataSize: JSON.stringify(data).length
             });
             
+            console.log('=== fetchApi END (SUCCESS) ===');
             return data;
         } catch (error) {
             const responseTime = performance.now() - startTime;
+            console.error('=== fetchApi ERROR ===', {
+                url,
+                error: error.message,
+                responseTime: responseTime.toFixed(2) + 'ms'
+            });
+            
             ConfigHelpers?.logError(`❌ API Error (${responseTime.toFixed(2)}ms):`, {
                 url,
                 error: error.message
@@ -162,20 +189,45 @@ const API_UTILS = {
 
     // Build URL parameters from object
     buildParams(params) {
-        if (!params) return null;
+        console.log('=== buildParams START ===');
+        console.log('Input params:', params);
+        
+        if (!params) {
+            console.log('No params provided, returning null');
+            return null;
+        }
         
         const urlParams = new URLSearchParams();
         Object.entries(params).forEach(([key, value]) => {
-            if (value !== null && value !== undefined && value !== '') {
+            console.log(`Processing parameter: ${key} = ${value} (type: ${typeof value})`);
+            
+            // Solo agregar si el filtro tiene valor real (no null, undefined, string vacío, ni array vacío)
+            if (
+                value !== null &&
+                value !== undefined &&
+                value !== '' &&
+                !(Array.isArray(value) && value.length === 0)
+            ) {
                 if (Array.isArray(value)) {
-                    value.forEach(v => urlParams.append(key, v));
+                    value.forEach(v => {
+                        console.log(`  Adding array value: ${key} = ${v}`);
+                        urlParams.append(key, v);
+                    });
                 } else {
+                    console.log(`  Adding single value: ${key} = ${value}`);
                     urlParams.append(key, value);
                 }
+            } else {
+                console.log(`  Skipping parameter ${key} (null/undefined/empty)`);
             }
         });
         
-        return urlParams;
+        const result = urlParams.toString();
+        console.log('Final URL params string:', result);
+        console.log('=== buildParams END ===');
+        
+        // Solo retornar si hay parámetros
+        return result ? urlParams : null;
     },
 
     // Handle common API errors with user-friendly messages
