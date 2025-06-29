@@ -16,7 +16,7 @@
                             <i class="bi bi-calendar3-event me-2"></i>Monthly Report
                         </h1>
                     </div>
-                    <p class="text-muted mb-0">Comprehensive monthly booking reports with trend analysis and drop flags.</p>
+                    <p class="text-muted mb-0">Global monthly booking trends with performance indicators. Track growth patterns and identify areas needing attention across all facilities.</p>
                 </div>
                 <div class="d-flex gap-2">
                     <button class="btn btn-outline-primary shadow-sm" onclick="exportData()">
@@ -47,10 +47,10 @@
                                 <button class="btn btn-outline-secondary w-100 text-start dropdown-toggle" type="button" id="sportsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                     <span id="sportsDropdownLabel">All Sports</span>
                                 </button>
-                                <ul class="dropdown-menu w-100 p-2" aria-labelledby="sportsDropdown" style="max-height: 300px; overflow-y: auto; z-index: 1051;">
-                                    <input type="text" class="form-control mb-2" placeholder="Search..." oninput="simpleFilterDropdown({containerId:'sportsOptions',type:'sports',labelId:'sportsDropdownLabel',defaultLabel:'All Sports'})">
+                                <div class="dropdown-menu w-100 p-2" aria-labelledby="sportsDropdown" style="max-height: 300px; overflow-y: auto;">
+                                    <input type="text" class="form-control mb-2" placeholder="Search..." oninput="if(SharedFilters && SharedFilters.isInitialized) simpleFilterDropdown({containerId:'sportsOptions',type:'sports',labelId:'sportsDropdownLabel',defaultLabel:'All Sports'})">
                                     <div id="sportsOptions"></div>
-                                </ul>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-3">
@@ -59,10 +59,10 @@
                                 <button class="btn btn-outline-secondary w-100 text-start dropdown-toggle" type="button" id="citiesDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                     <span id="citiesDropdownLabel">All Cities</span>
                                 </button>
-                                <ul class="dropdown-menu w-100 p-2" aria-labelledby="citiesDropdown" style="max-height: 300px; overflow-y: auto; z-index: 1051;">
-                                    <input type="text" class="form-control mb-2" placeholder="Search..." oninput="simpleFilterDropdown({containerId:'citiesOptions',type:'cities',labelId:'citiesDropdownLabel',defaultLabel:'All Cities'})">
+                                <div class="dropdown-menu w-100 p-2" aria-labelledby="citiesDropdown" style="max-height: 300px; overflow-y: auto;">
+                                    <input type="text" class="form-control mb-2" placeholder="Search..." oninput="if(SharedFilters && SharedFilters.isInitialized) simpleFilterDropdown({containerId:'citiesOptions',type:'cities',labelId:'citiesDropdownLabel',defaultLabel:'All Cities'})">
                                     <div id="citiesOptions"></div>
-                                </ul>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-3">
@@ -71,10 +71,10 @@
                                 <button class="btn btn-outline-secondary w-100 text-start dropdown-toggle" type="button" id="rinkSizesDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                     <span id="rinkSizesDropdownLabel">All Sizes</span>
                                 </button>
-                                <ul class="dropdown-menu w-100 p-2" aria-labelledby="rinkSizesDropdown" style="max-height: 300px; overflow-y: auto; z-index: 1051;">
-                                    <input type="text" class="form-control mb-2" placeholder="Search..." oninput="simpleFilterDropdown({containerId:'rinkSizesOptions',type:'rinkSizes',labelId:'rinkSizesDropdownLabel',defaultLabel:'All Sizes'})">
+                                <div class="dropdown-menu w-100 p-2" aria-labelledby="rinkSizesDropdown" style="max-height: 300px; overflow-y: auto;">
+                                    <input type="text" class="form-control mb-2" placeholder="Search..." oninput="if(SharedFilters && SharedFilters.isInitialized) simpleFilterDropdown({containerId:'rinkSizesOptions',type:'rinkSizes',labelId:'rinkSizesDropdownLabel',defaultLabel:'All Sizes'})">
                                     <div id="rinkSizesOptions"></div>
-                                </ul>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-3">
@@ -83,43 +83,11 @@
                                 <button class="btn btn-outline-secondary w-100 text-start dropdown-toggle" type="button" id="facilitiesDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                     <span id="facilitiesDropdownLabel">All Facilities</span>
                                 </button>
-                                <ul class="dropdown-menu w-100 p-2" aria-labelledby="facilitiesDropdown" style="max-height: 300px; overflow-y: auto; z-index: 1051;">
-                                    <input type="text" class="form-control mb-2" placeholder="Search..." oninput="simpleFilterDropdown({containerId:'facilitiesOptions',type:'facilities',labelId:'facilitiesDropdownLabel',defaultLabel:'All Facilities'})">
+                                <div class="dropdown-menu w-100 p-2" aria-labelledby="facilitiesDropdown" style="max-height: 300px; overflow-y: auto;">
+                                    <input type="text" class="form-control mb-2" placeholder="Search..." oninput="if(SharedFilters && SharedFilters.isInitialized) simpleFilterDropdown({containerId:'facilitiesOptions',type:'facilities',labelId:'facilitiesDropdownLabel',defaultLabel:'All Facilities'})">
                                     <div id="facilitiesOptions"></div>
-                                </ul>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-4">
-                            <label class="form-label fw-semibold">Year Range</label>
-                            <select class="form-select" id="yearRangeFilter">
-                                <option value="all">All Years</option>
-                                <option value="2024">2024</option>
-                                <option value="2023">2023</option>
-                                <option value="2022">2022</option>
-                                <option value="2021">2021</option>
-                                <option value="custom">Custom Range</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-semibold">Report Type</label>
-                            <select class="form-select" id="reportTypeFilter">
-                                <option value="all">All Reports</option>
-                                <option value="summary">Monthly Summary</option>
-                                <option value="trends">Trend Analysis</option>
-                                <option value="comparison">Year Comparison</option>
-                                <option value="forecast">Forecast</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-semibold">Chart Type</label>
-                            <select class="form-select" id="chartTypeFilter">
-                                <option value="line">Line Chart</option>
-                                <option value="bar">Bar Chart</option>
-                                <option value="area">Area Chart</option>
-                                <option value="mixed">Mixed Chart</option>
-                            </select>
                         </div>
                     </div>
                     <div class="d-flex gap-2 mb-3">
@@ -128,9 +96,6 @@
                         </button>
                         <button class="btn btn-outline-secondary px-4 shadow-sm" onclick="clearFilters()">
                             <i class="bi bi-x-circle me-2"></i>Clear Filters
-                        </button>
-                        <button class="btn btn-outline-info px-4 shadow-sm" onclick="toggleAdvancedFilters()">
-                            <i class="bi bi-gear me-2"></i>Advanced
                         </button>
                     </div>
                 </div>
@@ -148,17 +113,22 @@
                     </h5>
                 </div>
                 <div class="card-body">
-                    <div id="loadingSpinner" class="text-center d-none py-5">
-                        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+                    <!-- Loading -->
+                    <div id="loading" class="text-center d-none py-5">
+                        <div class="spinner-border text-primary" role="status">
                             <span class="visually-hidden">Loading...</span>
                         </div>
-                        <p class="mt-3 text-primary">Loading monthly report data...</p>
+                        <p class="mt-3">Loading monthly report data...</p>
                     </div>
-                    <div id="errorMessage" class="alert alert-danger d-none" role="alert">
+
+                    <!-- Error -->
+                    <div id="error" class="alert alert-danger d-none" role="alert">
                         <i class="bi bi-exclamation-triangle me-2"></i>
-                        <span id="errorText">An error occurred while loading data.</span>
+                        <span id="errorText">An error occurred</span>
                     </div>
-                    <div id="dataContainer" class="d-none">
+
+                    <!-- Data -->
+                    <div id="data" class="d-none">
                         <!-- Summary Cards -->
                         <div class="row mb-4 g-3">
                             <div class="col-md-3">
@@ -206,140 +176,88 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- Trend Analysis -->
-                        <div class="row mb-4 g-3">
-                            <div class="col-12">
-                                <div class="card border-0 bg-gradient-primary text-white shadow-sm h-100">
-                                    <div class="card-header bg-transparent border-bottom-0">
-                                        <h6 class="fw-bold mb-3">
-                                            <i class="bi bi-trending-up me-2"></i>Monthly Trends Analysis
-                                        </h6>
+
+                        <!-- Results Table -->
+                        <div class="table-responsive">
+                            <!-- Help Section -->
+                            <div class="alert alert-info mb-3">
+                                <h6 class="alert-heading mb-2">
+                                    <i class="bi bi-info-circle me-2"></i>How to read this report
+                                </h6>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <strong>Columns:</strong>
+                                        <ul class="mb-0 mt-1">
+                                            <li><strong>Month:</strong> Month and year of the report period</li>
+                                            <li><strong>Bookings:</strong> Total number of bookings for this month</li>
+                                            <li><strong>Previous Month:</strong> Total bookings from the previous month</li>
+                                            <li><strong>Change:</strong> Percentage change from previous month</li>
+                                            <li><strong>Status:</strong> Performance indicator based on growth rate</li>
+                                        </ul>
                                     </div>
-                                    <div class="card-body">
-                                        <div class="chart-container" style="height: 400px;">
-                                            <canvas id="monthlyTrendChart"></canvas>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Performance Metrics & Seasonal Patterns -->
-                        <div class="row mb-4 g-3">
-                            <div class="col-md-6">
-                                <div class="card border-0 bg-gradient-success text-white shadow-sm h-100">
-                                    <div class="card-header bg-transparent border-bottom-0">
-                                        <h6 class="fw-bold mb-3">
-                                            <i class="bi bi-speedometer2 me-2"></i>Performance Metrics
-                                        </h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="chart-container" style="height: 300px;">
-                                            <canvas id="performanceChart"></canvas>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="card border-0 bg-gradient-warning text-white shadow-sm h-100">
-                                    <div class="card-header bg-transparent border-bottom-0">
-                                        <h6 class="fw-bold mb-3">
-                                            <i class="bi bi-calendar-check me-2"></i>Seasonal Patterns
-                                        </h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="chart-container" style="height: 300px;">
-                                            <canvas id="seasonalChart"></canvas>
-                                        </div>
+                                    <div class="col-md-6">
+                                        <strong>Status Levels:</strong>
+                                        <ul class="mb-0 mt-1">
+                                            <li><span class="badge bg-success">Excellent</span> >10% growth</li>
+                                            <li><span class="badge bg-primary">Good</span> 5-10% growth</li>
+                                            <li><span class="badge bg-info">Stable</span> 0-5% growth</li>
+                                            <li><span class="badge bg-warning">Declining</span> 0 to -5%</li>
+                                            <li><span class="badge bg-danger">Poor</span> -5 to -50%</li>
+                                            <li><span class="badge bg-dark">Critical</span> < -50%</li>
+                                        </ul>
                                     </div>
                                 </div>
+                                <hr class="my-2">
+                                <small class="text-muted">
+                                    <i class="bi bi-lightbulb me-1"></i>
+                                    <strong>Note:</strong> This report shows global trends across all facilities. Status is calculated based on month-over-month booking changes. 
+                                    The first month will show "No Data" for Previous Month and Status since there's no baseline for comparison.
+                                </small>
                             </div>
-                        </div>
-                        <!-- Detailed Data Table -->
-                        <div class="row mb-4 g-3">
-                            <div class="col-12">
-                                <div class="card border-0 shadow-sm">
-                                    <div class="card-header bg-white border-bottom-0">
-                                        <h6 class="fw-bold mb-3">
-                                            <i class="bi bi-table me-2"></i>Monthly Breakdown
-                                        </h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="table-responsive mb-2">
-                                            <table class="table table-hover align-middle rounded shadow-sm">
-                                                <thead class="table-light">
-                                                    <tr>
-                                                        <th onclick="sortTable('month')" style="cursor: pointer;">
-                                                            Month <i class="bi bi-arrow-down-up"></i>
-                                                        </th>
-                                                        <th onclick="sortTable('bookings')" style="cursor: pointer;">
-                                                            Bookings <i class="bi bi-arrow-down-up"></i>
-                                                        </th>
-                                                        <th onclick="sortTable('previousMonth')" style="cursor: pointer;">
-                                                            Previous Month <i class="bi bi-arrow-down-up"></i>
-                                                        </th>
-                                                        <th onclick="sortTable('change')" style="cursor: pointer;">
-                                                            Change <i class="bi bi-arrow-down-up"></i>
-                                                        </th>
-                                                        <th>Drop Flag</th>
-                                                        <th>Trend</th>
-                                                        <th>Actions</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="dataTableBody">
-                                                    <!-- Data will be populated here -->
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Insights Section -->
-                        <div class="row mb-4 g-3">
-                            <div class="col-12">
-                                <div class="card border-0 shadow-sm">
-                                    <div class="card-header bg-white border-bottom-0">
-                                        <h6 class="fw-bold mb-3">
-                                            <i class="bi bi-lightbulb me-2"></i>Key Insights & Recommendations
-                                        </h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <div id="insightsContainer">
-                                            <!-- Insights will be populated here -->
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Query History Table -->
-                        <div class="table-responsive mb-3">
-                            <h6 class="fw-bold mt-4 mb-2">
-                                <i class="bi bi-clock-history me-2"></i>Query History
-                                <button class="btn btn-sm btn-outline-danger ms-2" onclick="clearHistory()" title="Clear History">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </h6>
-                            <table class="table table-sm table-bordered align-middle" id="historyTable">
+                            
+                            <table class="table table-bordered">
                                 <thead class="table-light">
                                     <tr>
-                                        <th>Date/Time</th>
-                                        <th>Filters</th>
-                                        <th>Biggest Drop (Facility/Month)</th>
-                                        <th>Total Bookings</th>
-                                        <th>Drop Flags</th>
+                                        <th>Month <i class="bi bi-info-circle" data-bs-toggle="tooltip" title="Month and year of the report period (MM/YYYY format)"></i></th>
+                                        <th>Bookings <i class="bi bi-info-circle" data-bs-toggle="tooltip" title="Total number of unique bookings for this month"></i></th>
+                                        <th>Previous Month <i class="bi bi-info-circle" data-bs-toggle="tooltip" title="Total bookings from the previous month for comparison"></i></th>
+                                        <th>Change <i class="bi bi-info-circle" data-bs-toggle="tooltip" title="Percentage change from previous month. Green = growth, Red = decline"></i></th>
+                                        <th>Status <i class="bi bi-info-circle" data-bs-toggle="tooltip" title="Performance indicator: Excellent (>10%), Good (5-10%), Stable (0-5%), Declining (0 to -5%), Poor (-5 to -50%), Critical (<-50%)"></i></th>
                                     </tr>
                                 </thead>
-                                <tbody id="historyTableBody">
-                                    <!-- History rows go here -->
+                                <tbody id="resultsTable">
+                                    <!-- Data will be populated here -->
                                 </tbody>
                             </table>
                         </div>
-                        <div class="d-flex justify-content-between align-items-center mt-3 small">
-                            <div>
-                                <span class="text-muted">Last updated: <span id="lastUpdated">Never</span></span>
+
+                        <!-- Last Updated -->
+                        <div class="mt-3 text-muted small">
+                            Last updated: <span id="lastUpdated">Never</span>
+                        </div>
+
+                        <!-- Historial de Consultas -->
+                        <div class="mt-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="fw-bold mb-0"><i class="bi bi-clock-history me-2"></i>Historial de Consultas</h6>
+                                <button class="btn btn-outline-danger btn-sm" onclick="clearHistory()">
+                                    <i class="bi bi-trash me-1"></i>Limpiar Historial
+                                </button>
                             </div>
-                            <div>
-                                <span class="text-muted">API Endpoint: <code>/api/Stats/GetMonthlyReport</code></span>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Fecha</th>
+                                            <th>Filtros</th>
+                                            <th>Total Bookings</th>
+                                            <th>Drop Flags</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="historyTable">
+                                        <!-- Historial se llena dinámicamente -->
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -351,523 +269,179 @@
 
 @section Scripts {
     <script>
+        // Variables globales
         let currentData = null;
-        let trendChart = null;
-        let performanceChart = null;
-        let seasonalChart = null;
-        let sortColumn = 'month';
-        let sortDirection = 'asc';
-        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        let queryHistory = [];
+        let filtersReady = false;
 
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', function() {
-            // Load history from localStorage
-            loadHistoryFromStorage();
-            
-            // Initialize shared filters and load data
-            if (typeof SharedFilters !== 'undefined' && SharedFilters.initialize) {
-                SharedFilters.initialize().then(() => {
-                    setupEventListeners();
-                    loadData();
-                });
-            } else {
-                // Fallback if SharedFilters not available
-                setupEventListeners();
-                loadData();
-            }
-        });
-
-        function setupEventListeners() {
-            document.getElementById('yearRangeFilter').addEventListener('change', function() {
-                if (this.value === 'custom') {
-                    alert('Custom year range feature coming soon!');
-                    this.value = 'all';
-                }
-            });
-            document.getElementById('reportTypeFilter').addEventListener('change', function() {
-                if (currentData) updateChart();
-            });
-            document.getElementById('chartTypeFilter').addEventListener('change', function() {
-                if (currentData) updateChart();
-            });
-        }
-
-        function applyFilters() {
-            loadData();
-        }
-
-        function clearFilters() {
-            ['sportsOptions','citiesOptions','rinkSizesOptions','facilitiesOptions'].forEach(id => {
-                const container = document.getElementById(id);
-                Array.from(container.querySelectorAll('input[type=checkbox]')).forEach(cb => cb.checked = false);
-            });
-            updateDropdownLabel('sportsOptions','All Sports','sportsDropdownLabel');
-            updateDropdownLabel('citiesOptions','All Cities','citiesDropdownLabel');
-            updateDropdownLabel('rinkSizesOptions','All Sizes','rinkSizesDropdownLabel');
-            updateDropdownLabel('facilitiesOptions','All Facilities','facilitiesDropdownLabel');
-            
-            // Reset other filters
-            document.getElementById('yearRangeFilter').value = 'all';
-            document.getElementById('reportTypeFilter').value = 'all';
-            document.getElementById('chartTypeFilter').value = 'line';
-            
-            loadData();
-        }
-
-        function getFiltersSummary() {
-            const sports = getSelectedDropdownValues('sportsOptions');
-            const cities = getSelectedDropdownValues('citiesOptions');
-            const rinkSizes = getSelectedDropdownValues('rinkSizesOptions');
-            const facilities = getSelectedDropdownValues('facilitiesOptions');
-            const yearRange = document.getElementById('yearRangeFilter')?.value;
-            const reportType = document.getElementById('reportTypeFilter')?.value;
-            const chartType = document.getElementById('chartTypeFilter')?.value;
-            
-            const parts = [];
-            if (sports.length) parts.push(`Sport: ${sports.join(', ')}`);
-            if (cities.length) parts.push(`City: ${cities.join(', ')}`);
-            if (rinkSizes.length) parts.push(`Rink Size: ${rinkSizes.join(', ')}`);
-            if (facilities.length) parts.push(`Facility: ${facilities.join(', ')}`);
-            if (yearRange && yearRange !== 'all') parts.push(`Year: ${yearRange}`);
-            if (reportType && reportType !== 'all') parts.push(`Report: ${reportType}`);
-            if (chartType && chartType !== 'line') parts.push(`Chart: ${chartType}`);
-            return parts.length ? parts.join(' | ') : 'All Data';
-        }
-
-        // Load data from API
-        async function loadData() {
-            showLoading();
-            hideError();
+        // Inicializar la vista con carga optimizada
+        async function initializeView() {
+            ConfigHelpers?.log('=== Monthly Report View Initialization ===');
             
             try {
-                const params = new URLSearchParams();
-                const sports = getSelectedDropdownValues('sportsOptions');
-                const cities = getSelectedDropdownValues('citiesOptions');
-                const rinkSizes = getSelectedDropdownValues('rinkSizesOptions');
-                const facilities = getSelectedDropdownValues('facilitiesOptions');
+                // Cargar datos inmediatamente sin filtros
+                await loadDataWithoutFilters();
                 
-                if (sports.length) params.append('sport', sports.join(','));
-                if (cities.length) params.append('city', cities.join(','));
-                if (rinkSizes.length) params.append('rinkSize', rinkSizes.join(','));
-                if (facilities.length) params.append('facility', facilities.join(','));
-                
-                const url = `${API_BASE_URL}/api/Stats/GetMonthlyReport${params.toString() ? '?' + params.toString() : ''}`;
-                const response = await fetch(url);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                // Inicializar filtros en paralelo
+                if (typeof initializeSharedFilters === 'function') {
+                    await initializeSharedFilters();
+                    filtersReady = true;
+                    
+                    // Callback cuando los filtros estén listos
+                    if (typeof setFiltersReadyCallback === 'function') {
+                        setFiltersReadyCallback(() => {
+                            ConfigHelpers?.log('Filtros listos, recargando datos...');
+                            loadData();
+                        });
+                    }
+                } else {
+                    ConfigHelpers?.log('SharedFilters no disponible, usando filtros básicos');
+                    filtersReady = true;
                 }
                 
-                // Mapear los datos de la API a la estructura esperada
-                const apiData = await response.json();
-                currentData = mapApiData(apiData);
-                displayData();
-                updateLastUpdated();
-                
             } catch (error) {
-                console.error('Error loading monthly report data:', error);
-                showError('Failed to load monthly report data: ' + error.message);
+                ConfigHelpers?.logError('Error inicializando vista:', error);
+            }
+        }
+        
+        // Cargar datos sin filtros (carga inicial rápida)
+        async function loadDataWithoutFilters() {
+            try {
+                showLoading();
+                hideError();
+                // Usar el nuevo endpoint global
+                const data = await API_UTILS.fetchApi('/Stats/GetMonthlyReportGlobal');
+                displayData(data, 'Carga inicial sin filtros');
+            } catch (error) {
+                ConfigHelpers?.logError('Error cargando datos iniciales:', error);
+                const userMessage = API_UTILS.handleApiError(error, 'loadDataWithoutFilters');
+                showError(userMessage);
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // Inicializar cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', initializeView);
+        
+        // También inicializar si el DOM ya está listo (para navegación SPA)
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeView);
+        } else {
+            initializeView();
+        }
+
+        // Cargar datos desde la API usando los filtros globales
+        async function loadData() {
+            try {
+                showLoading();
+                hideError();
+                // Obtener filtros actuales
+                let params = {};
+                if (typeof getCurrentFilterSelections === 'function') {
+                    params = getCurrentFilterSelections();
+                }
+                const data = await API_UTILS.fetchApi('/Stats/GetMonthlyReportGlobal', { params });
+                displayData(data, 'Datos filtrados');
+            } catch (error) {
+                ConfigHelpers?.logError('Error cargando datos:', error);
+                const userMessage = API_UTILS.handleApiError(error, 'loadData');
+                showError(userMessage);
             } finally {
                 hideLoading();
             }
         }
 
-        // Mapea los datos de la API a la estructura esperada por el frontend
-        function mapApiData(apiData) {
-            return apiData.map(item => ({
-                month: item.monthYear,
-                bookings: item.totalBookings,
-                previousMonth: item.previousMonthBookings,
-                change: item.percentageDrop,
-                dropFlag: item.isFlagged,
-                // You can add more fields if needed
-            }));
-        }
-
-        // Display data
-        function displayData() {
-            if (!currentData || currentData.length === 0) {
+        // Mostrar datos en la UI (ahora es un array simple)
+        function displayData(data, source = '') {
+            currentData = data;
+            ConfigHelpers?.log(`Mostrando datos (${source}):`, data);
+            if (!data || !Array.isArray(data) || data.length === 0) {
                 showError('No data available for monthly report');
                 return;
             }
-
-            updateSummaryCards();
-            updateDataTable();
-            updateTrendChart();
-            updatePerformanceChart();
-            updateSeasonalChart();
-            generateInsights();
             
-            // Calcular datos para historial
-            const biggestDrop = getBiggestDrop(currentData);
-            const totalBookings = currentData.reduce((sum, item) => sum + (item.bookings || 0), 0);
-            const dropFlags = currentData.filter(item => item.dropFlag).length;
-            addToHistory(getFiltersSummary(), biggestDrop, totalBookings, dropFlags);
+            // Calcular métricas para el historial
+            const totalBookings = data.reduce((sum, item) => sum + (item.totalBookings || 0), 0);
+            const dropFlags = data.filter(item => {
+                const change = item.percentageChange;
+                return change !== null && change !== undefined && change <= -50;
+            }).length;
             
-            document.getElementById('dataContainer').classList.remove('d-none');
+            // Obtener filtros actuales para el historial
+            let currentFilters = 'Sin filtros';
+            if (typeof getCurrentFilterSelections === 'function') {
+                const filters = getCurrentFilterSelections();
+                const filterParts = [];
+                if (filters.sports && filters.sports.length > 0) filterParts.push(`Sports: ${filters.sports.join(', ')}`);
+                if (filters.cities && filters.cities.length > 0) filterParts.push(`Cities: ${filters.cities.join(', ')}`);
+                if (filters.rinkSizes && filters.rinkSizes.length > 0) filterParts.push(`Rink Sizes: ${filters.rinkSizes.join(', ')}`);
+                if (filters.facilities && filters.facilities.length > 0) filterParts.push(`Facilities: ${filters.facilities.join(', ')}`);
+                if (filterParts.length > 0) {
+                    currentFilters = filterParts.join(' | ');
+                }
+            }
+            
+            // Guardar en historial
+            const historyEntry = {
+                date: new Date().toLocaleString(),
+                filters: currentFilters,
+                totalBookings: formatNumber(totalBookings),
+                dropFlags: dropFlags,
+                source: source
+            };
+            saveHistoryEntry(historyEntry);
+            
+            updateSummaryCards(data);
+            updateDataTable(data);
+            renderHistory(); // Actualizar la tabla de historial
+            document.getElementById('data').classList.remove('d-none');
+            document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
         }
 
-        // Update summary cards
-        function updateSummaryCards() {
-            const totalBookings = currentData.reduce((sum, item) => sum + (item.bookings || 0), 0);
-            const avgBookings = totalBookings / currentData.length;
-            const dropFlags = currentData.filter(item => item.dropFlag).length;
-            
-            // Calculate growth rate
-            const sortedData = [...currentData].sort((a, b) => new Date(a.month) - new Date(b.month));
-            const firstMonth = sortedData[0]?.bookings || 0;
-            const lastMonth = sortedData[sortedData.length - 1]?.bookings || 0;
-            const growthRate = firstMonth > 0 ? ((lastMonth - firstMonth) / firstMonth) * 100 : 0;
+        // Actualizar tarjetas resumen
+        function updateSummaryCards(data) {
+            const totalBookings = data.reduce((sum, item) => sum + (item.totalBookings || 0), 0);
+            const avgBookings = totalBookings / data.length;
 
-            document.getElementById('totalBookings').textContent = totalBookings.toLocaleString();
-            document.getElementById('avgBookings').textContent = Math.round(avgBookings).toLocaleString();
+            // Drop Flags: cuenta los meses con status Critical (<= -50%)
+            const dropFlags = data.filter(item => {
+                const change = item.percentageChange;
+                return change !== null && change !== undefined && change <= -50;
+            }).length;
+
+            // Growth Rate: usa el cambio del mes más reciente (primer elemento si está ordenado DESC)
+            let growthRate = 0;
+            if (data.length > 0 && data[0].percentageChange !== null && data[0].percentageChange !== undefined) {
+                growthRate = data[0].percentageChange;
+            }
+
+            document.getElementById('totalBookings').textContent = formatNumber(totalBookings);
+            document.getElementById('avgBookings').textContent = formatNumber(Math.round(avgBookings));
             document.getElementById('dropFlags').textContent = dropFlags;
             document.getElementById('growthRate').textContent = `${growthRate.toFixed(1)}%`;
         }
 
-        // Update data table
-        function updateDataTable() {
-            const tbody = document.getElementById('dataTableBody');
+        // Actualizar tabla de resultados
+        function updateDataTable(data) {
+            const tbody = document.getElementById('resultsTable');
             tbody.innerHTML = '';
-            
-            currentData.forEach(item => {
+            data.forEach(item => {
                 const row = document.createElement('tr');
-                const change = item.change || 0;
+                const change = item.percentageChange || 0;
                 const changeIndicator = getChangeIndicator(change);
-                const dropFlagBadge = item.dropFlag ? '<span class="badge bg-danger">Drop Flag</span>' : '<span class="badge bg-success">Normal</span>';
-                const trend = getTrendIndicator(item.trend || 0);
-                
+                const statusIndicator = getStatusIndicator(change);
                 row.innerHTML = `
-                    <td><strong>${formatMonth(item.month)}</strong></td>
-                    <td>${(item.bookings || 0).toLocaleString()}</td>
-                    <td>${(item.previousMonth || 0).toLocaleString()}</td>
+                    <td><strong>${item.monthYear}</strong></td>
+                    <td>${formatNumber(item.totalBookings || 0)}</td>
+                    <td>${formatNumber(item.previousMonthBookings || 0)}</td>
                     <td>${changeIndicator}</td>
-                    <td>${dropFlagBadge}</td>
-                    <td>${trend}</td>
-                    <td>
-                        <div class="btn-group btn-group-sm" role="group">
-                            <button class="btn btn-outline-primary" onclick="viewMonthDetails('${item.month}')" title="View Details">
-                                <i class="bi bi-eye"></i>
-                            </button>
-                            <button class="btn btn-outline-info" onclick="exportMonthData('${item.month}')" title="Export Data">
-                                <i class="bi bi-download"></i>
-                            </button>
-                            <button class="btn btn-outline-warning" onclick="generateReport('${item.month}')" title="Generate Report">
-                                <i class="bi bi-file-earmark-text"></i>
-                            </button>
-                        </div>
-                    </td>
+                    <td>${statusIndicator}</td>
                 `;
                 tbody.appendChild(row);
             });
         }
 
-        // Update trend chart
-        function updateTrendChart() {
-            if (trendChart) {
-                trendChart.destroy();
-            }
-
-            const ctx = document.getElementById('monthlyTrendChart').getContext('2d');
-            const chartType = document.getElementById('chartTypeFilter').value;
-            
-            const sortedData = [...currentData].sort((a, b) => new Date(a.month) - new Date(b.month));
-            const labels = sortedData.map(item => formatMonth(item.month));
-            const bookings = sortedData.map(item => item.bookings || 0);
-            const previousMonth = sortedData.map(item => item.previousMonth || 0);
-
-            trendChart = new Chart(ctx, {
-                type: chartType,
-                data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: 'Current Month',
-                            data: bookings,
-                            borderColor: '#36A2EB',
-                            backgroundColor: 'rgba(54, 162, 235, 0.1)',
-                            borderWidth: 2,
-                            fill: chartType === 'area'
-                        },
-                        {
-                            label: 'Previous Month',
-                            data: previousMonth,
-                            borderColor: '#FF6384',
-                            backgroundColor: 'rgba(255, 99, 132, 0.1)',
-                            borderWidth: 2,
-                            fill: false
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        },
-                        title: {
-                            display: true,
-                            text: 'Monthly Booking Trends'
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        }
-
-        // Update performance chart
-        function updatePerformanceChart() {
-            if (performanceChart) {
-                performanceChart.destroy();
-            }
-
-            const ctx = document.getElementById('performanceChart').getContext('2d');
-            const sortedData = [...currentData].sort((a, b) => new Date(a.month) - new Date(b.month));
-            const labels = sortedData.map(item => formatMonth(item.month));
-            const performance = sortedData.map(item => {
-                const change = item.change || 0;
-                return change > 0 ? 100 + change : 100 + change;
-            });
-
-            performanceChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Performance Index',
-                        data: performance,
-                        borderColor: '#4BC0C0',
-                        backgroundColor: 'rgba(75, 192, 192, 0.1)',
-                        borderWidth: 2,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            suggestedMin: 80,
-                            suggestedMax: 120
-                        }
-                    }
-                }
-            });
-        }
-
-        // Update seasonal chart
-        function updateSeasonalChart() {
-            if (seasonalChart) {
-                seasonalChart.destroy();
-            }
-
-            const ctx = document.getElementById('seasonalChart').getContext('2d');
-            const sortedData = [...currentData].sort((a, b) => new Date(a.month) - new Date(b.month));
-            const labels = sortedData.map(item => formatMonth(item.month));
-            const bookings = sortedData.map(item => item.bookings || 0);
-
-            seasonalChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Bookings',
-                        data: bookings,
-                        backgroundColor: [
-                            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', 
-                            '#9966FF', '#FF9F40', '#FF6384', '#C9CBCF',
-                            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'
-                        ],
-                        borderColor: [
-                            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', 
-                            '#9966FF', '#FF9F40', '#FF6384', '#C9CBCF',
-                            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        }
-
-        // Generate insights
-        function generateInsights() {
-            const insightsContainer = document.getElementById('insightsContainer');
-            const insights = [];
-
-            // Find best and worst performing months
-            const sortedByBookings = [...currentData].sort((a, b) => (b.bookings || 0) - (a.bookings || 0));
-            const bestMonth = sortedByBookings[0];
-            const worstMonth = sortedByBookings[sortedByBookings.length - 1];
-
-            insights.push(`
-                <div class="alert alert-success">
-                    <i class="bi bi-trophy me-2"></i>
-                    <strong>Best Performing Month:</strong> ${formatMonth(bestMonth.month)} with ${bestMonth.bookings} bookings. 
-                    Consider replicating successful strategies from this period.
-                </div>
-            `);
-
-            insights.push(`
-                <div class="alert alert-warning">
-                    <i class="bi bi-exclamation-triangle me-2"></i>
-                    <strong>Growth Opportunity:</strong> ${formatMonth(worstMonth.month)} had the lowest bookings (${worstMonth.bookings}). 
-                    Implement targeted marketing campaigns for this period.
-                </div>
-            `);
-
-            // Analyze drop flags
-            const dropFlagMonths = currentData.filter(item => item.dropFlag);
-            if (dropFlagMonths.length > 0) {
-                insights.push(`
-                    <div class="alert alert-danger">
-                        <i class="bi bi-flag me-2"></i>
-                        <strong>Drop Flags Detected:</strong> ${dropFlagMonths.length} month(s) show concerning trends. 
-                        Review operational factors and market conditions for these periods.
-                    </div>
-                `);
-            }
-
-            // Calculate average growth
-            const avgChange = currentData.reduce((sum, item) => sum + (item.change || 0), 0) / currentData.length;
-            if (avgChange > 5) {
-                insights.push(`
-                    <div class="alert alert-info">
-                        <i class="bi bi-graph-up-arrow me-2"></i>
-                        <strong>Strong Growth Trend:</strong> Average monthly growth is ${avgChange.toFixed(1)}%. 
-                        The business is expanding well - consider scaling operations.
-                    </div>
-                `);
-            } else if (avgChange < -5) {
-                insights.push(`
-                    <div class="alert alert-warning">
-                        <i class="bi bi-graph-down-arrow me-2"></i>
-                        <strong>Declining Trend:</strong> Average monthly decline is ${Math.abs(avgChange).toFixed(1)}%. 
-                        Immediate action required to reverse the trend.
-                    </div>
-                `);
-            }
-
-            insightsContainer.innerHTML = insights.join('');
-        }
-
-        // Sort table
-        function sortTable(column) {
-            if (sortColumn === column) {
-                sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
-            } else {
-                sortColumn = column;
-                sortDirection = 'asc';
-            }
-            
-            currentData.sort((a, b) => {
-                let aVal = a[column] || '';
-                let bVal = b[column] || '';
-                
-                if (column === 'month') {
-                    aVal = new Date(aVal);
-                    bVal = new Date(bVal);
-                } else {
-                    aVal = parseFloat(aVal) || 0;
-                    bVal = parseFloat(bVal) || 0;
-                }
-                
-                if (sortDirection === 'asc') {
-                    return aVal > bVal ? 1 : -1;
-                } else {
-                    return aVal < bVal ? 1 : -1;
-                }
-            });
-            
-            updateDataTable();
-        }
-
-        // Export data
-        function exportData() {
-            if (!currentData || currentData.length === 0) {
-                alert('No data to export');
-                return;
-            }
-            
-            const csvContent = "data:text/csv;charset=utf-8," 
-                + "Month,Bookings,Previous Month,Change,Drop Flag\n"
-                + currentData.map(item => 
-                    `"${formatMonth(item.month)}","${item.bookings || 0}","${item.previousMonth || 0}","${item.change || 0}","${item.dropFlag ? 'Yes' : 'No'}"`
-                ).join("\n");
-            
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "monthly_report.csv");
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        // View month details
-        function viewMonthDetails(month) {
-            alert(`Detailed analysis for ${formatMonth(month)}\n\nThis would show comprehensive statistics and breakdown for this specific month.`);
-        }
-
-        // Export month data
-        function exportMonthData(month) {
-            const monthData = currentData.find(item => item.month === month);
-            if (monthData) {
-                const csvContent = "data:text/csv;charset=utf-8," 
-                    + "Metric,Value\n"
-                    + `"Month","${formatMonth(monthData.month)}"\n`
-                    + `"Bookings","${monthData.bookings || 0}"\n`
-                    + `"Previous Month","${monthData.previousMonth || 0}"\n`
-                    + `"Change","${monthData.change || 0}"\n`
-                    + `"Drop Flag","${monthData.dropFlag ? 'Yes' : 'No'}"\n`;
-                
-                const encodedUri = encodeURI(csvContent);
-                const link = document.createElement("a");
-                link.setAttribute("href", encodedUri);
-                link.setAttribute("download", `${formatMonth(month)}_data.csv`);
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            }
-        }
-
-        // Generate report
-        function generateReport(month) {
-            alert(`Generate detailed report for ${formatMonth(month)}\n\nThis would create a comprehensive PDF report with charts and analysis.`);
-        }
-
-        // Toggle advanced filters
-        function toggleAdvancedFilters() {
-            const advancedSection = document.querySelector('.row.g-3:nth-child(2)');
-            advancedSection.style.display = advancedSection.style.display === 'none' ? 'flex' : 'none';
-        }
-
-        // Get change indicator
+        // Helper para cambio
         function getChangeIndicator(change) {
             if (change > 0) {
                 return `<span class="text-success"><i class="bi bi-arrow-up"></i> +${change.toFixed(1)}%</span>`;
@@ -878,130 +452,166 @@
             }
         }
 
-        // Get trend indicator
-        function getTrendIndicator(trend) {
-            if (trend > 0) {
-                return '<span class="text-success"><i class="bi bi-arrow-up"></i> +' + trend.toFixed(1) + '%</span>';
-            } else if (trend < 0) {
-                return '<span class="text-danger"><i class="bi bi-arrow-down"></i> ' + trend.toFixed(1) + '%</span>';
+        // Helper para status
+        function getStatusIndicator(change) {
+            if (change === null || change === undefined) {
+                return `<span class="badge bg-secondary">No Data</span>`;
+            } else if (change > 10) {
+                return `<span class="badge bg-success">Excellent</span>`;
+            } else if (change > 5) {
+                return `<span class="badge bg-primary">Good</span>`;
+            } else if (change > 0) {
+                return `<span class="badge bg-info">Stable</span>`;
+            } else if (change > -5) {
+                return `<span class="badge bg-warning">Declining</span>`;
+            } else if (change > -50) {
+                return `<span class="badge bg-danger">Poor</span>`;
             } else {
-                return '<span class="text-muted"><i class="bi bi-dash"></i> 0%</span>';
+                return `<span class="badge bg-dark">Critical</span>`;
             }
         }
 
-        // Format month
-        function formatMonth(monthString) {
-            const date = new Date(monthString);
-            return monthNames[date.getMonth()] + ' ' + date.getFullYear();
+        function formatNumber(num) {
+            return new Intl.NumberFormat().format(num);
         }
 
-        // Utility functions
+        // Botón para aplicar filtros (recarga datos con filtros)
+        function applyFilters() {
+            ConfigHelpers?.log('Aplicando filtros...');
+            loadData();
+        }
+
+        // Botón para limpiar filtros globales y recargar datos
+        function clearFilters() {
+            ConfigHelpers?.log('Limpiando filtros...');
+            if (typeof clearAllFilters === 'function') {
+                clearAllFilters();
+            }
+            loadData();
+        }
+
+        // Export function
+        function exportData() {
+            if (!currentData || currentData.length === 0) {
+                alert('No data to export');
+                return;
+            }
+            
+            const csvContent = generateCSV(currentData);
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `monthly-report-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        function generateCSV(data) {
+            const headers = ['Month', 'Total Bookings', 'Previous Month', 'Change %', 'Status'];
+            const rows = data.map(item => {
+                const change = item.percentageChange || 0;
+                const status = getStatusText(change);
+                return [
+                    item.monthYear,
+                    item.totalBookings || 0,
+                    item.previousMonthBookings || 0,
+                    change.toFixed(1),
+                    status
+                ];
+            });
+            
+            return [headers, ...rows].map(row => row.join(',')).join('\n');
+        }
+
+        // Helper para obtener texto del status (sin HTML)
+        function getStatusText(change) {
+            if (change === null || change === undefined) {
+                return 'No Data';
+            } else if (change > 10) {
+                return 'Excellent';
+            } else if (change > 5) {
+                return 'Good';
+            } else if (change > 0) {
+                return 'Stable';
+            } else if (change > -5) {
+                return 'Declining';
+            } else if (change > -50) {
+                return 'Poor';
+            } else {
+                return 'Critical';
+            }
+        }
+
+        // Guardar historial en localStorage
+        function saveHistoryEntry(entry) {
+            let history = JSON.parse(localStorage.getItem('monthlyReportHistory') || '[]');
+            history.unshift(entry); // Agrega al inicio
+            if (history.length > 20) history = history.slice(0, 20); // Max 20 entries
+            localStorage.setItem('monthlyReportHistory', JSON.stringify(history));
+        }
+
+        // Mostrar historial en la tabla
+        function renderHistory() {
+            const tbody = document.getElementById('historyTable');
+            if (!tbody) return;
+            let history = JSON.parse(localStorage.getItem('monthlyReportHistory') || '[]');
+            tbody.innerHTML = '';
+            if (history.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">No hay historial</td></tr>';
+                return;
+            }
+            history.forEach(item => {
+                const tr = document.createElement('tr');
+                const sourceBadge = item.source ? `<span class="badge bg-secondary ms-1">${item.source}</span>` : '';
+                tr.innerHTML = `
+                    <td><small>${item.date}</small></td>
+                    <td><small>${item.filters}${sourceBadge}</small></td>
+                    <td><strong>${item.totalBookings}</strong></td>
+                    <td><span class="badge bg-${item.dropFlags > 0 ? 'danger' : 'success'}">${item.dropFlags}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Renderizar historial al cargar
+        document.addEventListener('DOMContentLoaded', renderHistory);
+
+        // Inicializar tooltips de Bootstrap
+        document.addEventListener('DOMContentLoaded', function () {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+                new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+
         function showLoading() {
-            document.getElementById('loadingSpinner').classList.remove('d-none');
-            document.getElementById('dataContainer').classList.add('d-none');
+            document.getElementById('loading').classList.remove('d-none');
+            document.getElementById('data').classList.add('d-none');
+            document.getElementById('error').classList.add('d-none');
         }
 
         function hideLoading() {
-            document.getElementById('loadingSpinner').classList.add('d-none');
+            document.getElementById('loading').classList.add('d-none');
         }
 
         function showError(message) {
             document.getElementById('errorText').textContent = message;
-            document.getElementById('errorMessage').classList.remove('d-none');
+            document.getElementById('error').classList.remove('d-none');
+            document.getElementById('data').classList.add('d-none');
         }
 
         function hideError() {
-            document.getElementById('errorMessage').classList.add('d-none');
+            document.getElementById('error').classList.add('d-none');
         }
 
-        function updateLastUpdated() {
-            document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
-        }
-
-        function getSelectedDropdownValues(containerId) {
-            const checkboxes = document.querySelectorAll(`#${containerId} input[type="checkbox"]:checked`);
-            const values = Array.from(checkboxes).map(cb => cb.value);
-            
-            // Procesar rink sizes para extraer solo el número
-            if (containerId === 'rinkSizesOptions') {
-                return values.map(value => {
-                    if (value.includes('selected')) {
-                        const numericValue = value.replace(/\s*selected.*$/, '').trim();
-                        console.log(`Processing rink size: "${value}" -> "${numericValue}"`);
-                        return numericValue;
-                    }
-                    return value;
-                });
-            }
-            
-            return values;
-        }
-
-        function updateDropdownLabel(containerId, defaultLabel, labelId) {
-            const container = document.getElementById(containerId);
-            const selectedOptions = Array.from(container.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
-            const labelText = selectedOptions.length > 0 ? selectedOptions.join(', ') : defaultLabel;
-            document.getElementById(labelId).textContent = labelText;
-        }
-
-        function addToHistory(filtersSummary, biggestDrop, totalBookings, dropFlags) {
-            const now = new Date().toLocaleString();
-            queryHistory.unshift({
-                date: now,
-                filters: filtersSummary,
-                biggestDrop: biggestDrop,
-                total: totalBookings,
-                dropFlags: dropFlags
-            });
-            renderHistory();
-            saveHistoryToStorage();
-        }
-
-        function renderHistory() {
-            const tbody = document.getElementById('historyTableBody');
-            tbody.innerHTML = '';
-            queryHistory.forEach(item => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${item.date}</td>
-                    <td>${item.filters}</td>
-                    <td>${item.biggestDrop}</td>
-                    <td>${item.total}</td>
-                    <td>${item.dropFlags}</td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
-
+        // Botón para limpiar historial
         function clearHistory() {
-            queryHistory = [];
-            renderHistory();
-            localStorage.removeItem('monthlyReportHistory');
-        }
-
-        function saveHistoryToStorage() {
-            localStorage.setItem('monthlyReportHistory', JSON.stringify(queryHistory));
-        }
-
-        function loadHistoryFromStorage() {
-            const saved = localStorage.getItem('monthlyReportHistory');
-            if (saved) {
-                queryHistory = JSON.parse(saved);
+            if (confirm('¿Estás seguro de que quieres limpiar todo el historial de consultas?')) {
+                ConfigHelpers?.log('Limpiando historial...');
+                localStorage.removeItem('monthlyReportHistory');
                 renderHistory();
             }
-        }
-
-        function getBiggestDrop(data) {
-            if (!data || !data.length) return '-';
-            let maxDrop = -Infinity;
-            let result = '-';
-            data.forEach(item => {
-                if (item.dropFlag && item.percentageDrop !== undefined && item.percentageDrop < maxDrop) {
-                    maxDrop = item.percentageDrop;
-                    result = `${item.facilityName} (${item.monthYear}, ${item.percentageDrop.toFixed(1)}%)`;
-                }
-            });
-            return result;
         }
     </script>
 } 

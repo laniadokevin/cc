@@ -24,6 +24,7 @@ namespace CatchCornerStats.Data
             modelBuilder.Entity<Neighborhood>().ToTable("VW_Neighborhoods", "powerBI").HasNoKey();
             modelBuilder.Entity<Organization>().ToTable("VW_Organization", "powerBI").HasNoKey();
             modelBuilder.Entity<BookingsByDayDto>().HasNoKey();
+            modelBuilder.Entity<MonthlyReportGlobalDto>().HasNoKey();
 
             modelBuilder.Entity<Arena>().HasNoKey()
                     .Property(a => a.FacilityId)

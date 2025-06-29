@@ -556,5 +556,34 @@ namespace CatchCornerStats.Presentation.Controllers
                 return StatusCode(500, new { error = "Error al obtener el reporte de bookings por día.", details = ex.Message });
             }
         }
+
+        [HttpGet("GetMonthlyReportGlobal")]
+        public async Task<IActionResult> GetMonthlyReportGlobal(
+            [FromQuery] List<string>? sports,
+            [FromQuery] List<string>? cities,
+            [FromQuery] List<string>? rinkSizes,
+            [FromQuery] List<string>? facilities,
+            [FromQuery] DateTime? createdDateFrom,
+            [FromQuery] DateTime? createdDateTo,
+            [FromQuery] DateTime? happeningDateFrom,
+            [FromQuery] DateTime? happeningDateTo)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            try
+            {
+                var result = await _statsRepository.GetMonthlyReportGlobalAsync(
+                    sports, cities, rinkSizes, facilities,
+                    createdDateFrom, createdDateTo, happeningDateFrom, happeningDateTo);
+                stopwatch.Stop();
+                _logger.LogInformation($"GetMonthlyReportGlobal completed in {stopwatch.ElapsedMilliseconds}ms - {result.Count} rows");
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                stopwatch.Stop();
+                _logger.LogError(ex, $"GetMonthlyReportGlobal failed after {stopwatch.ElapsedMilliseconds}ms");
+                throw;
+            }
+        }
     }
 }

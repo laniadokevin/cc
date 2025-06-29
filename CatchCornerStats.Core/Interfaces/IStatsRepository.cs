@@ -123,5 +123,15 @@ namespace CatchCornerStats.Core.Interfaces
         Task<List<BookingsByDayDto>> GetBookingsByDayReportAsync(
             List<string>? sports, List<string>? cities, List<string>? rinkSizes, List<string>? facilities, int? month, int? year,
             DateTime? createdDateFrom = null, DateTime? createdDateTo = null, DateTime? happeningDateFrom = null, DateTime? happeningDateTo = null);
+        Task<List<MonthlyReportGlobalDto>> GetMonthlyReportGlobalAsync(
+            List<string>? sports,
+            List<string>? cities,
+            List<string>? rinkSizes,
+            List<string>? facilities,
+            DateTime? createdDateFrom,
+            DateTime? createdDateTo,
+            DateTime? happeningDateFrom,
+            DateTime? happeningDateTo
+        );
     }
 }

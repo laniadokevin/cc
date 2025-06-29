@@ -23,7 +23,7 @@ namespace CatchCornerStats.Data.Repositories
 
             // OPTIMIZACIÓN: Calcular promedio directamente en SQL
             var result = await query
-                .Where(x => x.CreatedDateUtc != null && x.HappeningDate != null)
+                .Where(x => x.CreatedDateUtc != null)
                 .Select(x => EF.Functions.DateDiffDay(x.CreatedDateUtc, x.HappeningDate))
                 .AverageAsync();
 
@@ -37,7 +37,7 @@ namespace CatchCornerStats.Data.Repositories
 
             // OPTIMIZACIÓN: Agregación en SQL en lugar de memoria
             var breakdown = await query
-                .Where(x => x.CreatedDateUtc != null && x.HappeningDate != null)
+                .Where(x => x.CreatedDateUtc != null)
                 .Select(x => new
                 {
                     LeadTimeDays = EF.Functions.DateDiffDay(x.CreatedDateUtc, x.HappeningDate)
@@ -108,7 +108,6 @@ namespace CatchCornerStats.Data.Repositories
 
             // Trae los datos a memoria y elimina duplicados por BookingNumber
             var bookings = await query
-                .Where(x => x.HappeningDate != null)
                 .GroupBy(x => x.BookingNumber)
                 .Select(g => g.First())
                 .ToListAsync();
@@ -221,18 +220,20 @@ namespace CatchCornerStats.Data.Repositories
             var query = BuildBaseQuery(sport, city, rinkSize, facility);
 
             var monthlyData = await query
-                .GroupBy(x => new
-                {
-                    x.Facility,
-                    Month = x.HappeningDate.Month,
-                    Year = x.HappeningDate.Year
-                })
+                .GroupBy(x => new { x.Facility, x.HappeningDate.Year, x.HappeningDate.Month, x.BookingNumber })
                 .Select(g => new
                 {
                     FacilityName = g.Key.Facility,
-                    Month = g.Key.Month,
+                    g.Key.Year,
+                    g.Key.Month
+                })
+                .GroupBy(x => new { x.FacilityName, x.Year, x.Month })
+                .Select(g => new
+                {
+                    FacilityName = g.Key.FacilityName,
                     Year = g.Key.Year,
-                    TotalBookings = g.Select(x => x.BookingNumber).Distinct().Count()
+                    Month = g.Key.Month,
+                    TotalBookings = g.Count()
                 })
                 .OrderBy(x => x.FacilityName)
                 .ThenBy(x => x.Year)
@@ -311,7 +312,7 @@ namespace CatchCornerStats.Data.Repositories
             if (month.HasValue)
                 query = query.Where(x => x.HappeningDate.Month == month);
 
-            // OPTIMIZACIÓN: Una sola consulta con ranking en SQL
+            // OPTIMIZACIÓN: Una sola consulta con ranking por ciudad
             var sportBookings = await query
                 .Where(x => !string.IsNullOrEmpty(x.Sport) && !string.IsNullOrEmpty(x.City))
                 .GroupBy(x => new { x.Sport, x.City })
@@ -321,27 +322,72 @@ namespace CatchCornerStats.Data.Repositories
                     City = g.Key.City,
                     TotalBookings = g.Select(x => x.BookingNumber).Distinct().Count()
                 })
-                .OrderByDescending(x => x.TotalBookings)
                 .ToListAsync();
 
             if (!sportBookings.Any()) return new List<SportComparisonResult>();
 
-            var maxBookings = sportBookings.First().TotalBookings;
-            var top6Sports = sportBookings.Take(6).Select(x => x.Sport).ToHashSet();
-            var top8Sports = sportBookings.Take(8).Select(x => x.Sport).ToHashSet();
-
-            return sportBookings.Select(booking => new SportComparisonResult
+            // Agrupar por ciudad y calcular rankings y flags por ciudad
+            var results = new List<SportComparisonResult>();
+            
+            var cities = sportBookings.Select(x => x.City).Distinct();
+            
+            foreach (var currentCity in cities)
             {
-                Sport = booking.Sport,
-                City = booking.City,
-                TotalBookings = booking.TotalBookings,
-                IsFlaggedTop6 = !top6Sports.Contains(booking.Sport) && 
-                               sportBookings.Take(6).Any(s => s.TotalBookings < booking.TotalBookings),
-                IsFlaggedTop8 = !top8Sports.Contains(booking.Sport) && 
-                               sportBookings.Take(8).Any(s => s.TotalBookings < booking.TotalBookings),
-                IsFlaggedHighBookings = booking.TotalBookings >= 60 || 
-                                       (maxBookings > 0 && booking.TotalBookings >= maxBookings * 0.05)
-            }).ToList();
+                var citySports = sportBookings
+                    .Where(x => x.City == currentCity)
+                    .OrderByDescending(x => x.TotalBookings)
+                    .ToList();
+
+                if (!citySports.Any()) continue;
+
+                var maxBookings = citySports.First().TotalBookings;
+                
+                // Calcular rankings por ciudad
+                for (int i = 0; i < citySports.Count; i++)
+                {
+                    var sport = citySports[i];
+                    var ranking = i + 1; // Ranking basado en posición (1 = más popular)
+                    
+                    // Determinar flags según criterios específicos
+                    bool isFlaggedTop6 = false;
+                    bool isFlaggedTop8 = false;
+                    bool isFlaggedHighBookings = false;
+
+                    // Flag Top6: Si no está en top 6 pero tiene más bookings que un top 6
+                    if (ranking > 6)
+                    {
+                        var top6MinBookings = citySports.Take(6).Min(x => x.TotalBookings);
+                        isFlaggedTop6 = sport.TotalBookings > top6MinBookings;
+                    }
+
+                    // Flag Top8: Si no está en top 8 pero tiene más bookings que un top 8
+                    if (ranking > 8)
+                    {
+                        var top8MinBookings = citySports.Take(8).Min(x => x.TotalBookings);
+                        isFlaggedTop8 = sport.TotalBookings > top8MinBookings;
+                    }
+
+                    // Flag HighBookings: Si está rankeado 9+ y tiene 60+ bookings o 5% del más popular
+                    if (ranking >= 9)
+                    {
+                        var threshold = Math.Max(60, maxBookings * 0.05);
+                        isFlaggedHighBookings = sport.TotalBookings >= threshold;
+                    }
+
+                    results.Add(new SportComparisonResult
+                    {
+                        Sport = sport.Sport,
+                        City = sport.City,
+                        TotalBookings = sport.TotalBookings,
+                        Ranking = ranking,
+                        IsFlaggedTop6 = isFlaggedTop6,
+                        IsFlaggedTop8 = isFlaggedTop8,
+                        IsFlaggedHighBookings = isFlaggedHighBookings
+                    });
+                }
+            }
+
+            return results.OrderBy(x => x.City).ThenBy(x => x.Ranking).ToList();
         }
 
         public async Task<List<string>> GetSportsAsync()
@@ -569,6 +615,79 @@ namespace CatchCornerStats.Data.Repositories
             }
             
             Console.WriteLine("=== StatsRepository.GetBookingsByDayReportAsync END ===");
+            return result;
+        }
+
+        public async Task<List<MonthlyReportGlobalDto>> GetMonthlyReportGlobalAsync(
+            List<string>? sports,
+            List<string>? cities,
+            List<string>? rinkSizes,
+            List<string>? facilities,
+            DateTime? createdDateFrom,
+            DateTime? createdDateTo,
+            DateTime? happeningDateFrom,
+            DateTime? happeningDateTo)
+        {
+            // Construir consulta base con filtros
+            var query = from b in _context.Bookings
+                        join a in _context.Arenas on b.FacilityId equals a.FacilityId
+                        select new { b.BookingNumber, b.HappeningDate, a.Sport, a.Area, a.Size, a.Facility, b.CreatedDateUtc };
+
+            if (sports?.Any() == true)
+                query = query.Where(x => sports.Contains(x.Sport));
+            if (cities?.Any() == true)
+                query = query.Where(x => cities.Contains(x.Area));
+            if (rinkSizes?.Any() == true)
+                query = query.Where(x => rinkSizes.Contains(x.Size));
+            if (facilities?.Any() == true)
+                query = query.Where(x => facilities.Contains(x.Facility));
+            if (createdDateFrom.HasValue)
+                query = query.Where(x => x.CreatedDateUtc >= createdDateFrom.Value);
+            if (createdDateTo.HasValue)
+                query = query.Where(x => x.CreatedDateUtc <= createdDateTo.Value);
+            if (happeningDateFrom.HasValue)
+                query = query.Where(x => x.HappeningDate >= happeningDateFrom.Value);
+            if (happeningDateTo.HasValue)
+                query = query.Where(x => x.HappeningDate <= happeningDateTo.Value);
+
+            // Hacer la agregación directamente en SQL para mejor rendimiento
+            var monthlyData = await query
+                .GroupBy(x => new { x.HappeningDate.Year, x.HappeningDate.Month, x.BookingNumber })
+                .Select(g => new
+                {
+                    g.Key.Year,
+                    g.Key.Month
+                })
+                .GroupBy(x => new { x.Year, x.Month })
+                .Select(g => new
+                {
+                    Year = g.Key.Year,
+                    Month = g.Key.Month,
+                    TotalBookings = g.Count()
+                })
+                .OrderByDescending(x => x.Year)
+                .ThenByDescending(x => x.Month)
+                .ToListAsync();
+
+            // Calcular PreviousMonthBookings y PercentageChange
+            var result = new List<MonthlyReportGlobalDto>();
+            for (int i = 0; i < monthlyData.Count; i++)
+            {
+                var current = monthlyData[i];
+                var previous = i + 1 < monthlyData.Count ? monthlyData[i + 1] : null;
+                decimal? percentageChange = null;
+                if (previous != null && previous.TotalBookings != 0)
+                {
+                    percentageChange = ((current.TotalBookings - previous.TotalBookings) * 100.0m) / previous.TotalBookings;
+                }
+                result.Add(new MonthlyReportGlobalDto
+                {
+                    MonthYear = $"{current.Month:D2}/{current.Year}",
+                    TotalBookings = current.TotalBookings,
+                    PreviousMonthBookings = previous?.TotalBookings,
+                    PercentageChange = percentageChange
+                });
+            }
             return result;
         }
 
