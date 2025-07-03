@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CatchCornerStats.Data")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+da20327000136ead0114186fbb05b682a8598ae4")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+96f5c5d065d12c6b3c142e1eb40c844a088942d8")]
 [assembly: System.Reflection.AssemblyProductAttribute("CatchCornerStats.Data")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CatchCornerStats.Data")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

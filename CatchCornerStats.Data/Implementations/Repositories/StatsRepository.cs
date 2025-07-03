@@ -21,7 +21,7 @@ namespace CatchCornerStats.Data.Repositories
         {
             var query = BuildBaseQuery(sports, cities, rinkSizes, facilities);
 
-            // OPTIMIZACIÓN: Calcular promedio directamente en SQL
+            // OPTIMIZATION: Calculate average directly in SQL
             var result = await query
                 .Where(x => x.CreatedDateUtc != null)
                 .Select(x => EF.Functions.DateDiffDay(x.CreatedDateUtc, x.HappeningDate))
@@ -35,7 +35,7 @@ namespace CatchCornerStats.Data.Repositories
             var query = BuildBaseQuery(sports, cities, rinkSizes, facilities);
             ApplyDateFilters(ref query, createdDateFrom, createdDateTo, happeningDateFrom, happeningDateTo);
 
-            // OPTIMIZACIÓN: Agregación en SQL en lugar de memoria
+            // OPTIMIZATION: Aggregation in SQL instead of memory
             var breakdown = await query
                 .Where(x => x.CreatedDateUtc != null)
                 .Select(x => new
@@ -64,7 +64,7 @@ namespace CatchCornerStats.Data.Repositories
 
         public async Task<Dictionary<string, double>> GetBookingsByDayAsync(string? sport, string? city, string? rinkSize, string? facility, int? month, DateTime? createdDateFrom, DateTime? createdDateTo, DateTime? happeningDateFrom, DateTime? happeningDateTo)
         {
-            // Forzar filtro de mes: si no se especifica, usar el mes actual
+            // Force month filter: if not specified, use current month
             if (!month.HasValue)
             {
                 month = DateTime.UtcNow.Month;
@@ -96,7 +96,7 @@ namespace CatchCornerStats.Data.Repositories
             if (!string.IsNullOrEmpty(facility))
                 query = query.Where(x => x.Facility == facility);
 
-            // Filtros de fecha
+            // Date filters
             if (createdDateFrom.HasValue)
                 query = query.Where(x => x.CreatedDateUtc >= createdDateFrom.Value);
             if (createdDateTo.HasValue)
@@ -106,7 +106,7 @@ namespace CatchCornerStats.Data.Repositories
             if (happeningDateTo.HasValue)
                 query = query.Where(x => x.HappeningDate <= happeningDateTo.Value);
 
-            // Trae los datos a memoria y elimina duplicados por BookingNumber
+            // Bring data to memory and remove duplicates by BookingNumber
             var bookings = await query
                 .GroupBy(x => x.BookingNumber)
                 .Select(g => g.First())
@@ -134,14 +134,14 @@ namespace CatchCornerStats.Data.Repositories
             var query = BuildBaseQuery(sports, cities, rinkSizes, facilities);
             ApplyDateFilters(ref query, createdDateFrom, createdDateTo, happeningDateFrom, happeningDateTo);
 
-            // Aplicar filtros adicionales si se especifican
+            // Apply additional filters if specified
             if (month.HasValue)
                 query = query.Where(x => x.HappeningDate.Month == month.Value);
             
             if (dayOfWeek.HasValue)
                 query = query.Where(x => (int)x.HappeningDate.DayOfWeek == dayOfWeek.Value);
 
-            // OPTIMIZACIÓN: Agrupar directamente por hora de inicio
+            // OPTIMIZATION: Group directly by start hour
             var grouped = await query
                 .GroupBy(x => x.StartTime.Value.Hours)
                 .Select(g => new
@@ -167,7 +167,7 @@ namespace CatchCornerStats.Data.Repositories
 
         public async Task<BookingDurationBreakdownResult> GetBookingDurationBreakdownAsync(List<string>? sports, List<string>? cities, List<string>? rinkSizes, List<string>? facilities, DateTime? createdDateFrom, DateTime? createdDateTo, DateTime? happeningDateFrom, DateTime? happeningDateTo)
         {
-            // Usar BuildBaseQuery para poder filtrar por rinkSizes (JOIN con Arena)
+            // Use BuildBaseQuery to filter by rinkSizes (JOIN with Arena)
             var query = BuildBaseQuery(sports, null, rinkSizes, facilities);
             if (createdDateFrom.HasValue)
                 query = query.Where(x => x.CreatedDateUtc >= createdDateFrom.Value);
@@ -178,7 +178,7 @@ namespace CatchCornerStats.Data.Repositories
             if (happeningDateTo.HasValue)
                 query = query.Where(x => x.HappeningDate <= happeningDateTo.Value);
 
-            // Traer solo BookingNumber, StartTime y EndTime únicos
+            // Bring only unique BookingNumber, StartTime and EndTime
             var bookings = await query
                        .Where(x => x.StartTime != null && x.EndTime != null)
                        .Select(x => new { x.BookingNumber, x.StartTime, x.EndTime })
@@ -240,7 +240,7 @@ namespace CatchCornerStats.Data.Repositories
                 .ThenBy(x => x.Month)
                 .ToListAsync();
 
-            // Construir tabla dinámica
+            // Build dynamic table
             var facilitiesDict = new Dictionary<string, MonthlyReportFacilityDto>();
             var allMonths = new HashSet<string>();
             foreach (var row in monthlyData)
@@ -284,7 +284,7 @@ namespace CatchCornerStats.Data.Repositories
                 }
             }
 
-            // Normalizar: asegurar que todos los meses estén presentes en cada facility (con 0 si falta)
+            // Normalize: ensure all months are present in each facility (with 0 if missing)
             var allMonthsOrdered = allMonths.OrderBy(m => m).ToList();
             foreach (var facilityDto in facilitiesDict.Values)
             {
@@ -293,7 +293,7 @@ namespace CatchCornerStats.Data.Repositories
                     if (!facilityDto.MonthlyBookings.ContainsKey(month))
                         facilityDto.MonthlyBookings[month] = 0;
                 }
-                // Ordenar el diccionario por mes
+                // Sort dictionary by month
                 facilityDto.MonthlyBookings = facilityDto.MonthlyBookings.OrderBy(kv => kv.Key)
                     .ToDictionary(kv => kv.Key, kv => kv.Value);
             }
@@ -324,13 +324,13 @@ namespace CatchCornerStats.Data.Repositories
             if (year.HasValue)
                 query = query.Where(x => x.HappeningDate.Year == year.Value);
 
-            // Obtener el total de bookings únicos (global, según filtro)
+            // Get total unique bookings (global, according to filter)
             var totalUniqueBookings = await query
                 .Select(x => x.BookingNumber)
                 .Distinct()
                 .CountAsync();
 
-            // OPTIMIZACIÓN: Una sola consulta con ranking por ciudad
+            // OPTIMIZATION: Single query with ranking by city
             var sportBookings = await query
                 .Where(x => !string.IsNullOrEmpty(x.Sport) && !string.IsNullOrEmpty(x.City))
                 .GroupBy(x => new { x.Sport, x.City })
@@ -345,7 +345,7 @@ namespace CatchCornerStats.Data.Repositories
             if (!sportBookings.Any())
                 return new SportComparisonResponseDto { Results = new List<SportComparisonResult>(), TotalUniqueBookings = 0 };
 
-            // Agrupar por ciudad y calcular rankings y flags por ciudad
+            // Group by city and calculate rankings and flags by city
             var results = new List<SportComparisonResult>();
             var citiesList = sportBookings.Select(x => x.City).Distinct();
             foreach (var currentCity in citiesList)
@@ -366,7 +366,7 @@ namespace CatchCornerStats.Data.Repositories
                     bool isFlaggedTop8 = false;
                     bool isFlaggedHighBookings = false;
                     
-                    // FLAGS TEMPORALMENTE DESACTIVADOS - Lógica comentada hasta redefinir criterios
+                    // FLAGS TEMPORARILY DISABLED - Logic commented until criteria redefined
                     // if (ranking > 6)
                     // {
                     //     var top6MinBookings = citySports.Take(6).Min(x => x.TotalBookings);
@@ -378,19 +378,19 @@ namespace CatchCornerStats.Data.Repositories
                     //     isFlaggedTop8 = sport.TotalBookings > top8MinBookings;
                     // }
                     
-                    // HIGHBOOKINGS FLAG REACTIVADO - Detecta deportes con volumen significativo
+                    // HIGHBOOKINGS FLAG REACTIVATED - Detects sports with significant volume
                     if (ranking >= 9)
                     {
-                        // CRITERIO 1: Mínimo absoluto de 60 bookings
+                        // CRITERION 1: Minimum absolute threshold of 60 bookings
                         bool meetsAbsoluteThreshold = sport.TotalBookings >= 60;
                         
-                        // CRITERIO 2: Al menos 5% de los bookings del deporte más popular
+                        // CRITERION 2: At least 5% of the most popular sport's bookings
                         //bool meetsRelativeThreshold = sport.TotalBookings >= (maxBookings * 0.05);
                         
-                        // ELIGE UNO DE LOS DOS CRITERIOS (descomenta la línea que quieras usar):
-                        isFlaggedHighBookings = meetsAbsoluteThreshold;        // Solo 60+ bookings
-                        // isFlaggedHighBookings = meetsRelativeThreshold;    // Solo 5% del máximo
-                        // isFlaggedHighBookings = meetsAbsoluteThreshold || meetsRelativeThreshold;  // Ambos criterios
+                        // CHOOSE ONE OF THE TWO CRITERIA (uncomment the line you want to use):
+                        isFlaggedHighBookings = meetsAbsoluteThreshold;        // Only 60+ bookings
+                        // isFlaggedHighBookings = meetsRelativeThreshold;    // Only 5% of maximum
+                        // isFlaggedHighBookings = meetsAbsoluteThreshold || meetsRelativeThreshold;  // Both criteria
                     }
                     
                     results.Add(new SportComparisonResult
@@ -415,49 +415,49 @@ namespace CatchCornerStats.Data.Repositories
 
         public async Task<List<string>> GetSportsAsync()
         {
-            // OPTIMIZACIÓN: Usar consulta más eficiente con índices
+            // OPTIMIZATION: Use more efficient query with indexes
             return await _context.Arenas
                 .Where(x => !string.IsNullOrEmpty(x.Sport))
                 .Select(x => x.Sport)
                 .Distinct()
                 .OrderBy(x => x)
-                .AsNoTracking() // OPTIMIZACIÓN: No tracking para consultas de solo lectura
+                .AsNoTracking() // OPTIMIZATION: No tracking for read-only queries
                 .ToListAsync();
         }
 
         public async Task<List<string>> GetCitiesAsync()
         {
-            // OPTIMIZACIÓN: Usar consulta más eficiente con índices
+            // OPTIMIZATION: Use more efficient query with indexes
             return await _context.Arenas
                 .Where(x => !string.IsNullOrEmpty(x.Area))
                 .Select(x => x.Area)
                 .Distinct()
                 .OrderBy(x => x)
-                .AsNoTracking() // OPTIMIZACIÓN: No tracking para consultas de solo lectura
+                .AsNoTracking() // OPTIMIZATION: No tracking for read-only queries
                 .ToListAsync();
         }
 
         public async Task<List<string>> GetRinkSizesAsync()
         {
-            // OPTIMIZACIÓN: Usar consulta más eficiente con índices
+            // OPTIMIZATION: Use more efficient query with indexes
             return await _context.Arenas
                 .Where(x => !string.IsNullOrEmpty(x.Size))
                 .Select(x => x.Size)
                 .Distinct()
                 .OrderBy(x => x)
-                .AsNoTracking() // OPTIMIZACIÓN: No tracking para consultas de solo lectura
+                .AsNoTracking() // OPTIMIZATION: No tracking for read-only queries
                 .ToListAsync();
         }
 
         public async Task<List<string>> GetFacilitiesAsync()
         {
-            // OPTIMIZACIÓN: Usar consulta más eficiente con índices
+            // OPTIMIZATION: Use more efficient query with indexes
             return await _context.Arenas
                 .Where(x => !string.IsNullOrEmpty(x.Facility))
                 .Select(x => x.Facility)
                 .Distinct()
                 .OrderBy(x => x)
-                .AsNoTracking() // OPTIMIZACIÓN: No tracking para consultas de solo lectura
+                .AsNoTracking() // OPTIMIZATION: No tracking for read-only queries
                 .ToListAsync();
         }
 
@@ -484,7 +484,7 @@ namespace CatchCornerStats.Data.Repositories
 
         public async Task<(double averageLeadTime, int totalBookings)> GetAverageLeadTimeWithCountAsync(List<string>? sports, List<string>? cities, List<string>? rinkSizes, List<string>? facilities, DateTime? createdDateFrom, DateTime? createdDateTo, DateTime? happeningDateFrom, DateTime? happeningDateTo)
         {
-            // Log de entrada
+            // Entry log
             Console.WriteLine("=== StatsRepository.GetAverageLeadTimeWithCountAsync START ===");
             Console.WriteLine($"Parameters received:");
             Console.WriteLine($"  sports: [{string.Join(", ", sports ?? new List<string>())}] (null: {sports == null})");
@@ -499,7 +499,7 @@ namespace CatchCornerStats.Data.Repositories
             var query = BuildBaseQuery(sports, cities, rinkSizes, facilities);
             ApplyDateFilters(ref query, createdDateFrom, createdDateTo, happeningDateFrom, happeningDateTo);
 
-            // OPTIMIZACIÓN: Una sola consulta para ambos valores
+            // OPTIMIZATION: Single query for both values
             var result = await query
                 .Where(x => x.CreatedDateUtc != null && x.HappeningDate != null)
                 .Select(x => new
@@ -507,7 +507,7 @@ namespace CatchCornerStats.Data.Repositories
                     LeadTimeDays = EF.Functions.DateDiffDay(x.CreatedDateUtc, x.HappeningDate),
                     x.BookingNumber
                 })
-                .GroupBy(x => 1) // Agrupar todo para agregación
+                .GroupBy(x => 1) // Group everything for aggregation
                 .Select(g => new
                 {
                     AverageLeadTime = g.Average(x => x.LeadTimeDays),
@@ -528,7 +528,7 @@ namespace CatchCornerStats.Data.Repositories
             List<string>? sports, List<string>? cities, List<string>? rinkSizes, List<string>? facilities, int? month, int? year,
             DateTime? createdDateFrom = null, DateTime? createdDateTo = null, DateTime? happeningDateFrom = null, DateTime? happeningDateTo = null)
         {
-            // Log de entrada
+            // Entry log
             Console.WriteLine("=== StatsRepository.GetBookingsByDayReportAsync START ===");
             Console.WriteLine($"Parameters received:");
             Console.WriteLine($"  sports: [{string.Join(", ", sports ?? new List<string>())}] (null: {sports == null})");
@@ -594,7 +594,7 @@ namespace CatchCornerStats.Data.Repositories
                 END
             ";
 
-            // Convertir listas a strings separados por comas
+            // Convert lists to comma-separated strings
             var sportsParam = sports?.Any() == true ? string.Join(",", sports) : null;
             var citiesParam = cities?.Any() == true ? string.Join(",", cities) : null;
             var rinkSizesParam = rinkSizes?.Any() == true ? string.Join(",", rinkSizes) : null;
@@ -614,14 +614,14 @@ namespace CatchCornerStats.Data.Repositories
                 new SqlParameter("@happeningDateTo", (object?)happeningDateTo ?? DBNull.Value)
             };
 
-            // Log de parámetros SQL
+            // SQL parameters log
             Console.WriteLine("SQL Parameters:");
             foreach (var param in parameters)
             {
                 Console.WriteLine($"  {param.ParameterName}: {param.Value} (Type: {param.Value?.GetType().Name ?? "DBNull"})");
             }
 
-            // Log adicional para verificar valores específicos
+            // Additional log to verify specific values
             Console.WriteLine("Parameter verification:");
             Console.WriteLine($"  sports parameter: [{string.Join(", ", sports ?? new List<string>())}] -> SQL: {sportsParam}");
             Console.WriteLine($"  cities parameter: [{string.Join(", ", cities ?? new List<string>())}] -> SQL: {citiesParam}");
@@ -651,7 +651,7 @@ namespace CatchCornerStats.Data.Repositories
             DateTime? happeningDateFrom,
             DateTime? happeningDateTo)
         {
-            // Construir consulta base con filtros
+            // Build base query with filters
             var query = from b in _context.Bookings
                         join a in _context.Arenas on b.FacilityId equals a.FacilityId
                         select new { b.BookingNumber, b.HappeningDate, a.Sport, a.Area, a.Size, a.Facility, b.CreatedDateUtc };
@@ -673,7 +673,7 @@ namespace CatchCornerStats.Data.Repositories
             if (happeningDateTo.HasValue)
                 query = query.Where(x => x.HappeningDate <= happeningDateTo.Value);
 
-            // Hacer la agregación directamente en SQL para mejor rendimiento
+            // Do aggregation directly in SQL for better performance
             var monthlyData = await query
                 .GroupBy(x => new { x.HappeningDate.Year, x.HappeningDate.Month, x.BookingNumber })
                 .Select(g => new
@@ -692,7 +692,7 @@ namespace CatchCornerStats.Data.Repositories
                 .ThenByDescending(x => x.Month)
                 .ToListAsync();
 
-            // Calcular PreviousMonthBookings y PercentageChange
+            // Calculate PreviousMonthBookings and PercentageChange
             var result = new List<MonthlyReportGlobalDto>();
             for (int i = 0; i < monthlyData.Count; i++)
             {
@@ -748,7 +748,7 @@ namespace CatchCornerStats.Data.Repositories
                             RinkSize = a.Size
                         };
 
-            // Aplicar filtros solo si las listas no son null y contienen elementos válidos
+            // Apply filters only if lists are not null and contain valid elements
             if (sports?.Any(x => !string.IsNullOrWhiteSpace(x)) == true)
                 query = query.Where(x => sports.Contains(x.Sport));
 

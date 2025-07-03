@@ -1,98 +1,98 @@
-# Optimizaciones de Rendimiento - CatchCornerStats
+# Performance Optimizations - CatchCornerStats
 
-## Problema Original
-Los filtros tardaban mucho en cargar y esto afectaba negativamente la experiencia del usuario, ya que la API principal tenía que esperar a que los filtros se cargaran antes de mostrar datos.
+## Original Problem
+Filters were taking too long to load, which negatively affected the user experience, as the main API had to wait for filters to load before showing data.
 
-## Solución Implementada: Carga Paralela y Optimizada
+## Implemented Solution: Parallel and Optimized Loading
 
-### 1. **Carga Inmediata de Datos Principales**
-- **Antes**: Los datos principales esperaban a que los filtros se cargaran
-- **Ahora**: Los datos principales se cargan inmediatamente sin filtros
-- **Beneficio**: El usuario ve datos rápidamente, mejorando la percepción de velocidad
+### 1. **Immediate Loading of Main Data**
+- **Before**: Main data waited for filters to load
+- **Now**: Main data loads immediately without filters
+- **Benefit**: User sees data quickly, improving speed perception
 
-### 2. **Carga Paralela de Filtros**
-- **Antes**: Los filtros se cargaban secuencialmente, bloqueando la UI
-- **Ahora**: Los filtros se cargan en paralelo sin bloquear la carga de datos
-- **Beneficio**: Reducción significativa del tiempo total de carga
+### 2. **Parallel Filter Loading**
+- **Before**: Filters loaded sequentially, blocking the UI
+- **Now**: Filters load in parallel without blocking data loading
+- **Benefit**: Significant reduction in total loading time
 
-### 3. **Sistema de Callbacks Optimizado**
-- **Nuevo**: Sistema de callbacks para notificar cuando los filtros estén listos
-- **Beneficio**: Recarga automática de datos cuando los filtros están disponibles
+### 3. **Optimized Callback System**
+- **New**: Callback system to notify when filters are ready
+- **Benefit**: Automatic data reload when filters are available
 
-### 4. **Configuración Centralizada**
-- **Nuevo**: Archivo `config.js` con configuración centralizada
-- **Beneficio**: URLs de API centralizadas, fácil mantenimiento
+### 4. **Centralized Configuration**
+- **New**: `config.js` file with centralized configuration
+- **Benefit**: Centralized API URLs, easy maintenance
 
-### 5. **Utilidades de API Optimizadas**
-- **Nuevo**: Archivo `api-utils.js` con funciones optimizadas
-- **Características**:
-  - Logging de rendimiento automático
-  - Manejo de errores mejorado
-  - Cache automático
-  - Retry con backoff exponencial
-  - Debounce y throttle para llamadas API
+### 5. **Optimized API Utilities**
+- **New**: `api-utils.js` file with optimized functions
+- **Features**:
+  - Automatic performance logging
+  - Improved error handling
+  - Automatic cache
+  - Retry with exponential backoff
+  - Debounce and throttle for API calls
 
-### 6. **Sistema de Filtros Compartidos Mejorado**
-- **Optimizaciones**:
-  - Cache inteligente con TTL configurable
-  - Carga paralela de todas las opciones de filtros
-  - Estado persistente en localStorage
-  - Inicialización única con reutilización
+### 6. **Improved Shared Filters System**
+- **Optimizations**:
+  - Smart cache with configurable TTL
+  - Parallel loading of all filter options
+  - Persistent state in localStorage
+  - Single initialization with reuse
 
-### 7. **Gestión de Estado Global**
-- **Nuevo**: Sistema de estado global en `app.js`
-- **Características**:
-  - Control de estados de carga
-  - Manejo de errores global
-  - Monitoreo de rendimiento
-  - Gestión de navegación
+### 7. **Global State Management**
+- **New**: Global state system in `app.js`
+- **Features**:
+  - Loading state control
+  - Global error handling
+  - Performance monitoring
+  - Navigation management
 
-## Flujo de Carga Optimizado
+## Optimized Loading Flow
 
 ```
-1. Usuario navega a la página
+1. User navigates to page
    ↓
-2. Datos principales se cargan INMEDIATAMENTE (sin filtros)
+2. Main data loads IMMEDIATELY (without filters)
    ↓
-3. Filtros se cargan EN PARALELO (sin bloquear)
+3. Filters load IN PARALLEL (without blocking)
    ↓
-4. Cuando los filtros están listos, se recargan los datos automáticamente
+4. When filters are ready, data reloads automatically
    ↓
-5. Usuario puede interactuar con filtros inmediatamente
+5. User can interact with filters immediately
 ```
 
-## Mejoras de Rendimiento
+## Performance Improvements
 
-### Tiempo de Carga Inicial
-- **Antes**: ~3-5 segundos (esperando filtros)
-- **Ahora**: ~0.5-1 segundo (datos inmediatos)
+### Initial Loading Time
+- **Before**: ~3-5 seconds (waiting for filters)
+- **Now**: ~0.5-1 second (immediate data)
 
-### Tiempo de Carga de Filtros
-- **Antes**: Secuencial, ~2-3 segundos
-- **Ahora**: Paralelo, ~0.8-1.5 segundos
+### Filter Loading Time
+- **Before**: Sequential, ~2-3 seconds
+- **Now**: Parallel, ~0.8-1.5 seconds
 
-### Experiencia del Usuario
-- **Antes**: Pantalla en blanco esperando
-- **Ahora**: Datos visibles inmediatamente, filtros aparecen cuando están listos
+### User Experience
+- **Before**: Blank screen waiting
+- **Now**: Data visible immediately, filters appear when ready
 
-## Archivos Modificados/Creados
+## Modified/Created Files
 
-### Nuevos Archivos
-- `config.js` - Configuración centralizada
-- `api-utils.js` - Utilidades de API optimizadas
-- `PERFORMANCE_OPTIMIZATIONS.md` - Este documento
+### New Files
+- `config.js` - Centralized configuration
+- `api-utils.js` - Optimized API utilities
+- `PERFORMANCE_OPTIMIZATIONS.md` - This document
 
-### Archivos Modificados
-- `shared-filters.js` - Sistema de filtros optimizado
-- `app.js` - Gestión de estado global
-- `GetAverageLeadTime.cshtml` - Vista optimizada
+### Modified Files
+- `shared-filters.js` - Optimized filter system
+- `app.js` - Global state management
+- `GetAverageLeadTime.cshtml` - Optimized view
 
-## Configuración
+## Configuration
 
 ### Cache
 ```javascript
 cache: {
-    filterExpiry: 10 * 60 * 1000, // 10 minutos
+    filterExpiry: 10 * 60 * 1000, // 10 minutes
     localStoragePrefix: 'catchCornerStats_'
 }
 ```
@@ -114,32 +114,32 @@ debug: {
 }
 ```
 
-## Monitoreo y Logging
+## Monitoring and Logging
 
-### Logs de Rendimiento
-- Tiempo de respuesta de API
-- Tiempo de carga de filtros
+### Performance Logs
+- API response time
+- Filter loading time
 - Cache hits/misses
-- Errores con contexto
+- Errors with context
 
-### Métricas Disponibles
-- Tiempo de carga inicial
-- Tiempo de carga de filtros
-- Tiempo de respuesta de API
-- Uso de cache
+### Available Metrics
+- Initial loading time
+- Filter loading time
+- API response time
+- Cache usage
 
-## Próximos Pasos Recomendados
+## Recommended Next Steps
 
-1. **Implementar en otras vistas**: Aplicar el mismo patrón a todas las vistas
-2. **Optimización de backend**: Considerar cache en el servidor
-3. **Lazy loading**: Cargar filtros solo cuando sean necesarios
-4. **Service Worker**: Cache offline para filtros
-5. **Compresión**: Comprimir respuestas de API
+1. **Implement in other views**: Apply the same pattern to all views
+2. **Backend optimization**: Consider server-side cache
+3. **Lazy loading**: Load filters only when necessary
+4. **Service Worker**: Offline cache for filters
+5. **Compression**: Compress API responses
 
-## Resultados Esperados
+## Expected Results
 
-- ✅ **Carga inicial 3-5x más rápida**
-- ✅ **Filtros no bloquean datos principales**
-- ✅ **Mejor experiencia de usuario**
-- ✅ **Código más mantenible**
-- ✅ **Logging y monitoreo mejorados** 
+- ✅ **3-5x faster initial loading**
+- ✅ **Filters don't block main data**
+- ✅ **Better user experience**
+- ✅ **More maintainable code**
+- ✅ **Improved logging and monitoring** 
